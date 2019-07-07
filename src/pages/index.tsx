@@ -20,7 +20,11 @@ export default () => {
     <Layout>
       <Sidebar />
       <SlidesContainer>
-        {slides ? <Slides slides={slides} /> : <DotLoader />}
+        {slides && slides.length > 0 ? (
+          <Slides slides={slides} />
+        ) : (
+          <DotLoader />
+        )}
       </SlidesContainer>
     </Layout>
   );

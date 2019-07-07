@@ -118,7 +118,6 @@ export default ({ data }) => {
       <Td>
         <Info leavesSoon={leavesSoon}>{info}</Info>
       </Td>
-      <Td />
     </tr>
   );
 };

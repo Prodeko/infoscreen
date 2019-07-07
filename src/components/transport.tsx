@@ -65,20 +65,22 @@ export default () => {
     return <span>Error: {error}</span>;
   }
 
-  return !loading
-    ? data.nearest.edges.map((e, i) => (
-        <table>
-          <tbody>
-            <TransportItem key={i} data={e.node} />
-          </tbody>
-        </table>
+  return !loading ? (
+    <table>
+      <tbody>
+        {data.nearest.edges.map((e, i) => (
+          <TransportItem key={i} data={e.node} />
+        ))}
+      </tbody>
+    </table>
+  ) : (
+    Array(12)
+      .fill(0)
+      .map(_ => (
+        <>
+          <LineLoader />
+          <Hr />
+        </>
       ))
-    : Array(12)
-        .fill(0)
-        .map(_ => (
-          <>
-            <LineLoader />
-            <Hr />
-          </>
-        ));
+  );
 };
