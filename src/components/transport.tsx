@@ -76,11 +76,11 @@ export default () => {
   ) : (
     Array(12)
       .fill(0)
-      .map(_ => (
-        <>
+      .map((_, i) => (
+        <div key={i}>
           <LineLoader />
           <Hr />
-        </>
+        </div>
       ))
   );
 };

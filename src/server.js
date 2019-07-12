@@ -7,6 +7,10 @@ const app = next({ dir: "./src", dev });
 const handle = app.getRequestHandler();
 var request = require("request");
 
+const { API_URL } = dev
+  ? require("../config/dev.env")
+  : require("../config/prod.env");
+
 app.prepare().then(() => {
   const server = polka();
 
@@ -16,7 +20,12 @@ app.prepare().then(() => {
   });
 
   server.get("/slides", (req, res) => {
-    var url = "http://localhost:8000/fi/infoscreen/api/slides/?format=json";
+    var url = `${API_URL}/slides/?format=json`;
+    req.pipe(request(url)).pipe(res);
+  });
+
+  server.get("/time", (req, res) => {
+    var url = `${API_URL}/time`;
     req.pipe(request(url)).pipe(res);
   });
 

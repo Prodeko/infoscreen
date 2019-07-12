@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export const useFetch = url => {
+export const useFetch = (url, fetchInterval) => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
@@ -17,7 +17,14 @@ export const useFetch = url => {
           setData(json);
         });
     };
+
+    if (fetchInterval !== 0) {
+      var interval = setInterval(() => fetchData(), fetchInterval);
+    }
     fetchData();
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   return data;

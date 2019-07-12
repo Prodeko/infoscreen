@@ -15,7 +15,7 @@ export default () => {
   const date = new Date().toISOString().split("T")[0];
 
   const restaurantData = restaurants.map(r => {
-    return useFetch(`/restaurants/${r.id}/menu?day=${date}`);
+    return useFetch(`/restaurants/${r.id}/menu?day=${date}`, 0);
   });
 
   return (

@@ -104,7 +104,7 @@ export default ({ data }) => {
   return (
     <tr>
       <Td>
-        <Distance>{data.distance}m </Distance>
+        <Distance>{data.distance}m</Distance>
       </Td>
       <Td>
         <Line>
