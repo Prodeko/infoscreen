@@ -1,4 +1,4 @@
-import { useQuery } from "react-apollo-hooks";
+import { useQuery } from "@apollo/react-hooks";
 import styled from "styled-components";
 import gql from "graphql-tag";
 import TransportItem from "./transportItem";
@@ -58,29 +58,76 @@ const Hr = styled.div`
   overflow: hidden;
 `;
 
+function compare(a, b) {
+  const placeA = a.node.place;
+  const placeB = b.node.place;
+
+  if (
+    placeA.__typename === "BikeRentalStation" &&
+    placeB.__typename !== "BikeRentalStation"
+  )
+    return 1;
+  if (
+    placeA.__typename !== "BikeRentalStation" &&
+    placeB.__typename === "BikeRentalStation"
+  )
+    return -1;
+  if (
+    placeA.__typename === "BikeRentalStation" &&
+    placeB.__typename === "BikeRentalStation"
+  )
+    return 0;
+
+  const { serviceDay: dayA, realtimeDeparture: depA } = placeA.stoptimes[0];
+  const { serviceDay: dayB, realtimeDeparture: depB } = placeB.stoptimes[0];
+
+  const timeA = dayA + depA;
+  const timeB = dayB + depB;
+
+  if (timeA > timeB) return 1;
+  if (timeA < timeB) return -1;
+
+  return 0;
+}
+
+function sortData(unordered) {
+  const filtered = unordered.filter(
+    d =>
+      d.node.place.__typename === "BikeRentalStation" ||
+      d.node.place.stoptimes[0]
+  );
+  return filtered.sort((a, b) => compare(a, b));
+}
+
 export default () => {
-  const { data, error, loading } = useQuery(GET_DATA);
+  const { data, error, loading } = useQuery(GET_DATA, {
+    fetchPolicy: "network-only"
+  });
 
   if (error) {
     return <span>Error: {error}</span>;
   }
 
-  return !loading ? (
-    <table>
-      <tbody>
-        {data.nearest.edges.map((e, i) => (
-          <TransportItem key={i} data={e.node} />
-        ))}
-      </tbody>
-    </table>
-  ) : (
-    Array(12)
+  if (loading) {
+    return Array(12)
       .fill(0)
       .map((_, i) => (
         <div key={i}>
           <LineLoader />
           <Hr />
         </div>
-      ))
+      ));
+  }
+
+  const sorted = sortData(data.nearest.edges);
+
+  return (
+    <table>
+      <tbody>
+        {sorted.map((e, i) => (
+          <TransportItem key={i} data={e.node} />
+        ))}
+      </tbody>
+    </table>
   );
 };

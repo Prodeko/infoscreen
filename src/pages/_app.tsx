@@ -1,7 +1,7 @@
 import React from "react";
 import App, { Container } from "next/app";
 import { ThemeProvider } from "styled-components";
-import { ApolloProvider } from "react-apollo-hooks";
+import { ApolloProvider } from "@apollo/react-hooks";
 import theme from "../assets/theme";
 import withApollo from "../lib/withApollo";
 

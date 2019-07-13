@@ -50,7 +50,7 @@ const Td = styled.td`
 `;
 
 export default ({ data }) => {
-  const { place } = data;
+  const { distance, place } = data;
   let icon, info, line, destination;
   let leavesSoon = false;
 
@@ -84,7 +84,6 @@ export default ({ data }) => {
     if (transportTime - currentTime.unix() < 600) leavesSoon = true;
 
     info = moment.unix(transportTime).format("HH:mm");
-    //info = currentTime.to(info);
 
     icon =
       place.stop.vehicleMode === "BUS" ? (
@@ -104,7 +103,7 @@ export default ({ data }) => {
   return (
     <tr>
       <Td>
-        <Distance>{data.distance}m</Distance>
+        <Distance>{distance}m</Distance>
       </Td>
       <Td>
         <Line>

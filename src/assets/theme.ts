@@ -1,7 +1,7 @@
 const blueLight = "#0053a0";
 const blueMedium = "#002e7d";
 const blueDark = "#002851";
-const highlightColor = "red";
+const highlightColor = "tomato";
 const textColor = "#4d4d4d";
 
 const sidebarWidth = "30%";
