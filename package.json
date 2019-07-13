@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "node --inspect src/server.js",
-    "build": "next build",
-    "start": "NODE_ENV=production node server.js"
+    "build": "next build src",
+    "start": "NODE_ENV=production node src/server.js"
   },
   "dependencies": {
     "@apollo/react-hooks": "0.1.0-beta.10",
