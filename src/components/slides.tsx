@@ -31,13 +31,17 @@ export default ({ slides }) => {
     []
   );
 
-  return transitions.map(({ item, props, key }) => (
-    <SlideContainer key={key} style={props}>
-      <Slide
-        title={item.title}
-        highlight={item.highlight}
-        description={item.description}
-      />
-    </SlideContainer>
-  ));
+  return (
+    <>
+      {transitions.map(({ item, props, key }) => (
+        <SlideContainer key={key} style={props}>
+          <Slide
+            title={item.title}
+            highlight={item.highlight}
+            description={item.description}
+          />
+        </SlideContainer>
+      ))}
+    </>
+  );
 };

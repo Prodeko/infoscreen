@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import Layout from "../layouts/layout";
-import Slides from "../components/Slides";
+import Slides from "../components/slides";
 import Sidebar from "../components/sidebar";
 import { DotLoader } from "../components/loading";
 import { useFetch } from "../hooks";

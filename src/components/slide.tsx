@@ -1,6 +1,6 @@
 import styled, { css } from "styled-components";
 
-const Slide = styled.div`
+const Slide = styled.div<{ highlight: boolean }>`
   ${({ theme, highlight }) =>
     highlight &&
     css`

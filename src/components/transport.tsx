@@ -1,3 +1,4 @@
+import React from "react";
 import { useQuery } from "@apollo/react-hooks";
 import styled from "styled-components";
 import gql from "graphql-tag";
@@ -52,6 +53,12 @@ const GET_DATA = gql`
   }
 `;
 
+interface Data {
+  nearest: {
+    edges: Array<{ any }>;
+  };
+}
+
 const Hr = styled.div`
   padding: 0.4em 10px;
   border-bottom: 1px solid #cbcbcb;
@@ -90,7 +97,7 @@ function compare(a, b) {
   return 0;
 }
 
-function sortData(unordered) {
+function sortData(unordered: any) {
   const filtered = unordered.filter(
     d =>
       d.node.place.__typename === "BikeRentalStation" ||
@@ -99,8 +106,8 @@ function sortData(unordered) {
   return filtered.sort((a, b) => compare(a, b));
 }
 
-export default () => {
-  const { data, error, loading } = useQuery(GET_DATA, {
+const Transport = () => {
+  const { data, error, loading } = useQuery<Data>(GET_DATA, {
     fetchPolicy: "network-only"
   });
 
@@ -109,14 +116,18 @@ export default () => {
   }
 
   if (loading) {
-    return Array(12)
-      .fill(0)
-      .map((_, i) => (
-        <div key={i}>
-          <LineLoader />
-          <Hr />
-        </div>
-      ));
+    return (
+      <>
+        {Array(12)
+          .fill(0)
+          .map((_, i) => (
+            <div key={i}>
+              <LineLoader />
+              <Hr />
+            </div>
+          ))}
+      </>
+    );
   }
 
   const sorted = sortData(data.nearest.edges);
@@ -124,10 +135,12 @@ export default () => {
   return (
     <table>
       <tbody>
-        {sorted.map((e, i) => (
+        {sorted.map((e: { node: any }, i: string) => (
           <TransportItem key={i} data={e.node} />
         ))}
       </tbody>
     </table>
   );
 };
+
+export default Transport;
