@@ -3,6 +3,8 @@ import styled from "styled-components";
 import Restaurants from "./restaurants";
 import Transport from "./transport";
 
+const { SIDEBAR_SWITCH_INTERVAL } = require("../../config");
+
 const Sidebar = styled.div`
   height: 100%;
   width: ${({ theme }) => theme.sidebarWidth};
@@ -20,7 +22,7 @@ export default () => {
   useEffect(() => {
     let timeout = setInterval(() => {
       setShow(t => !t);
-    }, 15000);
+    }, SIDEBAR_SWITCH_INTERVAL);
     return () => {
       clearInterval(timeout);
     };

@@ -3,7 +3,7 @@ import { useTransition, animated, config } from "react-spring";
 import styled from "styled-components";
 import Slide from "./slide";
 
-const SLIDE_TIMEOUT = 2000;
+const { SLIDE_CHANGE_INTERVAL } = require("../../config");
 
 const SlideContainer = styled(animated.div)`
   position: absolute;
@@ -26,7 +26,7 @@ export default ({ slides }) => {
     () =>
       void setInterval(
         () => setIndex(state => (state + 1) % slides.length),
-        SLIDE_TIMEOUT
+        SLIDE_CHANGE_INTERVAL
       ),
     []
   );

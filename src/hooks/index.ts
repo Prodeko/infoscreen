@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import moment from "moment";
 
-// 10 minutes
-const TIME_FETCH_INTERVAL = 600000;
+const { FETCH_TIME_INTERVAL } = require("../../config");
 
 export const useFetch = (url, fetchInterval = 0) => {
   const [data, setData] = useState(null);
@@ -36,7 +35,7 @@ export const useFetch = (url, fetchInterval = 0) => {
 
 export const getTime = () => {
   const [time, setTime] = useState(null);
-  const serverTime = useFetch("/time", TIME_FETCH_INTERVAL);
+  const serverTime = useFetch("/time", FETCH_TIME_INTERVAL);
 
   useEffect(() => {
     const sTime = moment(serverTime, "YYYY-MM-DD HH:mm:ss").format("HH:mm:ss");
@@ -54,4 +53,38 @@ export const getTime = () => {
   }, [serverTime]);
 
   return time;
+};
+
+export const getRestaurantData = () => {
+  const [data, setData] = useState([]);
+
+  const restaurants = [
+    { id: 2, name: "T-talo" },
+    { id: 3, name: "Täffä" },
+    { id: 7, name: "TUAS" },
+    { id: 52, name: "A Bloc" }
+  ];
+  const date = moment().format("YYYY-MM-DD");
+
+  useEffect(() => {
+    function fetchData(url) {
+      return fetch(url, {
+        headers: {
+          accepts: "application/json"
+        }
+      });
+    }
+
+    let promises = [];
+
+    restaurants.forEach(r =>
+      promises.push(fetchData(`/restaurants/${r.id}/menu?day=${date}`))
+    );
+
+    Promise.all(promises)
+      .then(results => Promise.all(results.map(r => r.json())))
+      .then(data => setData(data));
+  }, []);
+
+  return data;
 };

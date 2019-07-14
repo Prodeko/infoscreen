@@ -7,9 +7,7 @@ const app = next({ dir: "./src", dev });
 const handle = app.getRequestHandler();
 var request = require("request");
 
-const { API_URL } = dev
-  ? require("../config/dev.env")
-  : require("../config/prod.env");
+const { API_URL } = require("../config");
 
 app.prepare().then(() => {
   const server = polka();

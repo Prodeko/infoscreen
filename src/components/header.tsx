@@ -3,9 +3,9 @@ import Time from "./time";
 
 const HeaderImg = styled.div`
   width: 100vw;
-  height: 200px;
+  height: 180px;
   background-image: url("/static/images/header.png");
-  background-position: center;
+  background-position: top;
   background-repeat: no-repeat;
   background-size: cover;
 `;

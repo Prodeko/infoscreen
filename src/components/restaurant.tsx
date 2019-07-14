@@ -22,7 +22,6 @@ const MenuItem = styled.li`
 
 export default ({ data }) => {
   const dateIndex = moment().isoWeekday() - 1;
-  if (!data || !data.openingHours[dateIndex]) return null;
 
   return (
     <Restaurant>
@@ -30,8 +29,16 @@ export default ({ data }) => {
       <OpenHours>{data.openingHours[dateIndex]}</OpenHours>
 
       <Menus>
-        {data.menus.map(m =>
-          m.courses.map((c, i) => <MenuItem key={i}>{c.title}</MenuItem>)
+        {data.menus.length === 0 ? (
+          <MenuItem>Ruokalistaa ei saatavilla</MenuItem>
+        ) : (
+          data.menus.map(m =>
+            m.courses.length === 0 ? (
+              <MenuItem key={0}>Ruokalistaa ei saatavilla</MenuItem>
+            ) : (
+              m.courses.map((c, i) => <MenuItem key={i}>{c.title}</MenuItem>)
+            )
+          )
         )}
       </Menus>
     </Restaurant>
