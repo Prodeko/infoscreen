@@ -1,5 +1,7 @@
 import styled, { css } from "styled-components";
 
+const { API_URL_ROOT } = require("../../config");
+
 const Slide = styled.div<{ highlight: boolean }>`
   ${({ theme, highlight }) =>
     highlight &&
@@ -34,11 +36,16 @@ const SlideContent = styled.h1`
 `;
 
 export default ({ title, highlight, description }) => {
-  const content = { __html: description };
+  console.log(description);
+  const content = description.replace(
+    /(.*)src="*([^"]+)"/g,
+    `$1src=${API_URL_ROOT}$2`
+  );
+
   return (
     <Slide highlight={highlight}>
       <SlideHeader>{title}</SlideHeader>
-      <SlideContent dangerouslySetInnerHTML={content} />
+      <SlideContent dangerouslySetInnerHTML={{ __html: content }} />
     </Slide>
   );
 };

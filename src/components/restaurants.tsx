@@ -10,7 +10,7 @@ export default () => {
   return (
     <RestaurantList>
       {restaurantData && restaurantData.length === 0 ? (
-        <p>No data</p>
+        <p>Ruokalistoja ei saatavilla</p>
       ) : (
         restaurantData.map((r, i) => <Restaurant key={i} data={r} />)
       )}
