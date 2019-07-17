@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
-import { useTransition, animated, config } from "react-spring";
-import styled from "styled-components";
-import Slide from "./slide";
+import { useState, useEffect } from 'react';
+import { useTransition, animated, config } from 'react-spring';
+import styled from 'styled-components';
+import { DotLoader } from '../components/loading';
+import Slide from './slide';
+import { getSlides } from '../hooks';
 
-const { SLIDE_CHANGE_INTERVAL } = require("../../config");
+const { SLIDE_CHANGE_INTERVAL } = require('../../config');
 
 const SlideContainer = styled(animated.div)`
   position: absolute;
@@ -12,24 +14,28 @@ const SlideContainer = styled(animated.div)`
   margin-left: 0 20px;
 `;
 
-export default ({ slides }) => {
+export default () => {
+  const slides = getSlides();
   const [index, setIndex] = useState(0);
 
   const transitions = useTransition(slides[index], slide => slide.id, {
     from: { opacity: 0 },
     enter: { opacity: 1 },
     leave: { opacity: 0 },
-    config: config.molasses
+    config: config.molasses,
   });
 
-  useEffect(
-    () =>
-      void setInterval(
-        () => setIndex(state => (state + 1) % slides.length),
-        SLIDE_CHANGE_INTERVAL
-      ),
-    []
-  );
+  useEffect(() => {
+    const interval = setInterval(
+      () => setIndex(state => (state + 1) % slides.length),
+      SLIDE_CHANGE_INTERVAL,
+    );
+    return () => {
+      clearInterval(interval);
+    };
+  }, [slides]);
+
+  if (!slides) return <DotLoader />;
 
   return (
     <>

@@ -1,6 +1,6 @@
-import Head from "../components/head";
-import Header from "../components/header";
-import styled from "styled-components";
+import Head from '../components/head';
+import Header from '../components/header';
+import styled from 'styled-components';
 
 const ContentContainer = styled.div`
   display: flex;
@@ -17,6 +17,6 @@ export default ({ children }: LayoutProps) => (
   </>
 );
 
-type LayoutProps = {
+interface LayoutProps {
   children: JSX.Element[] | JSX.Element;
-};
+}

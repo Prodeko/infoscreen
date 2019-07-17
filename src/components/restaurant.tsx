@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import moment from "moment";
+import styled from 'styled-components';
+import moment from 'moment';
 
 const Restaurant = styled.div``;
 
@@ -37,7 +37,7 @@ export default ({ data }) => {
               <MenuItem key={0}>Ruokalistaa ei saatavilla</MenuItem>
             ) : (
               m.courses.map((c, i) => <MenuItem key={i}>{c.title}</MenuItem>)
-            )
+            ),
           )
         )}
       </Menus>

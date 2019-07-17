@@ -1,10 +1,10 @@
-import styled, { css } from "styled-components";
-import BikeIcon from "./icons/bike";
-import BusIcon from "./icons/bus";
-import MetroIcon from "./icons/metro";
-import moment from "moment";
+import styled, { css } from 'styled-components';
+import BikeIcon from './icons/bike';
+import BusIcon from './icons/bus';
+import MetroIcon from './icons/metro';
+import moment from 'moment';
 
-moment.locale("fi");
+moment.locale('fi');
 
 interface InfoInterface {
   readonly leavesSoon: boolean;
@@ -54,14 +54,14 @@ export default ({ data }) => {
   let icon, info, line, destination;
   let leavesSoon = false;
 
-  if (place.__typename === "BikeRentalStation") {
+  if (place.__typename === 'BikeRentalStation') {
     icon = (
       <IconContainer>
         <BikeIcon />
       </IconContainer>
     );
 
-    line = "";
+    line = '';
     destination = place.name;
     const { bikesAvailable, spacesAvailable } = place;
     const capacity = bikesAvailable + spacesAvailable;
@@ -73,7 +73,7 @@ export default ({ data }) => {
       serviceDay,
       realtimeDeparture,
       headsign,
-      trip
+      trip,
     } = place.stoptimes[0];
 
     const currentTime = moment();
@@ -83,10 +83,10 @@ export default ({ data }) => {
     if (transportTime - currentTime.unix() > 10000) return null;
     if (transportTime - currentTime.unix() < 600) leavesSoon = true;
 
-    info = moment.unix(transportTime).format("HH:mm");
+    info = moment.unix(transportTime).format('HH:mm');
 
     icon =
-      place.stop.vehicleMode === "BUS" ? (
+      place.stop.vehicleMode === 'BUS' ? (
         <IconContainer>
           <BusIcon />
         </IconContainer>

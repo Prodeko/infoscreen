@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import styled from "styled-components";
-import Restaurants from "./restaurants";
-import Transport from "./transport";
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import Restaurants from './restaurants';
+import Transport from './transport';
 
-const { SIDEBAR_SWITCH_INTERVAL } = require("../../config");
+const { SIDEBAR_SWITCH_INTERVAL } = require('../../config');
 
 const Sidebar = styled.div`
   height: 100%;

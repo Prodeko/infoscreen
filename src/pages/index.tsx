@@ -1,12 +1,9 @@
-import React from "react";
-import styled from "styled-components";
-import Layout from "../layouts/layout";
-import Slides from "../components/slides";
-import Sidebar from "../components/sidebar";
-import { DotLoader } from "../components/loading";
-import { getSlides } from "../hooks";
-import "../assets/global.less";
-
+import React from 'react';
+import styled from 'styled-components';
+import Layout from '../layouts/layout';
+import Slides from '../components/slides';
+import Sidebar from '../components/sidebar';
+import '../assets/global.less';
 
 const SlidesContainer = styled.div`
   position: relative;
@@ -15,17 +12,11 @@ const SlidesContainer = styled.div`
 `;
 
 export default () => {
-  const slides = getSlides();
-
   return (
     <Layout>
       <Sidebar />
       <SlidesContainer>
-        {slides && slides.length > 0 ? (
-          <Slides slides={slides} />
-        ) : (
-          <DotLoader />
-        )}
+        <Slides />
       </SlidesContainer>
     </Layout>
   );

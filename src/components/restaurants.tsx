@@ -1,6 +1,6 @@
-import styled from "styled-components";
-import { getRestaurantData } from "../hooks";
-import Restaurant from "./restaurant";
+import styled from 'styled-components';
+import { getRestaurantData } from '../hooks';
+import Restaurant from './restaurant';
 
 const RestaurantList = styled.div``;
 

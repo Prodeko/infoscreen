@@ -1,9 +1,9 @@
-import React from "react";
-import App, { Container } from "next/app";
-import { ThemeProvider } from "styled-components";
-import { ApolloProvider } from "@apollo/react-hooks";
-import theme from "../assets/theme";
-import withApollo from "../lib/withApollo";
+import React from 'react';
+import App, { Container } from 'next/app';
+import { ThemeProvider } from 'styled-components';
+import { ApolloProvider } from '@apollo/react-hooks';
+import theme from '../assets/theme';
+import withApollo from '../lib/withApollo';
 
 class Infoscreen extends App<any> {
   public static async getInitialProps({ Component, ctx }) {

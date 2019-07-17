@@ -1,9 +1,9 @@
-import React from "react";
-import { useQuery } from "@apollo/react-hooks";
-import styled from "styled-components";
-import gql from "graphql-tag";
-import TransportItem from "./transportItem";
-import { LineLoader } from "./loading";
+import React from 'react';
+import { useQuery } from '@apollo/react-hooks';
+import styled from 'styled-components';
+import gql from 'graphql-tag';
+import TransportItem from './transportItem';
+import { LineLoader } from './loading';
 
 const lat = 60.187187;
 const lon = 24.818151;
@@ -55,7 +55,7 @@ const GET_DATA = gql`
 
 interface Data {
   nearest: {
-    edges: Array<{ any }>;
+    edges: { any }[];
   };
 }
 
@@ -70,18 +70,18 @@ function compare(a, b) {
   const placeB = b.node.place;
 
   if (
-    placeA.__typename === "BikeRentalStation" &&
-    placeB.__typename !== "BikeRentalStation"
+    placeA.__typename === 'BikeRentalStation' &&
+    placeB.__typename !== 'BikeRentalStation'
   )
     return 1;
   if (
-    placeA.__typename !== "BikeRentalStation" &&
-    placeB.__typename === "BikeRentalStation"
+    placeA.__typename !== 'BikeRentalStation' &&
+    placeB.__typename === 'BikeRentalStation'
   )
     return -1;
   if (
-    placeA.__typename === "BikeRentalStation" &&
-    placeB.__typename === "BikeRentalStation"
+    placeA.__typename === 'BikeRentalStation' &&
+    placeB.__typename === 'BikeRentalStation'
   )
     return 0;
 
@@ -100,15 +100,15 @@ function compare(a, b) {
 function sortData(unordered: any) {
   const filtered = unordered.filter(
     d =>
-      d.node.place.__typename === "BikeRentalStation" ||
-      d.node.place.stoptimes[0]
+      d.node.place.__typename === 'BikeRentalStation' ||
+      d.node.place.stoptimes[0],
   );
   return filtered.sort((a, b) => compare(a, b));
 }
 
 const Transport = () => {
   const { data, error, loading } = useQuery<Data>(GET_DATA, {
-    fetchPolicy: "network-only"
+    fetchPolicy: 'network-only',
   });
 
   if (error) {
