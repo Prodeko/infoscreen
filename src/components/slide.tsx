@@ -30,7 +30,7 @@ const SlideHeader = styled.h1`
   font-size: 50px;
 `;
 
-const SlideContent = styled.h1`
+const SlideContent = styled.div`
   font-weight: 400;
   font-size: 16px;
 `;

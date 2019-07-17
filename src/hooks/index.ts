@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import moment from "moment";
 
 const { FETCH_TIME_INTERVAL } = require("../../config");
+const { SLIDE_FETCH_INTERVAL } = require("../../config");
 
 export const useFetch = (url, fetchInterval = 0) => {
   const [data, setData] = useState(null);
@@ -87,4 +88,21 @@ export const getRestaurantData = () => {
   }, []);
 
   return data;
+};
+
+export const getSlides = () => {
+  const [slides, setSlides] = useState(null);
+  const data = useFetch("/slides", SLIDE_FETCH_INTERVAL);
+
+  const defaultSlides = [{title: "Ei dioja", highlight: false, description: "<br /><div style='font-size: 50px; width: 100%; margin: 0 auto;'>🌈🦄<div/>"}]
+
+  useEffect(() => {
+    if (data && data.length > 0) {
+      setSlides(data)
+    } else {
+      setSlides(defaultSlides)
+    }
+  }, [])
+
+  return slides;
 };

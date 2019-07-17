@@ -4,10 +4,9 @@ import Layout from "../layouts/layout";
 import Slides from "../components/slides";
 import Sidebar from "../components/sidebar";
 import { DotLoader } from "../components/loading";
-import { useFetch } from "../hooks";
+import { getSlides } from "../hooks";
 import "../assets/global.less";
 
-const { SLIDE_FETCH_INTERVAL } = require("../../config");
 
 const SlidesContainer = styled.div`
   position: relative;
@@ -16,7 +15,7 @@ const SlidesContainer = styled.div`
 `;
 
 export default () => {
-  const slides = useFetch("/slides", SLIDE_FETCH_INTERVAL);
+  const slides = getSlides();
 
   return (
     <Layout>
