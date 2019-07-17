@@ -7,7 +7,7 @@ const app = next({ dir: "./src", dev });
 const handle = app.getRequestHandler();
 var request = require("request");
 
-const { API_URL } = require("../config");
+const { API_URL, GIPHY_KEY, GIPHY_SEARCH } = require("../config");
 
 app.prepare().then(() => {
   const server = polka();
@@ -19,6 +19,11 @@ app.prepare().then(() => {
 
   server.get("/slides", (req, res) => {
     var url = `${API_URL}/slides/?format=json`;
+    req.pipe(request(url)).pipe(res);
+  });
+
+  server.get("/gifs", (req, res) => {
+    var url = `http://api.giphy.com/v1/gifs/search?api_key=${GIPHY_KEY}&q=${GIPHY_SEARCH}&limit=6`;
     req.pipe(request(url)).pipe(res);
   });
 

@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import moment from 'moment';
 
-const { FETCH_TIME_INTERVAL } = require('../../config');
-const { SLIDE_FETCH_INTERVAL } = require('../../config');
+const { FETCH_TIME_INTERVAL, SLIDE_FETCH_INTERVAL } = require('../../config');
 
 export const useFetch = (url, fetchInterval = 0) => {
   const [data, setData] = useState(null);
@@ -100,17 +99,52 @@ const defaultSlides = [
   },
 ];
 
+const getGifSlides = () => {
+  const [gifs, setGifs] = useState(null);
+  const data = useFetch('gifs');
+
+  useEffect(() => {
+    if (data) {
+      const gifs = transformGifsToSlides(data.data);
+      setGifs(gifs);
+    }
+  }, [data]);
+
+  return gifs;
+};
+
+function transformGifsToSlides(gifs) {
+  const ret = gifs.reduce((acc, obj) => {
+    const slide = {
+      id: obj.id,
+      title: '',
+      description: `<iframe src="${obj.embed_url}" style="display: block; width: 70%; height: 100%; margin: 0 auto;" frameBorder="0" />`,
+      highlight: false,
+    };
+    acc.push(slide);
+    return acc;
+  }, []);
+  return ret;
+}
+
 export const getSlides = () => {
   const [slides, setSlides] = useState(defaultSlides);
   const data = useFetch('/slides', SLIDE_FETCH_INTERVAL);
+  const gifSlides = getGifSlides();
 
   useEffect(() => {
+    let slides = [];
     if (data && data.length > 0) {
-      setSlides(data);
-    } else {
-      setSlides(defaultSlides);
+      slides = slides.concat(data);
     }
-  }, [data]);
+    if (gifSlides && gifSlides.length > 0) {
+      slides = slides.concat(gifSlides);
+    }
+
+    if (slides.length > 0) {
+      setSlides(slides);
+    }
+  }, [data, gifSlides]);
 
   return slides;
 };

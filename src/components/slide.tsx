@@ -37,8 +37,8 @@ const SlideContent = styled.div`
 
 export default ({ title, highlight, description }) => {
   const content = description.replace(
-    /(.*)src="*([^"]+)"/g,
-    `$1src=${API_URL_ROOT}$2`,
+    /img alt=\"\" (.*)src="*([^"]+)"/g,
+    `$1img alt=\"\" src=${API_URL_ROOT}$2`,
   );
 
   return (
