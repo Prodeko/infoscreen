@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Layout from '../layouts/layout';
 import Slides from '../components/slides';
 import Sidebar from '../components/sidebar';
+import { getSlides } from '../hooks';
 import '../assets/global.less';
 
 const SlidesContainer = styled.div`
@@ -12,11 +13,13 @@ const SlidesContainer = styled.div`
 `;
 
 export default () => {
+  const slides = getSlides();
+
   return (
     <Layout>
       <Sidebar />
       <SlidesContainer>
-        <Slides />
+        <Slides slides={slides}/>
       </SlidesContainer>
     </Layout>
   );

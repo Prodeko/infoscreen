@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import moment from 'moment';
 
-const { FETCH_TIME_INTERVAL, SLIDE_FETCH_INTERVAL } = require('../../config');
+const { FETCH_TIME_INTERVAL, FETCH_SLIDES_INTERVAL } = require('../../config');
 
 export const useFetch = (url, fetchInterval = 0) => {
   const [data, setData] = useState(null);
@@ -101,11 +101,11 @@ const defaultSlides = [
 
 const getGifSlides = () => {
   const [gifs, setGifs] = useState(null);
-  const data = useFetch('gifs');
+  const data = useFetch('gifs', FETCH_SLIDES_INTERVAL);
 
   useEffect(() => {
     if (data) {
-      const gifs = transformGifsToSlides(data.data);
+      const gifs = transformGifsToSlides([data.data]);
       setGifs(gifs);
     }
   }, [data]);
@@ -129,7 +129,7 @@ function transformGifsToSlides(gifs) {
 
 export const getSlides = () => {
   const [slides, setSlides] = useState(defaultSlides);
-  const data = useFetch('/slides', SLIDE_FETCH_INTERVAL);
+  const data = useFetch('/slides', FETCH_SLIDES_INTERVAL);
   const gifSlides = getGifSlides();
 
   useEffect(() => {

@@ -3,7 +3,6 @@ import { useTransition, animated, config } from 'react-spring';
 import styled from 'styled-components';
 import { DotLoader } from '../components/loading';
 import Slide from './slide';
-import { getSlides } from '../hooks';
 
 const { SLIDE_CHANGE_INTERVAL } = require('../../config');
 
@@ -14,8 +13,7 @@ const SlideContainer = styled(animated.div)`
   margin-left: 0 20px;
 `;
 
-export default () => {
-  const slides = getSlides();
+export default ({slides}) => {
   const [index, setIndex] = useState(0);
 
   const transitions = useTransition(slides[index], slide => slide.id, {
