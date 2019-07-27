@@ -1,23 +1,31 @@
-import React from 'react';
-import App, { Container } from 'next/app';
-import { ThemeProvider } from 'styled-components';
-import { ApolloProvider } from '@apollo/react-hooks';
-import theme from '../assets/theme';
-import withApollo from '../lib/withApollo';
+import React from 'react'
+import App, { Container, AppInitialProps } from 'next/app'
+import { ThemeProvider } from 'styled-components'
+import { ApolloProvider } from '@apollo/react-hooks'
+import { ApolloClient } from 'apollo-client'
+import theme from '../assets/theme'
+import withApollo from '../lib/withApollo'
 
-class Infoscreen extends App<any> {
-  public static async getInitialProps({ Component, ctx }) {
-    let pageProps = {};
+interface AppProps {
+  apollo: ApolloClient<object>
+}
+
+class Infoscreen extends App<AppProps> {
+  public static async getInitialProps({
+    Component,
+    ctx,
+  }): Promise<AppInitialProps> {
+    let pageProps = {}
 
     if (Component.getInitialProps) {
-      pageProps = await Component.getInitialProps({ ctx });
+      pageProps = await Component.getInitialProps({ ctx })
     }
 
-    return { pageProps };
+    return { pageProps }
   }
 
-  render() {
-    const { Component, pageProps, apollo } = this.props;
+  render(): JSX.Element {
+    const { Component, pageProps, apollo } = this.props
 
     return (
       <Container>
@@ -27,8 +35,8 @@ class Infoscreen extends App<any> {
           </ThemeProvider>
         </ApolloProvider>
       </Container>
-    );
+    )
   }
 }
 
-export default withApollo(Infoscreen);
+export default withApollo(Infoscreen)

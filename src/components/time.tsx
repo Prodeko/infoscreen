@@ -1,20 +1,22 @@
-import styled from 'styled-components';
-import { getTime } from '../hooks';
+import React from 'react'
+import styled from 'styled-components'
+import { getTime } from '../hooks'
 
-const Time = styled.span`
+const TimeContainer = styled.span`
   position: absolute;
-  left: 25px;
-  top: 4px;
+  left: 50px;
   color: white;
-  font-size: 65px;
+  font-size: 70px;
   font-weight: 900;
   font-family: 'Arial', Courier, monospace;
   letter-spacing: -2px;
-  text-shadow: -3px 0px 5px rgba(0, 0, 0, 0.8);
-`;
+  text-shadow: ${({ theme }) => theme.textShadow};
+`
 
-export default () => {
-  const time = getTime();
+const Time: React.FC<{}> = (): JSX.Element => {
+  const time = getTime()
 
-  return <Time>{time}</Time>;
-};
+  return <TimeContainer>{time}</TimeContainer>
+}
+
+export default Time

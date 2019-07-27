@@ -1,9 +1,9 @@
-import styled, { css } from 'styled-components';
+import React from 'react'
+import styled, { css, FlattenSimpleInterpolation } from 'styled-components'
+import { API_URL_ROOT } from '../../config'
 
-const { API_URL_ROOT } = require('../../config');
-
-const Slide = styled.div<{ highlight: boolean }>`
-  ${({ theme, highlight }) =>
+const SlideContainer = styled.div<{ highlight: boolean }>`
+  ${({ theme, highlight }): FlattenSimpleInterpolation =>
     highlight &&
     css`
       background: url('data:image/svg+xml, \
@@ -11,7 +11,7 @@ const Slide = styled.div<{ highlight: boolean }>`
         <style>@keyframes loop {to {stroke-dashoffset: -45px;}}</style> \
         <rect width="100%" height="100%" style="stroke: \
         ${theme.highlightColor}; stroke-width: 8px; fill: none; \
-          stroke-dasharray: 30px 20px; animation: loop 0.3s infinite linear;" /> \
+          stroke-dasharray: 30px 0px; animation: loop 0.6s infinite linear;" /> \
       </svg>');
   `}
   width: ${({ theme }) => theme.slideWidth};
@@ -20,31 +20,44 @@ const Slide = styled.div<{ highlight: boolean }>`
   background-color: ${({ theme }) => theme.contentBackgroundColor};
   box-shadow: ${({ theme }) => theme.contentBoxShadow};
   height: 100%;
-`;
+`
 
 const SlideHeader = styled.h1`
   letter-spacing: -0.01em;
   font-weight: 900;
   font-size: 50px;
-`;
+  margin-bottom: 30px;
+`
 
 const SlideContent = styled.div`
   font-weight: 400;
   font-size: 16px;
   position: relative;
   height: 100%;
-`;
+`
 
-export default ({ title, highlight, description }) => {
+interface Props {
+  title: string
+  highlight: boolean
+  description: string
+}
+
+const Slide: React.FC<Props> = ({
+  title,
+  highlight,
+  description,
+}): JSX.Element => {
   const content = description.replace(
-    /img alt=\"\" (.*)src="*([^"]+)"/g,
-    `$1img alt=\"\" src=${API_URL_ROOT}$2`,
-  );
+    /img alt="" (.*)src="*([^"]+)"/g,
+    `$1img alt="" src=${API_URL_ROOT}$2`,
+  )
 
   return (
-    <Slide highlight={highlight}>
+    <SlideContainer highlight={highlight}>
       <SlideHeader>{title}</SlideHeader>
       <SlideContent dangerouslySetInnerHTML={{ __html: content }} />
-    </Slide>
-  );
-};
+    </SlideContainer>
+  )
+}
+
+export default Slide

@@ -1,12 +1,13 @@
-import styled from 'styled-components';
-import ContentLoader from 'react-content-loader';
+import React from 'react'
+import styled from 'styled-components'
+import ContentLoader from 'react-content-loader'
 
 const Container = styled.div`
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-`;
+`
 
 const Dots = styled.div`
   width: 150px;
@@ -39,9 +40,9 @@ const Dots = styled.div`
       opacity: 0;
     }
   }
-`;
+`
 
-export const DotLoader = () => (
+export const DotLoader: React.FC<{}> = (): JSX.Element => (
   <Container>
     <Dots>
       <div />
@@ -49,9 +50,9 @@ export const DotLoader = () => (
       <div />
     </Dots>
   </Container>
-);
+)
 
-export const LineLoader = () => (
+export const LineLoader: React.FC<{}> = (): JSX.Element => (
   <ContentLoader
     height={40}
     width={400}
@@ -61,4 +62,4 @@ export const LineLoader = () => (
   >
     <rect x="0" y="22" rx="3" ry="3" width="350" height="22" />
   </ContentLoader>
-);
+)

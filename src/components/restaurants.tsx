@@ -1,11 +1,12 @@
-import styled from 'styled-components';
-import { getRestaurantData } from '../hooks';
-import Restaurant from './restaurant';
+import React from 'react'
+import styled from 'styled-components'
+import { getRestaurantData } from '../hooks'
+import Restaurant from './restaurant'
 
-const RestaurantList = styled.div``;
+const RestaurantList = styled.div``
 
-export default () => {
-  const restaurantData = getRestaurantData();
+const Restaurants: React.FC<{}> = (): JSX.Element => {
+  const restaurantData = getRestaurantData()
 
   return (
     <RestaurantList>
@@ -15,5 +16,7 @@ export default () => {
         restaurantData.map((r, i) => <Restaurant key={i} data={r} />)
       )}
     </RestaurantList>
-  );
-};
+  )
+}
+
+export default Restaurants

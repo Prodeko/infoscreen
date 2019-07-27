@@ -1,4 +1,6 @@
-export default () => (
+import React from 'react'
+
+const Bike: React.FC<{}> = (): JSX.Element => (
   <svg viewBox="0 0 283.46 283.46">
     <path
       fill="#F2B62D"
@@ -38,4 +40,6 @@ export default () => (
 		c23.035,0,41.645-18.608,41.645-41.644C252.684,153.682,234.074,135.075,211.039,135.075z"
     />
   </svg>
-);
+)
+
+export default Bike

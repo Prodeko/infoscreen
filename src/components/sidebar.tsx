@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import Restaurants from './restaurants';
-import Transport from './transport';
+import React, { useState, useEffect } from 'react'
+import styled from 'styled-components'
+import Restaurants from './restaurants'
+import Transport from './transport'
+import { SIDEBAR_SWITCH_INTERVAL } from '../../config'
 
-const { SIDEBAR_SWITCH_INTERVAL } = require('../../config');
-
-const Sidebar = styled.div`
+const SidebarContainer = styled.div`
   height: 100%;
   width: ${({ theme }) => theme.sidebarWidth};
   border-radius: ${({ theme }) => theme.borderRadius};
@@ -14,19 +13,25 @@ const Sidebar = styled.div`
   box-shadow: ${({ theme }) => theme.contentBoxShadow};
   z-index: 10;
   overflow: hidden;
-`;
+`
 
-export default () => {
-  const [show, setShow] = useState(true);
+const Sidebar: React.FC<{}> = (): JSX.Element => {
+  const [show, setShow] = useState(true)
 
   useEffect(() => {
     let timeout = setInterval(() => {
-      setShow(t => !t);
-    }, SIDEBAR_SWITCH_INTERVAL);
+      setShow(t => !t)
+    }, SIDEBAR_SWITCH_INTERVAL)
     return () => {
-      clearInterval(timeout);
-    };
-  }, []);
+      clearInterval(timeout)
+    }
+  }, [])
 
-  return <Sidebar>{show ? <Restaurants /> : <Transport />}</Sidebar>;
-};
+  return (
+    <SidebarContainer>
+      {show ? <Transport /> : <Restaurants />}
+    </SidebarContainer>
+  )
+}
+
+export default Sidebar
