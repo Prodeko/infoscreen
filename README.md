@@ -1,41 +1,54 @@
-# TypeScript & Styled Components Next.js example
+# Prodeko infoscreen :tv:
 
-This is a really simple project that show the usage of Next.js with TypeScript and Styled Components.
+Prodekon kiltahuoneen infoscreen - ruokalistat, julkinen liikenne, tiedottaminen, tapahtumamainonta.
 
-## How to use it?
+---
 
-### Using `create-next-app`
+### Kehittäminen
 
-Execute [`create-next-app`](https://github.com/segmentio/create-next-app) with [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/) or [npx](https://github.com/zkat/npx#readme) to bootstrap the example:
+Paikallinen kehittäminen onnistuu seuraavilla komennoilla:
 
-```bash
-npx create-next-app --example with-typescript-styled-components with-typescript-app
-# or
-yarn create next-app --example with-typescript-styled-components with-typescript-app
 ```
-
-### Download manually
-
-Download the example:
-
-```bash
-curl https://codeload.github.com/zeit/next.js/tar.gz/canary | tar -xz --strip=2 next.js-canary/examples/with-typescript-styled-components
-cd with-typescript-styled-components
-```
-
-Install it and run:
-
-```bash
 npm install
 npm run dev
-# or
-yarn
-yarn dev
 ```
 
-## The idea behind the example
+### Koodityyli
 
-This is an amalgamation of the 2 existing examples:
+Tiedostot src/tsconfig.json, .eslintrc ja .prettierrc sisältävät koodin tyyppi- ja tyylimäärittelyjä. Käytössä on [Typescript](https://www.typescriptlang.org/), [ESLint](https://eslint.org/) ja [Prettier](https://prettier.io/)
 
-- [with-typescript](https://github.com/zeit/next.js/tree/canary/examples/with-typescript)
-- [with-styled-components](https://github.com/zeit/next.js/tree/canary/examples/with-styled-components)
+## Konfigurointi
+
+Infoscreenin toimintaa on mahdollista muokata src/config kansiosta löytyvien tiedostojen avulla.
+
+Saatavilla olevat muuttujat (tässä dev.env.js):
+
+```
+API_URL_ROOT: "http://localhost:8000",
+API_URL: "http://localhost:8000/fi/infoscreen/api",
+SLIDE_CHANGE_INTERVAL: 5000,
+SIDEBAR_SWITCH_INTERVAL: 15000,
+FETCH_TIME_INTERVAL: 600000,
+FETCH_SLIDES_INTERVAL: 300000
+```
+
+## Käyttöönotto
+
+Production build ja servaus
+
+```
+npm run build && npm run start
+```
+
+## Rakennuspalikat
+
+- [React](https://reactjs.org/) - Javascript UI-kirjasto
+- [Next.js](https://nextjs.org/) - React framework
+
+## Kehittäjät
+
+- Timo Riski
+
+## Lisenssi
+
+MIT lisenssi - [LICENSE](LICENSE).
