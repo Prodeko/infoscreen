@@ -39,6 +39,7 @@ const SlideContent = styled.div`
 const Img = styled.img`
   max-height: 30%;
   object-fit: contain;
+  margin-bottom: 15px;
 `
 
 interface Props {
