@@ -3,6 +3,7 @@ import { useTransition, animated, config } from 'react-spring'
 import styled from 'styled-components'
 import { DotLoader } from '../components/loading'
 import Slide from './slide'
+import { Slide as SlideType } from '../types'
 import { SLIDE_CHANGE_INTERVAL } from '../../config'
 
 const SlideContainer = styled(animated.div)`
@@ -12,15 +13,8 @@ const SlideContainer = styled(animated.div)`
   margin-left: 0 20px;
 `
 
-interface Slide {
-  id: number
-  title: string
-  description: string
-  highlight: boolean
-}
-
 interface Props {
-  slides: Slide[]
+  slides: SlideType[]
 }
 
 const Slides: React.FC<Props> = ({ slides }): JSX.Element => {
@@ -54,6 +48,7 @@ const Slides: React.FC<Props> = ({ slides }): JSX.Element => {
               title={item.title}
               highlight={item.highlight}
               description={item.description}
+              image={item.image}
             />
           </SlideContainer>
         ),

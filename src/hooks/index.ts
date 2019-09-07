@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import moment, { MomentInput } from 'moment'
 import { FETCH_TIME_INTERVAL, FETCH_SLIDES_INTERVAL } from '../../config'
-import { RestaurantInterface } from '../types'
+import { RestaurantInterface, Slide } from '../types'
 
-type FetchReturn = { data: Gif } & Slide[] & MomentInput
+type FetchReturn = Slide[] & MomentInput
 
 export const useFetch = (
   url: string,
@@ -94,46 +94,6 @@ export const getRestaurantData = (): RestaurantInterface[] => {
   return data
 }
 
-interface Gif {
-  id: number
-  embed_url: string
-}
-
-interface Slide {
-  id: number
-  title: string
-  description: string
-  highlight: boolean
-}
-
-function transformGifsToSlides(gifs: Gif[]): Slide[] {
-  const ret: Slide[] = gifs.reduce((acc: Slide[], obj: Gif) => {
-    const slide = {
-      id: obj.id,
-      title: '',
-      description: `<iframe src="${obj.embed_url}" style="display: block; width: 70%; height: 100%; margin: 0 auto;" frameBorder="0" />`,
-      highlight: false,
-    }
-    acc.push(slide)
-    return acc
-  }, [])
-  return ret
-}
-
-const getGifSlides = (): Slide[] => {
-  const [gifs, setGifs] = useState(null)
-  const data = useFetch('gifs', FETCH_SLIDES_INTERVAL)
-
-  useEffect(() => {
-    if (data) {
-      const gifs: Slide[] = transformGifsToSlides([data.data])
-      setGifs(gifs)
-    }
-  }, [data])
-
-  return gifs
-}
-
 const defaultSlides = [
   {
     id: -1,
@@ -147,20 +107,15 @@ const defaultSlides = [
 export const getSlides = (): Slide[] => {
   const [slides, setSlides] = useState(defaultSlides)
   const data: Slide[] = useFetch('/slides', FETCH_SLIDES_INTERVAL)
-  const gifSlides: Slide[] = getGifSlides()
 
   useEffect(() => {
     let slides: Slide[] = []
     if (data && data.length > 0) {
       slides = slides.concat(data)
-    } else if (gifSlides && gifSlides.length > 0) {
-      slides = slides.concat(gifSlides)
     }
 
-    if (slides.length > 0) {
-      setSlides(slides)
-    }
-  }, [data, gifSlides])
+    slides.length === 0 ? setSlides(defaultSlides) : setSlides(slides)
+  }, [data])
 
   return slides
 }

@@ -20,6 +20,8 @@ const SlideContainer = styled.div<{ highlight: boolean }>`
   background-color: ${({ theme }) => theme.contentBackgroundColor};
   box-shadow: ${({ theme }) => theme.contentBoxShadow};
   height: 100%;
+  display: flex;
+  flex-direction: column;
 `
 
 const SlideHeader = styled.h1`
@@ -32,20 +34,25 @@ const SlideHeader = styled.h1`
 const SlideContent = styled.div`
   font-weight: 400;
   font-size: 16px;
-  position: relative;
-  height: 100%;
+`
+
+const Img = styled.img`
+  max-height: 30%;
+  object-fit: contain;
 `
 
 interface Props {
   title: string
   highlight: boolean
   description: string
+  image: string
 }
 
 const Slide: React.FC<Props> = ({
   title,
   highlight,
   description,
+  image,
 }): JSX.Element => {
   const content = description.replace(
     /img alt="" (.*)src="*([^"]+)"/g,
@@ -55,6 +62,7 @@ const Slide: React.FC<Props> = ({
   return (
     <SlideContainer highlight={highlight}>
       <SlideHeader>{title}</SlideHeader>
+      <Img src={`${API_URL_ROOT}${image}`} />
       <SlideContent dangerouslySetInnerHTML={{ __html: content }} />
     </SlideContainer>
   )

@@ -13,6 +13,14 @@ export interface Theme {
   textShadow: string
 }
 
+export interface Slide {
+  id: number
+  title: string
+  description: string
+  highlight: boolean
+  image?: string
+}
+
 export interface Course {
   title: string
 }
