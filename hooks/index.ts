@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import moment, { MomentInput } from 'moment'
-import { FETCH_TIME_INTERVAL, FETCH_SLIDES_INTERVAL } from '../../config'
+import { FETCH_TIME_INTERVAL, FETCH_SLIDES_INTERVAL } from '../config'
 import { RestaurantInterface, Slide } from '../types'
 
 type FetchReturn = Slide[] & MomentInput

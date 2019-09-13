@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Restaurants from './restaurants'
 import Transport from './transport'
-import { SIDEBAR_SWITCH_INTERVAL } from '../../config'
+import { SIDEBAR_SWITCH_INTERVAL } from '../config'
 
 const SidebarContainer = styled.div`
   height: 100%;

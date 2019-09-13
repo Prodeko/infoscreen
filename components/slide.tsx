@@ -1,6 +1,6 @@
 import React from 'react'
 import styled, { css, FlattenSimpleInterpolation } from 'styled-components'
-import { API_URL_ROOT } from '../../config'
+import { API_URL_ROOT } from '../config'
 
 const SlideContainer = styled.div<{ highlight: boolean }>`
   ${({ theme, highlight }): FlattenSimpleInterpolation =>
@@ -63,7 +63,7 @@ const Slide: React.FC<Props> = ({
   return (
     <SlideContainer highlight={highlight}>
       <SlideHeader>{title}</SlideHeader>
-      <Img src={`${API_URL_ROOT}${image}`} />
+      {image && <Img src={`${API_URL_ROOT}${image}`} />}
       <SlideContent dangerouslySetInnerHTML={{ __html: content }} />
     </SlideContainer>
   )

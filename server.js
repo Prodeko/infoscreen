@@ -3,11 +3,11 @@ const next = require("next");
 
 const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== "production";
-const app = next({ dir: "./src", dev });
+const app = next({ dev });
 const handle = app.getRequestHandler();
 var request = require("request");
 
-const { API_URL, GIPHY_KEY } = require("../config");
+const { API_URL, GIPHY_KEY } = require("./config");
 
 app.prepare().then(() => {
   const server = polka();

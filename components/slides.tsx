@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { DotLoader } from '../components/loading'
 import Slide from './slide'
 import { Slide as SlideType } from '../types'
-import { SLIDE_CHANGE_INTERVAL } from '../../config'
+import { SLIDE_CHANGE_INTERVAL } from '../config'
 
 const SlideContainer = styled(animated.div)`
   position: absolute;
