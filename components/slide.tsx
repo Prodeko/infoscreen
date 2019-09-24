@@ -1,19 +1,10 @@
 import React from 'react'
-import styled, { css, FlattenSimpleInterpolation } from 'styled-components'
+import styled from 'styled-components'
 import { API_URL_ROOT } from '../config'
 
 const SlideContainer = styled.div<{ highlight: boolean }>`
-  ${({ theme, highlight }): FlattenSimpleInterpolation =>
-    highlight &&
-    css`
-      background: url('data:image/svg+xml, \
-      <svg xmlns="http://www.w3.org/2000/svg"> \
-        <style>@keyframes loop {to {stroke-dashoffset: -45px;}}</style> \
-        <rect width="100%" height="100%" style="stroke: \
-        ${theme.highlightColor}; stroke-width: 8px; fill: none; \
-          stroke-dasharray: 30px 0px; animation: loop 0.6s infinite linear;" /> \
-      </svg>');
-  `}
+  border: ${({ highlight }) => highlight && '4px solid blue'};
+  margin: ${({ highlight }) => highlight && '-4px'};
   width: ${({ theme }) => theme.slideWidth};
   border-radius: ${({ theme }) => theme.borderRadius};
   padding: ${({ theme }) => theme.contentPadding};
