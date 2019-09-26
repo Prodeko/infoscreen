@@ -1,6 +1,7 @@
 module.exports = {
   API_URL_ROOT: "http://localhost:8000",
   API_URL: "http://localhost:8000/fi/infoscreen/api",
+  STATIC_URL: API_URL_ROOT,
   SLIDE_CHANGE_INTERVAL: 5000,
   SIDEBAR_SWITCH_INTERVAL: 15000,
   FETCH_TIME_INTERVAL: 600000,

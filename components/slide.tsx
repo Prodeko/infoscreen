@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { API_URL_ROOT } from '../config'
+import { STATIC_URL } from '../config'
 
 const SlideContainer = styled.div<{ highlight: boolean }>`
   border: ${({ highlight }) => highlight && '4px solid blue'};
@@ -48,13 +48,13 @@ const Slide: React.FC<Props> = ({
 }): JSX.Element => {
   const content = description.replace(
     /img alt="" (.*)src="*([^"]+)"/g,
-    `$1img alt="" src=${API_URL_ROOT}$2`,
+    `$1img alt="" src=${STATIC_URL}$2`,
   )
 
   return (
     <SlideContainer highlight={highlight}>
       <SlideHeader>{title}</SlideHeader>
-      {image && <Img src={`${API_URL_ROOT}${image}`} />}
+      {image && <Img src={`${STATIC_URL}${image}`} />}
       <SlideContent dangerouslySetInnerHTML={{ __html: content }} />
     </SlideContainer>
   )
