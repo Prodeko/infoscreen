@@ -54,7 +54,15 @@ const Slide: React.FC<Props> = ({
   return (
     <SlideContainer highlight={highlight}>
       <SlideHeader>{title}</SlideHeader>
-      {image && <Img src={`${API_URL_ROOT}${image}`} />}
+      {image && (
+        <Img
+          src={
+            process.env.NODE_ENV === 'production'
+              ? image
+              : `${API_URL_ROOT}${image}`
+          }
+        />
+      )}
       <SlideContent
         dangerouslySetInnerHTML={{
           __html: process.env.NODE_ENV === 'production' ? description : content,
