@@ -43,13 +43,15 @@ export const getTime = (): string => {
   const serverTime = useFetch('/time', FETCH_TIME_INTERVAL)
 
   useEffect(() => {
-    const sTime = moment(serverTime, 'YYYY-MM-DD HH:mm:ss').format('HH:mm:ss')
+    const sTime = moment(serverTime, 'YYYY-MM-DD HH:mm:ss').format(
+      'HH:mm:ss,DD.MM.YYYY',
+    )
     setTime(sTime)
     let timeout = setInterval(() => {
       setTime((t: MomentInput): string =>
         moment(t, 'HH:mm:ss')
           .add(1, 'seconds')
-          .format('HH:mm:ss'),
+          .format('HH:mm:ss,DD.MM.YYYY'),
       )
     }, 1000)
     return () => {

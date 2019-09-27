@@ -21,9 +21,12 @@ const StyledDate = styled.p`
 `
 
 const Time: React.FC<{}> = (): JSX.Element => {
-  const time = getTime()
-  const d: Date = new Date()
-  const date = d.toLocaleDateString('fi-FI')
+  const dateTime = getTime()
+
+  if (!dateTime) return null
+
+  const time = dateTime.split(',')[0]
+  const date = dateTime.split(',')[1]
 
   return (
     <TimeContainer>
