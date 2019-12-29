@@ -23,6 +23,7 @@ module.exports =  {
     "react/display-name": 0,
     "react/prop-types": 0,
     "no-undef": 0,
+    "@typescript-eslint/no-empty-function": 0,
     "@typescript-eslint/explicit-member-accessibility": 0,
     "@typescript-eslint/explicit-function-return-type": [
       "warn",

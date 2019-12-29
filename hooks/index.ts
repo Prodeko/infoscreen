@@ -23,8 +23,9 @@ export const useFetch = (url: string, fetchInterval = 0): FetchReturn => {
         })
     }
 
+    let interval
     if (fetchInterval !== 0) {
-      var interval = setInterval(() => fetchData(), fetchInterval)
+      interval = setInterval(() => fetchData(), fetchInterval)
     }
     fetchData()
     return () => {
