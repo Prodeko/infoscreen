@@ -33,6 +33,7 @@ const SlideImg = styled.div`
   flex: 1 1 auto;
   height: calc(100% - 80px);
   padding-bottom: 15px;
+  text-align: center;
 `
 
 const Img = styled.img`
