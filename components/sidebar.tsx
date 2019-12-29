@@ -19,7 +19,7 @@ const Sidebar: React.FC<{}> = (): JSX.Element => {
   const [show, setShow] = useState(true)
 
   useEffect(() => {
-    let timeout = setInterval(() => {
+    const timeout = setInterval(() => {
       setShow(t => !t)
     }, SIDEBAR_SWITCH_INTERVAL)
     return () => {

@@ -101,7 +101,6 @@ interface Props {
 
 const TransportItem: React.FC<Props> = ({ data }): JSX.Element => {
   const { distance, place } = data
-  let icon: JSX.Element, info: string, line: string, destination: string
   let leavesSoon = false
 
   if (!isBikePlace(place)) {
@@ -116,10 +115,10 @@ const TransportItem: React.FC<Props> = ({ data }): JSX.Element => {
     if (transportTime - currentTime.unix() < 600) leavesSoon = true
   }
 
-  icon = getIcon(place)
-  info = getInfo(place)
-  line = getLine(place)
-  destination = getDestination(place)
+  const icon: JSX.Element = getIcon(place)
+  const info: string = getInfo(place)
+  const line: string = getLine(place)
+  const destination: string = getDestination(place)
 
   return (
     <tr>

@@ -5,10 +5,7 @@ import { RestaurantInterface, Slide } from '../types'
 
 type FetchReturn = Slide[] & MomentInput
 
-export const useFetch = (
-  url: string,
-  fetchInterval: number = 0,
-): FetchReturn => {
+export const useFetch = (url: string, fetchInterval = 0): FetchReturn => {
   const [data, setData] = useState(null)
 
   useEffect(() => {
@@ -47,7 +44,7 @@ export const getTime = (): string => {
       'HH:mm:ss,DD.MM.YYYY',
     )
     setTime(sTime)
-    let timeout = setInterval(() => {
+    const timeout = setInterval(() => {
       setTime((t: MomentInput): string =>
         moment(t, 'HH:mm:ss')
           .add(1, 'seconds')
@@ -82,7 +79,7 @@ export const getRestaurantData = (): RestaurantInterface[] => {
       })
     }
 
-    let promises = []
+    const promises = []
 
     restaurants.forEach(r =>
       promises.push(fetchData(`/restaurants/${r.id}/menu?day=${date}`)),
