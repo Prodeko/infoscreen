@@ -19,18 +19,25 @@ const SlideHeader = styled.h1`
   letter-spacing: -0.01em;
   font-weight: 900;
   font-size: 50px;
-  margin-bottom: 30px;
+  height: 80px;
 `
 
 const SlideContent = styled.div`
   font-weight: 400;
   font-size: 16px;
+  overflow: hidden;
+  padding-top: 20px;
+`
+
+const SlideImg = styled.div`
+  flex: 1 1 auto;
+  height: calc(100% - 80px);
+  padding-bottom: 15px;
 `
 
 const Img = styled.img`
-  max-height: 30%;
   object-fit: contain;
-  margin-bottom: 15px;
+  max-height: 100%;
 `
 
 interface Props {
@@ -55,19 +62,24 @@ const Slide: React.FC<Props> = ({
     <SlideContainer highlight={highlight}>
       <SlideHeader>{title}</SlideHeader>
       {image && (
-        <Img
-          src={
-            process.env.NODE_ENV === 'production'
-              ? image
-              : `${API_URL_ROOT}${image}`
-          }
+        <SlideImg>
+          <Img
+            src={
+              process.env.NODE_ENV === 'production'
+                ? image
+                : `${API_URL_ROOT}${image}`
+            }
+          />
+        </SlideImg>
+      )}
+      {content && (
+        <SlideContent
+          dangerouslySetInnerHTML={{
+            __html:
+              process.env.NODE_ENV === 'production' ? description : content,
+          }}
         />
       )}
-      <SlideContent
-        dangerouslySetInnerHTML={{
-          __html: process.env.NODE_ENV === 'production' ? description : content,
-        }}
-      />
     </SlideContainer>
   )
 }
