@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import moment from 'moment'
-import { RestaurantInterface, Menu, Course } from '../types'
+import { RestaurantData, Menu, Course } from '../types'
 
 const RestaurantContainer = styled.div``
 
@@ -23,7 +23,7 @@ const MenuItem = styled.li`
 `
 
 interface Props {
-  data: RestaurantInterface
+  data: RestaurantData
 }
 
 const Restaurant: React.FC<Props> = ({ data }): JSX.Element => {

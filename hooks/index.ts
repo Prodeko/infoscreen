@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import moment, { MomentInput } from 'moment'
 import { FETCH_TIME_INTERVAL, FETCH_SLIDES_INTERVAL } from '../config'
-import { RestaurantInterface, Slide } from '../types'
+import { RestaurantData, Slide } from '../types'
 
 type FetchReturn = Slide[] & MomentInput
 
@@ -60,7 +60,7 @@ export const getTime = (): string => {
   return time
 }
 
-export const getRestaurantData = (): RestaurantInterface[] => {
+export const getRestaurantData = (): RestaurantData[] => {
   const [data, setData] = useState([])
 
   const restaurants = [

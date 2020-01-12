@@ -1,4 +1,10 @@
-const withLess = require("@zeit/next-less");
-const withPlugins = require("next-compose-plugins");
+const withLess = require('@zeit/next-less')
+const withSourceMaps = require('@zeit/next-source-maps')()
 
-module.exports = withPlugins([withLess], {});
+module.exports = withLess(
+  withSourceMaps({
+    webpack(config, _options) {
+      return config
+    },
+  }),
+)

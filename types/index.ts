@@ -29,7 +29,7 @@ export interface Menu {
   courses: Course[]
 }
 
-export interface RestaurantInterface {
+export interface RestaurantData {
   name: string
   openingHours: {}
   menus: Menu[]
