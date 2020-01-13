@@ -24,7 +24,7 @@ app.prepare().then(() => {
     ctx.body = request(`https://kitchen.kanttiinit.fi${ctx.req.url}`)
   })
 
-  router.get('/slides/*', async ctx => {
+  router.get('/slides', async ctx => {
     ctx.body = request(`${API_URL}/slides/?format=json`)
   })
 
