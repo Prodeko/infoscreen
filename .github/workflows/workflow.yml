@@ -1,7 +1,3 @@
-# This workflow will build and push a Django application to
-# an Azure Web App on every push to the master branch. The
-# workflow is only
-#
 # To configure this workflow:
 #
 # 1. Set up a secret in your repository named AZURE_CREDENTIALS
@@ -10,7 +6,7 @@
 env:
   AZURE_WEBAPP_NAME: infoscreeni
   AZURE_WEBAPP_PACKAGE_PATH: '.'
-  NODE_VERSION: '10.x'
+  NODE_VERSION: '12'
 
 on:
   push:
@@ -22,15 +18,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
       # Setup Node.js
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2-beta
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      # Install dependencies
+      # Install dependencies and build
       - name: npm install and build
         run: |
           npm install
@@ -38,7 +34,7 @@ jobs:
 
       # Deploy web app
       - name: Deploy to Azure App Service
-        uses: azure/webapps-deploy@v1
+        uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_CREDENTIALS }}
