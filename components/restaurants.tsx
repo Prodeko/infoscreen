@@ -5,7 +5,7 @@ import Restaurant from './restaurant'
 
 const RestaurantList = styled.div``
 
-const Restaurants: React.FC<{}> = (): JSX.Element => {
+const Restaurants: React.FC = (): JSX.Element => {
   const restaurantData = getRestaurantData()
 
   return (

@@ -31,7 +31,7 @@ const Subtitle = styled.p`
   margin-top: 5px;
 `
 
-const Header: React.FC<{}> = (): JSX.Element => (
+const Header: React.FC = (): JSX.Element => (
   <HeaderImg>
     <Time />
     <TextContainer>

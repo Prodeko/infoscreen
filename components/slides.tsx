@@ -20,7 +20,7 @@ interface Props {
 const Slides: React.FC<Props> = ({ slides }): JSX.Element => {
   const [index, setIndex] = useState(0)
 
-  const transitions = useTransition(slides[index], slide => slide.id, {
+  const transitions = useTransition(slides[index], (slide) => slide.id, {
     from: { opacity: 0 },
     enter: { opacity: 1 },
     leave: { opacity: 0 },
@@ -29,7 +29,7 @@ const Slides: React.FC<Props> = ({ slides }): JSX.Element => {
 
   useEffect(() => {
     const interval = setInterval(
-      () => setIndex(state => (state + 1) % slides.length),
+      () => setIndex((state) => (state + 1) % slides.length),
       SLIDE_CHANGE_INTERVAL,
     )
     return () => {

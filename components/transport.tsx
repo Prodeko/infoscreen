@@ -110,7 +110,7 @@ function sortData(unordered: Edge[]): Edge[] {
   return filtered.sort((a: Edge, b: Edge): -1 | 0 | 1 => compare(a, b))
 }
 
-const Transport: React.FC<{}> = (): JSX.Element => {
+const Transport: React.FC = (): JSX.Element => {
   const { data, error, loading } = useQuery<Data>(GET_DATA, {
     fetchPolicy: 'network-only',
   })

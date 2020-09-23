@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Bike: React.FC<{}> = (): JSX.Element => (
+const Bike: React.FC = (): JSX.Element => (
   <svg viewBox="0 0 283.46 283.46">
     <path
       fill="#F2B62D"

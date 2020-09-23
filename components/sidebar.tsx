@@ -15,12 +15,12 @@ const SidebarContainer = styled.div`
   overflow: hidden;
 `
 
-const Sidebar: React.FC<{}> = (): JSX.Element => {
+const Sidebar: React.FC = (): JSX.Element => {
   const [show, setShow] = useState(true)
 
   useEffect(() => {
     const timeout = setInterval(() => {
-      setShow(t => !t)
+      setShow((t) => !t)
     }, SIDEBAR_SWITCH_INTERVAL)
     return () => {
       clearInterval(timeout)

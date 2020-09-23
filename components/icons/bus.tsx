@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Bus: React.FC<{}> = (): JSX.Element => (
+const Bus: React.FC = (): JSX.Element => (
   <svg viewBox="0 0 1024 1024">
     <path
       fill="rgb(255, 255, 255)"

@@ -15,10 +15,10 @@ export const useFetch = (url: string, fetchInterval = 0): FetchReturn => {
           accepts: 'application/json',
         },
       })
-        .then(res => {
+        .then((res) => {
           return res.json()
         })
-        .then(json => {
+        .then((json) => {
           setData(json)
         })
     }
@@ -47,9 +47,7 @@ export const getTime = (): string => {
     setTime(sTime)
     const timeout = setInterval(() => {
       setTime((t: MomentInput): string =>
-        moment(t, 'HH:mm:ss')
-          .add(1, 'seconds')
-          .format('HH:mm:ss,DD.MM.YYYY'),
+        moment(t, 'HH:mm:ss').add(1, 'seconds').format('HH:mm:ss,DD.MM.YYYY'),
       )
     }, 1000)
     return () => {
@@ -82,13 +80,13 @@ export const getRestaurantData = (): RestaurantData[] => {
 
     const promises = []
 
-    restaurants.forEach(r =>
+    restaurants.forEach((r) =>
       promises.push(fetchData(`/restaurants/${r.id}/menu?day=${date}`)),
     )
 
     Promise.all(promises)
-      .then(results => Promise.all(results.map(r => r.json())))
-      .then(data => setData(data))
+      .then((results) => Promise.all(results.map((r) => r.json())))
+      .then((data) => setData(data))
   }, [])
 
   return data

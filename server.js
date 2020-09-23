@@ -16,29 +16,30 @@ app.prepare().then(() => {
   const server = new Koa()
   const router = new Router()
 
-  server.on('error', err => {
+  server.on('error', (err) => {
     Sentry.captureException(err)
   })
 
-  router.get('/restaurants/*', async ctx => {
+  router.get('/restaurants/(.*)', async (ctx) => {
     ctx.body = request(`https://kitchen.kanttiinit.fi${ctx.req.url}`)
   })
 
-  router.get('/slides', async ctx => {
+  router.get('/slides', async (ctx) => {
     ctx.body = request(`${API_URL}/slides/?format=json`)
   })
 
-  router.get('/gifs', async ctx => {
+  router.get('/gifs', async (ctx) => {
     ctx.body = request(
       `http://api.giphy.com/v1/gifs/random?api_key=${GIPHY_KEY}&rating=g`,
     )
   })
 
-  router.get('/time', async ctx => {
-    ctx.body = request(`${API_URL}/time`)
+  router.get('/time', async (ctx) => {
+    console.log(API_URL)
+    ctx.body = request(`${API_URL}/time/`)
   })
 
-  router.all('*', async ctx => {
+  router.all('(.*)', async (ctx) => {
     await handle(ctx.req, ctx.res)
     ctx.respond = false
   })
@@ -50,7 +51,7 @@ app.prepare().then(() => {
 
   server.use(router.routes())
 
-  server.listen(port, err => {
+  server.listen(port, (err) => {
     if (err) throw err
     console.log(`> Ready on http://localhost:${port}`)
   })

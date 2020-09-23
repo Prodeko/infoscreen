@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Metro: React.FC<{}> = (): JSX.Element => (
+const Metro: React.FC = (): JSX.Element => (
   <svg viewBox="0 0 1024 1024">
     <path
       fill="#ff6319"

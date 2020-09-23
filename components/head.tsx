@@ -1,7 +1,7 @@
 import React from 'react'
 import Head from 'next/head'
 
-const CustomHead: React.FC<{}> = (): JSX.Element => (
+const CustomHead: React.FC = (): JSX.Element => (
   <Head>
     <title>Prodeko Infoscreen</title>
     <meta charSet="utf-8" />

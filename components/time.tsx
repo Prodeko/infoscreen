@@ -20,7 +20,7 @@ const StyledDate = styled.p`
   letter-spacing: 2px;
 `
 
-const Time: React.FC<{}> = (): JSX.Element => {
+const Time: React.FC = (): JSX.Element => {
   const dateTime = getTime()
 
   if (!dateTime) return null

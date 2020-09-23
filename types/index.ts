@@ -31,7 +31,7 @@ export interface Menu {
 
 export interface RestaurantData {
   name: string
-  openingHours: {}
+  openingHours: Record<string, unknown>
   menus: Menu[]
 }
 
