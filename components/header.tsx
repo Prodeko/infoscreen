@@ -35,7 +35,7 @@ const Header: React.FC = (): JSX.Element => (
   <HeaderImg>
     <Time />
     <TextContainer>
-      <Title>PRODEKO</Title>
+      <Title>HYVÄÄ WAPPUA</Title>
       <Subtitle>
         {
           'THINK BIG | GET THINGS DONE | LEARN AND GROW | GIVE BACK | BE A GOOD PERSON'

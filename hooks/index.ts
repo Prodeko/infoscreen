@@ -63,9 +63,8 @@ export const getRestaurantData = (): RestaurantData[] => {
 
   const restaurants = [
     { id: 2, name: 'T-talo' },
-    { id: 3, name: 'Täffä' },
     { id: 7, name: 'TUAS' },
-    { id: 52, name: 'A Bloc' },
+    { id: 52, name: 'A Bloc' }
   ]
   const date = moment().format('YYYY-MM-DD')
 
