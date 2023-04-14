@@ -16,20 +16,20 @@ const SidebarContainer = styled.div`
 `
 
 const Sidebar: React.FC = (): JSX.Element => {
-  const [show, setShow] = useState(true)
+  // const [show, setShow] = useState(true)
 
-  useEffect(() => {
-    const timeout = setInterval(() => {
-      setShow((t) => !t)
-    }, SIDEBAR_SWITCH_INTERVAL)
-    return () => {
-      clearInterval(timeout)
-    }
-  }, [])
+  // useEffect(() => {
+  //   const timeout = setInterval(() => {
+  //     setShow((t) => !t)
+  //   }, SIDEBAR_SWITCH_INTERVAL)
+  //   return () => {
+  //     clearInterval(timeout)
+  //   }
+  // }, [])
 
   return (
     <SidebarContainer>
-      {show ? <Transport /> : <Restaurants />}
+      <Restaurants />
     </SidebarContainer>
   )
 }
