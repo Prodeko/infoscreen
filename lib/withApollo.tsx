@@ -6,6 +6,8 @@ const GRAPHQL_URL =
 
 export default withApollo(
   ({ initialState }) =>
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     new ApolloClient({
       uri: GRAPHQL_URL,
       cache: new InMemoryCache().restore(initialState || {}),
