@@ -1,54 +1,30 @@
-# Prodeko infoscreen :tv:
+# React + TypeScript + Vite
 
-Prodekon kiltahuoneen infoscreen - ruokalistat, julkinen liikenne, tiedottaminen, tapahtumamainonta.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
----
+Currently, two official plugins are available:
 
-### Kehittäminen
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-Paikallinen kehittäminen onnistuu seuraavilla komennoilla:
+## Expanding the ESLint configuration
 
-```
-npm install
-npm run dev
-```
+If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
 
-### Koodityyli
+- Configure the top-level `parserOptions` property like this:
 
-Tiedostot src/tsconfig.json, .eslintrc ja .prettierrc sisältävät koodin tyyppi- ja tyylimäärittelyjä. Käytössä on [Typescript](https://www.typescriptlang.org/), [ESLint](https://eslint.org/) ja [Prettier](https://prettier.io/)
-
-## Konfigurointi
-
-Infoscreenin toimintaa on mahdollista muokata src/config kansiosta löytyvien tiedostojen avulla.
-
-Saatavilla olevat muuttujat (tässä dev.env.js):
-
-```
-API_URL_ROOT: 'https://prodeko.org/',
-API_URL: 'https://prodeko.org/fi/infoscreen/api',
-SLIDE_CHANGE_INTERVAL: 5000,
-SIDEBAR_SWITCH_INTERVAL: 15000,
-FETCH_TIME_INTERVAL: 600000,
-FETCH_SLIDES_INTERVAL: 10000,
+```js
+export default {
+  // other rules...
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    project: ['./tsconfig.json', './tsconfig.node.json'],
+    tsconfigRootDir: __dirname,
+  },
+}
 ```
 
-## Käyttöönotto
-
-Production build ja servaus
-
-```
-npm run build && npm run start
-```
-
-## Rakennuspalikat
-
-- [React](https://reactjs.org/) - Javascript UI-kirjasto
-- [Next.js](https://nextjs.org/) - React framework
-
-## Kehittäjät
-
-- Timo Riski
-
-## Lisenssi
-
-MIT lisenssi - [LICENSE](LICENSE).
+- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
+- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
+- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
