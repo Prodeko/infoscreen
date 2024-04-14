@@ -2,7 +2,9 @@ import * as puppeteer from 'puppeteer';
 import { writeFileSync } from 'fs';
 
 /**
- * Scrapes the open events from ilmo.prodeko.org.
+ * Scrapes the events from ilmo.prodeko.org.
+ * Returns both open events and upcoming events.
+ *
  * The events are returned as an array of objects.
  * Each object contains the following fields:
  * - name: The name of the event
@@ -11,7 +13,7 @@ import { writeFileSync } from 'fs';
  * - registrationStartTime: The start time of the registration
  * - headerImageFile: The URL to the header image of the event
  * 
- * @returns An array of event objects
+ * @returns `{openEvents: Array, upcompingEvents: Array}`
  * @throws If the scraping fails
 */
 async function scrapeOpenEvents() {
@@ -34,13 +36,15 @@ async function scrapeOpenEvents() {
     });
 
     const { data } = await graphqlResponse.json()
-    const { signupOpenEvents } = data
-    const events = signupOpenEvents.nodes
+
+    const { signupOpenEvents, signupUpcomingEvents } = data
+    const openEvents = signupOpenEvents.nodes
+    const upcompingEvents = signupUpcomingEvents.nodes
 
     // Close the browser
     await browser.close();
 
-    return events
+    return { openEvents, upcompingEvents }
 }
 
 /**
@@ -96,9 +100,9 @@ const getLocaleTimeString = () => {
 }
 
 /**
- * Scrapes the open events from ilmo.prodeko.org and saves them to a JSON file.
+ * Scrapes the open and upcoming events from ilmo.prodeko.org and saves them to a JSON file.
  * The JSON file is saved to public/events.json.
- * 
+ *
  * Used as a regularly scheduled task (cron job) for updating the events
  * that can be read by the frontend.
 */
@@ -107,11 +111,16 @@ const scrapeAndSaveEventsToJSONFile = async () => {
     const timestamp = getLocaleTimeString()
     console.log(`Starting scrape ${timestamp}`)
 
-    const rawEvents = await scrapeOpenEvents()
-    const events = rawEvents.map(parseEvent)
+    const { openEvents, upcompingEvents } = await scrapeOpenEvents()
+
+    const openEventsParsed = openEvents.map(parseEvent)
+    const upcompingEventsParsed = upcompingEvents.map(parseEvent)
+    const events = { open: openEventsParsed, upcomping: upcompingEventsParsed }
 
     writeFileSync(FILE_PATH, JSON.stringify(events, null, 2))
-    console.log(`Scrape finished. Found ${events.length} events. Saved to ${FILE_PATH}`)
+    console.log(`Found ${openEventsParsed.length} open events and ${upcompingEventsParsed.length} upcoming events.`)
+    console.log(`Saved to ${FILE_PATH}`)
+    console.log("Scrape finished")
 }
 
 scrapeAndSaveEventsToJSONFile()
