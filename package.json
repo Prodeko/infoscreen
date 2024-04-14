@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "scrape": "node scrape.js"
   },
   "dependencies": {
     "puppeteer": "^22.6.4",
