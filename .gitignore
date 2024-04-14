@@ -1,3 +1,6 @@
+# Ilmo event store
+/public/events.json
+
 # Logs
 logs
 *.log
