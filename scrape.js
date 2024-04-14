@@ -13,7 +13,7 @@ import { writeFileSync } from "fs";
  * - registrationStartTime: The start time of the registration
  * - headerImageFile: The URL to the header image of the event
  *
- * @returns `{openEvents: Array, upcompingEvents: Array}`
+ * @returns `{openEvents: Array, upcomingEvents: Array}`
  * @throws If the scraping fails
  */
 async function scrapeOpenEvents() {
@@ -39,12 +39,12 @@ async function scrapeOpenEvents() {
 
   const { signupOpenEvents, signupUpcomingEvents } = data;
   const openEvents = signupOpenEvents.nodes;
-  const upcompingEvents = signupUpcomingEvents.nodes;
+  const upcomingEvents = signupUpcomingEvents.nodes;
 
   // Close the browser
   await browser.close();
 
-  return { openEvents, upcompingEvents };
+  return { openEvents, upcomingEvents };
 }
 
 /**
@@ -119,15 +119,15 @@ const scrapeAndSaveEventsToJSONFile = async () => {
   const timestamp = getLocaleTimeString();
   console.log(`Starting scrape ${timestamp}`);
 
-  const { openEvents, upcompingEvents } = await scrapeOpenEvents();
+  const { openEvents, upcomingEvents } = await scrapeOpenEvents();
 
   const openEventsParsed = openEvents.map(parseEvent);
-  const upcompingEventsParsed = upcompingEvents.map(parseEvent);
-  const events = { open: openEventsParsed, upcomping: upcompingEventsParsed };
+  const upcomingEventsParsed = upcomingEvents.map(parseEvent);
+  const events = { open: openEventsParsed, upcoming: upcomingEventsParsed };
 
   writeFileSync(FILE_PATH, JSON.stringify(events, null, 2));
   console.log(
-    `Found ${openEventsParsed.length} open events and ${upcompingEventsParsed.length} upcoming events.`
+    `Found ${openEventsParsed.length} open events and ${upcomingEventsParsed.length} upcoming events.`
   );
   console.log(`Saved to ${FILE_PATH}`);
   console.log("Scrape finished");
