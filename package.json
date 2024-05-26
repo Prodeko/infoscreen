@@ -12,7 +12,8 @@
   "dependencies": {
     "puppeteer": "^22.6.4",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-icons": "^5.2.1"
   },
   "devDependencies": {
     "@biomejs/biome": "1.5.3",

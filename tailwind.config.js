@@ -5,7 +5,12 @@ export default {
     "./index.html"
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        mono: ['IBM Plex Mono', 'monospace'],
+        sans: ['IBM Plex Sans', 'sans-serif'],
+      }
+    },
   },
   plugins: [],
 }

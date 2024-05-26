@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react'
+import { PiForkKnifeBold, PiHandWavingFill } from 'react-icons/pi'
 
 /**
  * Custom hook to get the current time from the browser.
@@ -6,26 +7,26 @@ import { useCallback, useEffect, useState } from "react";
  * @returns The current time as a Date object.
  */
 const useClock = () => {
-  const [time, setTime] = useState<Date>(new Date());
+	const [time, setTime] = useState<Date>(new Date())
 
-  useEffect(() => {
-    const interval = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(interval);
-  }, []);
+	useEffect(() => {
+		const interval = setInterval(() => setTime(new Date()), 1000)
+		return () => clearInterval(interval)
+	}, [])
 
-  return time;
-};
+	return time
+}
 
 /**
  * A scraped ilmo event.
  */
 type IlmoEvent = {
-  name: string;
-  description: string;
-  eventStartTime: string;
-  registrationStartTime: string;
-  headerImageFile: string;
-};
+	name: string
+	description: string
+	eventStartTime: string
+	registrationStartTime: string
+	headerImageFile: string
+}
 
 /**
  * Custom hook to fetch ilmo events from a JSON file and refresh them every `refreshIntervalMS` milliseconds.
@@ -33,129 +34,208 @@ type IlmoEvent = {
  * @returns An object containing the open and upcoming ilmo events.
  */
 const useAutoRefreshingIlmoEvents = (refreshIntervalMS: number = 60 * 1000) => {
-  const [openIlmos, setOpenIlmos] = useState<IlmoEvent[]>([]);
-  const [upcomingIlmos, setUpcomingIlmos] = useState<IlmoEvent[]>([]);
+	const [openIlmos, setOpenIlmos] = useState<IlmoEvent[]>([])
+	const [upcomingIlmos, setUpcomingIlmos] = useState<IlmoEvent[]>([])
 
-  /**
-   * Fetch the ilmo events from the JSON file and set them to the state.
-   */
-  const setIlmoEvents = useCallback(async () => {
-    try {
-      const response = await fetch("/events.json");
-      const data = await response.json();
-      const { open, upcoming } = data;
-      if (open) setOpenIlmos(open);
-      if (upcoming) setUpcomingIlmos(upcoming);
-    } catch (error) {
-      console.error(
-        "Failed to get ilmo events. Maybe you forgot to set up the scraper?",
-        error
-      );
-    }
-  }, []);
+	/**
+	 * Fetch the ilmo events from the JSON file and set them to the state.
+	 */
+	const setIlmoEvents = useCallback(async () => {
+		try {
+			const response = await fetch('/events.json')
+			const data = await response.json()
+			const { open, upcoming } = data
+			if (open) setOpenIlmos(open)
+			if (upcoming) setUpcomingIlmos(upcoming)
+		} catch (error) {
+			console.error(
+				'Failed to get ilmo events. Maybe you forgot to set up the scraper?',
+				error,
+			)
+		}
+	}, [])
 
-  // Refresh the ilmo events every `refreshIntervalMS` milliseconds.
-  useEffect(() => {
-    const interval = setInterval(setIlmoEvents, refreshIntervalMS);
-    return () => clearInterval(interval);
-  }, [refreshIntervalMS, setIlmoEvents]);
+	// Refresh the ilmo events every `refreshIntervalMS` milliseconds.
+	useEffect(() => {
+		const interval = setInterval(setIlmoEvents, refreshIntervalMS)
+		return () => clearInterval(interval)
+	}, [refreshIntervalMS, setIlmoEvents])
 
-  // Fetch the ilmo events on mount.
-  useEffect(() => {
-    setIlmoEvents();
-  }, [setIlmoEvents]);
+	// Fetch the ilmo events on mount.
+	useEffect(() => {
+		setIlmoEvents()
+	}, [setIlmoEvents])
 
-  return { openIlmos, upcomingIlmos };
-};
+	return { openIlmos, upcomingIlmos }
+}
+
+const Time = () => {
+	const time = useClock()
+	const timeHoursMinutesSeconds = time.toLocaleTimeString('fi-FI', {
+		minute: '2-digit',
+		hour: '2-digit',
+		second: '2-digit',
+	})
+
+	const date = time.toLocaleDateString('fi-FI', {
+		weekday: 'short', // This adds the name of the day
+		year: 'numeric',
+		month: 'numeric',
+		day: 'numeric',
+	})
+
+	return (
+		<div>
+			<p className="text-2xl">{date}</p>
+			<p className="text-3xl font-mono font-bold">{timeHoursMinutesSeconds}</p>
+		</div>
+	)
+}
+
+const Viewers = () => {
+	// TODO: Create custom hook for fetching viewers
+	const [viewers, setViewers] = useState<string[]>(['Jaska', 'Kalle', 'Matti'])
+	// const [viewers, setViewers] = useState<string[]>([])
+
+	return (
+		<div className="flex items-center justify-center p-4 rounded-lg shadow-inner relative">
+			<div
+				className={`absolute inset-0 rounded-lg ${
+					viewers.length > 0 ? 'bg-red-200 animate-pulse' : 'bg-green-100'
+				}`}
+			/>
+			<div className="relative z-10">
+				{viewers.length > 0 ? (
+					<div className="flex flex-col gap-2">
+						<p className="text-2xl font-bold text-red-700">ON AIR</p>
+						<p className="text-xl font-semibold">Camera viewers</p>
+						<ul className="text-lg">
+							{viewers.map((viewer) => (
+								<li key={viewer}>{viewer}</li>
+							))}
+						</ul>
+					</div>
+				) : (
+					<p className="text-xl font-light">No camera viewers</p>
+				)}
+			</div>
+		</div>
+	)
+}
 
 /**
  * A card component for displaying an ilmo event.
  */
 const IlmoEventCard = ({ ilmo }: { ilmo: IlmoEvent }) => {
-  const formatToLocaleDateTime = (dateString: string) =>
-    new Date(dateString).toLocaleString("fi-FI", {
-      minute: "2-digit",
-      hour: "2-digit",
-      day: "2-digit",
-      month: "2-digit",
-    });
+	const formatToLocaleDateTime = (dateString: string) =>
+		new Date(dateString).toLocaleString('fi-FI', {
+			minute: '2-digit',
+			hour: '2-digit',
+			day: '2-digit',
+			month: '2-digit',
+		})
 
-  return (
-    <div className="bg-white border border-slate-100 rounded-lg">
-      <img
-        src={ilmo.headerImageFile}
-        alt={ilmo.name}
-        className="w-full h-56 object-cover"
-      />
-      <div className="p-4">
-        <h2 className="text-4xl font-medium mt-4">{ilmo.name}</h2>
-        <p className="mt-2 text-2xl">
-          {ilmo.description.slice(0, 120)}
-          {ilmo.description.length > 120 ? "..." : ""}
-        </p>
-        <div className="flex flex-row gap-2 mt-4 justify-between">
-          <div className="flex flex-col">
-            <h3 className="text-2xl font-medium">Ilmo aukeaa</h3>
-            <p className="text-2xl">
-              {formatToLocaleDateTime(ilmo.registrationStartTime)}
-            </p>
-          </div>
-          <div className="flex flex-col">
-            <h3 className="text-2xl font-medium">Tapahtuma-aika</h3>
-            <p className="text-2xl">
-              {formatToLocaleDateTime(ilmo.eventStartTime)}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+	return (
+		<div className="grid grid-cols-[3fr_5fr] rounded-lg overflow-hidden gap-4 border-stone-200 border-2 items-center">
+			<img
+				src={
+					ilmo.headerImageFile ??
+					'https://static.prodeko.org/media/ilmo/default-header-image.jpg'
+				}
+				alt={ilmo.name}
+			/>
+			<div className="my-2">
+				<h3 className="font-bold text-2xl mb-1">{ilmo.name}</h3>
+				<div className="text-lg">
+					<label className="font-semibold">Signup opens: </label>
+					<span>{formatToLocaleDateTime(ilmo.registrationStartTime)}</span>
+				</div>
+				<div className="text-lg">
+					<label className="font-semibold">Event starts: </label>
+					<span>{formatToLocaleDateTime(ilmo.eventStartTime)}</span>
+				</div>
+			</div>
+		</div>
+	)
+}
+
+const Ilmos = () => {
+	const { openIlmos, upcomingIlmos } = useAutoRefreshingIlmoEvents(60 * 1000)
+
+	return (
+		<div className="flex flex-col gap-4">
+			<div className="flex items-center gap-6">
+				<div className="bg-stone-200 rounded-2xl p-4 text-5xl items-center flex shadow-md">
+					<PiHandWavingFill />
+				</div>
+				<h1 className="text-4xl font-bold">Ilmos</h1>
+			</div>
+			<div>
+				<h2 className="text-3xl font-semibold mb-4">Currently open</h2>
+				<div className="grid grid-cols-1 gap-4">
+					{openIlmos.length > 0 ? (
+						openIlmos.map((ilmo) => (
+							<IlmoEventCard key={ilmo.name} ilmo={ilmo} />
+						))
+					) : (
+						<p className="text-center text-2xl font-light">
+							No open ilmos right now! :(
+						</p>
+					)}
+				</div>
+			</div>
+			<div>
+				<h2 className="text-3xl font-semibold mb-4">Upcoming</h2>
+				<div className="grid grid-cols-1 gap-4">
+					{openIlmos.length > 0 ? (
+						upcomingIlmos.map((ilmo) => (
+							<IlmoEventCard key={ilmo.name} ilmo={ilmo} />
+						))
+					) : (
+						<p className="text-center text-2xl font-light">
+							No upcoming ilmos in sight! :(
+						</p>
+					)}
+				</div>
+			</div>
+		</div>
+	)
+}
+
+const Menus = () => {
+	return (
+		<div className="flex">
+			<div className="flex items-center gap-6">
+				<div className="bg-stone-200 rounded-2xl p-4 text-5xl items-center flex shadow-md">
+					<PiForkKnifeBold />
+				</div>
+				<h1 className="text-4xl font-bold">Today's menus</h1>
+			</div>
+		</div>
+	)
+}
 
 const App = () => {
-  const time = useClock();
-  const timeHoursMinutes = time
-    .toLocaleTimeString("fi-FI", {
-      minute: "2-digit",
-      hour: "2-digit",
-    })
-    .replace(/\./g, ":");
+	return (
+		<main className="grid grid-rows-1 grid-cols-[8fr_1fr] h-screen">
+			<div className="h-full p-4 flex gap-4">
+				<div className="w-1/2 h-full border-r-2 border-stone-200">
+					<Menus />
+				</div>
+				<div className="w-1/2">
+					<Ilmos />
+				</div>
+			</div>
+			<div className="bg-stone-100 h-full text-center flex flex-col justify-between shadow-md p-4">
+				<Time />
+				<Viewers />
+				<div>
+					<p className="mb-4">Sponsored by</p>
+					<img src="/McKinsey_logo.svg" alt="McKinsey sponsor logo" />
+				</div>
+			</div>
+		</main>
+	)
+}
 
-  const { openIlmos, upcomingIlmos } = useAutoRefreshingIlmoEvents(60 * 1000);
-
-  return (
-    <div className="grid min-h-screen grid-cols-[2fr_2fr_1fr] grid-rows-[100px_auto_100px] gap-10 bg-gray-50 p-4">
-      <h1 className="text-xl font-bold underline bg-blue-100 col-span-2">
-        Prodeko
-      </h1>
-      <h1 className="text-8xl flex flex-col font-semibold bg-green-200 text-center items-center justify-center">
-        {timeHoursMinutes}
-      </h1>
-      <h1 className="text-xl font-bold underline bg-orange-100">Kanttiinit</h1>
-      <div className="bg-transparent border border-slate-100 row-span-2 flex flex-row gap-8">
-        <div className="flex flex-col basis-1/2 gap-2">
-          <h1 className="text-4xl font-bold">Avoimet Ilmot</h1>
-          <div className="flex flex-col gap-2">
-            {openIlmos.slice(0, 5).map((ilmo) => (
-              <IlmoEventCard ilmo={ilmo} key={ilmo.name} />
-            ))}
-          </div>
-        </div>
-        <div className="flex flex-col basis-1/2 gap-2">
-          <h1 className="text-4xl font-bold">Tulevat Ilmot</h1>
-          <div className="flex flex-col gap-2">
-            {upcomingIlmos.slice(0, 5).map((ilmo) => (
-              <IlmoEventCard ilmo={ilmo} key={ilmo.name} />
-            ))}
-          </div>
-        </div>
-      </div>
-      <h1 className="text-xl font-bold underline bg-orange-100 row-span-2">
-        Viewers
-      </h1>
-      <h1 className="text-xl font-bold underline bg-orange-100">Sponsors</h1>
-    </div>
-  );
-};
-
-export default App;
+export default App
