@@ -69,6 +69,67 @@ const useAutoRefreshingIlmoEvents = (refreshIntervalMS: number = 60 * 1000) => {
 	return { openIlmos, upcomingIlmos }
 }
 
+type MenuDetails = {
+	restaurantName: string
+	items: string[]
+}
+
+const useAutoRefreshingMenus = (refreshIntervalMS: number = 60 * 1000) => {
+	const [menus, setMenus] = useState<MenuDetails[]>([])
+
+	/**
+	 * Fetch the menus from Kanttiinit API and set them to the state.
+	 */
+	const fetchMenus = useCallback(async () => {
+		const restaurants = [
+			{
+				name: 'A Bloc',
+				id: '52',
+			},
+			{
+				name: 'TUAS',
+				id: '7',
+			},
+		]
+		try {
+			const responses = await Promise.all(
+				restaurants.map(async (restaurant) => {
+					const response = await fetch(
+						`/kanttiinitproxy/menus?restaurants=${restaurant.id}`,
+					)
+					const data = await response.json()
+					const items: { title: string; properties: string[] }[] =
+						data[restaurant.id][Object.keys(data[restaurant.id])[0]] || []
+
+					return {
+						restaurantName: restaurant.name,
+						items: items.map((item) => item.title),
+					}
+				}),
+			)
+			setMenus(responses)
+		} catch (error) {
+			console.error(
+				'Failed to fetch restaurant menus. Maybe the API is down?',
+				error,
+			)
+		}
+	}, [])
+
+	// Refresh the ilmo events every `refreshIntervalMS` milliseconds.
+	useEffect(() => {
+		const interval = setInterval(fetchMenus, refreshIntervalMS)
+		return () => clearInterval(interval)
+	}, [refreshIntervalMS, fetchMenus])
+
+	// Fetch the menus on mount.
+	useEffect(() => {
+		fetchMenus()
+	}, [fetchMenus])
+
+	return { menus }
+}
+
 const Time = () => {
 	const time = useClock()
 	const timeHoursMinutesSeconds = time.toLocaleTimeString('fi-FI', {
@@ -163,7 +224,7 @@ const Ilmos = () => {
 	const { openIlmos, upcomingIlmos } = useAutoRefreshingIlmoEvents(60 * 1000)
 
 	return (
-		<div className="flex flex-col gap-4">
+		<div className="flex flex-col gap-4 p-4">
 			<div className="flex items-center gap-6">
 				<div className="bg-stone-200 rounded-2xl p-4 text-5xl items-center flex shadow-md">
 					<PiHandWavingFill />
@@ -202,14 +263,42 @@ const Ilmos = () => {
 	)
 }
 
-const Menus = () => {
+const MenuCard = ({ menu }: { menu: MenuDetails }) => {
 	return (
-		<div className="flex">
+		<div className="border-stone-200 border-2 rounded-lg p-4">
+			<h2 className="text-4xl font-bold mb-2">{menu.restaurantName}</h2>
+			<ul className="text-lg">
+				{menu.items.length > 0 ? (
+					<ul>
+						{menu.items.map((item) => (
+							<li className="text-3xl" key={item}>
+								{item}
+							</li>
+						))}
+					</ul>
+				) : (
+					<li className="text-3xl">No menu available for today :(</li>
+				)}
+			</ul>
+		</div>
+	)
+}
+
+const Menus = () => {
+	const { menus } = useAutoRefreshingMenus()
+
+	return (
+		<div className="flex flex-col gap-6 p-4">
 			<div className="flex items-center gap-6">
 				<div className="bg-stone-200 rounded-2xl p-4 text-5xl items-center flex shadow-md">
 					<PiForkKnifeBold />
 				</div>
 				<h1 className="text-4xl font-bold">Today's menus</h1>
+			</div>
+			<div className="flex flex-col gap-4">
+				{menus.map((menu) => (
+					<MenuCard key={menu.restaurantName} menu={menu} />
+				))}
 			</div>
 		</div>
 	)
@@ -218,7 +307,7 @@ const Menus = () => {
 const App = () => {
 	return (
 		<main className="grid grid-rows-1 grid-cols-[8fr_1fr] h-screen">
-			<div className="h-full p-4 flex gap-4">
+			<div className="h-full p-4 flex">
 				<div className="w-1/2 h-full border-r-2 border-stone-200">
 					<Menus />
 				</div>
