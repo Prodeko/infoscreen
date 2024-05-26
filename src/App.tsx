@@ -147,8 +147,8 @@ const Time = () => {
 
 	return (
 		<div>
-			<p className="text-2xl">{date}</p>
-			<p className="text-3xl font-mono font-bold">{timeHoursMinutesSeconds}</p>
+			<p className="text-3xl">{date}</p>
+			<p className="text-4xl font-mono font-bold">{timeHoursMinutesSeconds}</p>
 		</div>
 	)
 }
@@ -197,7 +197,7 @@ const IlmoEventCard = ({ ilmo }: { ilmo: IlmoEvent }) => {
 		})
 
 	return (
-		<div className="grid grid-cols-[3fr_5fr] rounded-lg overflow-hidden gap-4 border-stone-200 border-2 items-center">
+		<div className="grid grid-cols-[4fr_5fr] rounded-lg overflow-hidden gap-4 border-stone-200 border-2 items-center">
 			<img
 				src={
 					ilmo.headerImageFile ??
@@ -205,13 +205,13 @@ const IlmoEventCard = ({ ilmo }: { ilmo: IlmoEvent }) => {
 				}
 				alt={ilmo.name}
 			/>
-			<div className="my-2">
-				<h3 className="font-bold text-2xl mb-1">{ilmo.name}</h3>
-				<div className="text-lg">
+			<div className="my-2 text-2xl">
+				<h3 className="font-bold text-3xl mb-1">{ilmo.name}</h3>
+				<div>
 					<label className="font-semibold">Signup opens: </label>
 					<span>{formatToLocaleDateTime(ilmo.registrationStartTime)}</span>
 				</div>
-				<div className="text-lg">
+				<div>
 					<label className="font-semibold">Event starts: </label>
 					<span>{formatToLocaleDateTime(ilmo.eventStartTime)}</span>
 				</div>
@@ -229,10 +229,10 @@ const Ilmos = () => {
 				<div className="bg-stone-200 rounded-2xl p-4 text-5xl items-center flex shadow-md">
 					<PiHandWavingFill />
 				</div>
-				<h1 className="text-4xl font-bold">Ilmos</h1>
+				<h1 className="text-5xl font-bold">Ilmos</h1>
 			</div>
 			<div>
-				<h2 className="text-3xl font-semibold mb-4">Currently open</h2>
+				<h2 className="text-4xl font-semibold mb-4">Currently open</h2>
 				<div className="grid grid-cols-1 gap-4">
 					{openIlmos.length > 0 ? (
 						openIlmos.map((ilmo) => (
@@ -246,7 +246,7 @@ const Ilmos = () => {
 				</div>
 			</div>
 			<div>
-				<h2 className="text-3xl font-semibold mb-4">Upcoming</h2>
+				<h2 className="text-4xl font-semibold mb-4">Upcoming</h2>
 				<div className="grid grid-cols-1 gap-4">
 					{openIlmos.length > 0 ? (
 						upcomingIlmos.map((ilmo) => (
@@ -293,7 +293,7 @@ const Menus = () => {
 				<div className="bg-stone-200 rounded-2xl p-4 text-5xl items-center flex shadow-md">
 					<PiForkKnifeBold />
 				</div>
-				<h1 className="text-4xl font-bold">Today's menus</h1>
+				<h1 className="text-5xl font-bold">Today's menus</h1>
 			</div>
 			<div className="flex flex-col gap-4">
 				{menus.map((menu) => (
@@ -319,7 +319,7 @@ const App = () => {
 				<Time />
 				<Viewers />
 				<div>
-					<p className="mb-4">Sponsored by</p>
+					<p className="mb-4 text-xl">Sponsored by</p>
 					<img src="/McKinsey_logo.svg" alt="McKinsey sponsor logo" />
 				</div>
 			</div>
