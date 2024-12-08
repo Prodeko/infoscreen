@@ -130,6 +130,41 @@ const useAutoRefreshingMenus = (refreshIntervalMS: number = 60 * 1000) => {
 	return { menus }
 }
 
+const useAutoRefreshingViewerCount = (
+	refreshIntervalMS: number = 60 * 1000,
+) => {
+	const [onAir, setOnAir] = useState<boolean>(false)
+
+	const fetchViewerCount = useCallback(async () => {
+		try {
+			const response = await fetch(
+				'https://kiltiskamera.prodeko.org/on_air?password=',
+			)
+			const data = await response.json()
+			console.log(data)
+			setOnAir(data.onAir)
+		} catch (error) {
+			console.error(
+				'Failed to fetch viewer count. Maybe the Kiltiskamera is down?',
+				error,
+			)
+		}
+	}, [])
+
+	// Refresh the viewer count every `refreshIntervalMS` milliseconds
+	useEffect(() => {
+		const interval = setInterval(fetchViewerCount, refreshIntervalMS)
+		return () => clearInterval(interval)
+	}, [refreshIntervalMS, fetchViewerCount])
+
+	// Fetch viewers on mount
+	useEffect(() => {
+		fetchViewerCount()
+	}, [fetchViewerCount])
+
+	return { onAir }
+}
+
 const Time = () => {
 	const time = useClock()
 	const timeHoursMinutesSeconds = time.toLocaleTimeString('fi-FI', {
@@ -154,27 +189,20 @@ const Time = () => {
 }
 
 const Viewers = () => {
-	// TODO: Create custom hook for fetching viewers
-	const [viewers, setViewers] = useState<string[]>(['Jaska', 'Kalle', 'Matti'])
-	// const [viewers, setViewers] = useState<string[]>([])
+	const { onAir } = useAutoRefreshingViewerCount(1000)
 
 	return (
 		<div className="flex items-center justify-center p-4 rounded-lg shadow-inner relative">
 			<div
 				className={`absolute inset-0 rounded-lg ${
-					viewers.length > 0 ? 'bg-red-200 animate-pulse' : 'bg-green-100'
+					onAir ? 'bg-red-200 animate-pulse' : 'bg-green-200'
 				}`}
 			/>
 			<div className="relative z-10">
-				{viewers.length > 0 ? (
+				{onAir ? (
 					<div className="flex flex-col gap-2">
+						<p className="text-xl font-normal">Kiltiskamera</p>
 						<p className="text-2xl font-bold text-red-700">ON AIR</p>
-						<p className="text-xl font-semibold">Camera viewers</p>
-						<ul className="text-lg">
-							{viewers.map((viewer) => (
-								<li key={viewer}>{viewer}</li>
-							))}
-						</ul>
 					</div>
 				) : (
 					<p className="text-xl font-light">No camera viewers</p>
@@ -240,7 +268,7 @@ const Ilmos = () => {
 						))
 					) : (
 						<p className="text-center text-2xl font-light">
-							No open ilmos right now! :(
+							No open ilmos right now. :(
 						</p>
 					)}
 				</div>
@@ -254,7 +282,7 @@ const Ilmos = () => {
 						))
 					) : (
 						<p className="text-center text-2xl font-light">
-							No upcoming ilmos in sight! :(
+							No upcoming ilmos in sight. :(
 						</p>
 					)}
 				</div>
