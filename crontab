@@ -1,0 +1,2 @@
+# Run the scrape script every hour
+0 * * * * root node /app/scrapePlaywright.js >> /var/log/cron.log 2>&1

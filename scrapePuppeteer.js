@@ -18,7 +18,8 @@ import { writeFileSync } from "fs";
  */
 async function scrapeOpenEvents() {
   // Launch a headless browser
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch()
+  // const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
   // Navigate to the website

@@ -1,72 +1,65 @@
-# Stage 1: Build the React application
-FROM ubuntu:22.04 AS builder
+# Stage 1: Build the React app
+FROM node:22 AS build
 
-# Install Node.js and npm
-RUN apt-get update && \
-    apt-get install -y curl gnupg && \
-    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs && \
-    rm -rf /var/lib/apt/lists/*
-
-# Set the working directory
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Copy package.json and package-lock.json to install dependencies
 COPY package*.json ./
+
+# Install dependencies
 RUN npm install
 
-# Copy all project files to the container
+# Copy the rest of your application's code to the container
 COPY . .
 
-# Build the React application
+# Build the React app
 RUN npm run build
 
-# Stage 2: Set up cron and Nginx for serving the application and running the script
-FROM --platform=linux/amd64 ubuntu:20.04
+# Stage 2: Set up the production environment
+FROM node:22
 
-# Set an environment variable for the output path
-ENV EVENT_FILE_PATH="/app/data/events.json"
+# Install nginx and cron
+RUN apt-get update && apt-get install -y nginx cron
 
-# Install required packages
-RUN apt-get update && \
-    apt-get install -y curl gnupg ca-certificates && \
-    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs nginx cron bash chromium-browser && \
-    rm -rf /var/lib/apt/lists/*
+# Copy nginx config
+COPY nginx.prod.conf /etc/nginx/nginx.conf
+
+# Remove default nginx site config if necessary
+RUN rm /etc/nginx/sites-enabled/default
+
+# Copy built React app from Stage 1
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Create directory for data
+RUN mkdir -p /app/data
+
+# Copy the scrape script and package files
+COPY scrapePlaywright.js /app/scrapePlaywright.js
+COPY package*.json /app/
 
 # Set the working directory
 WORKDIR /app
 
-# Copy the React build files from the builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Copy application files
-COPY package*.json ./
-COPY scrape.js ./
-
-# Install dependencies for scrape.js
+# Install dependencies for the scrape script
 RUN npm install
 
-# Create a directory to store the generated JSON file and set permissions
-RUN mkdir -p /app/data && chmod 777 /app/data
+# Install Playwright browsers
+RUN npx playwright install --with-deps
 
-# Create a cron job configuration file and set permissions
-RUN echo "*/5 * * * * root node /app/scrape.js >> /var/log/cron.log 2>&1" > /etc/cron.d/scrape-cron && \
-    chmod 644 /etc/cron.d/scrape-cron
+# Set up cron job
+COPY crontab /etc/cron.d/scrape-cron
+RUN chmod 0644 /etc/cron.d/scrape-cron
+RUN crontab /etc/cron.d/scrape-cron
 
-# Apply the cron job and set permissions for the cron log
-RUN crontab /etc/cron.d/scrape-cron && \
-    touch /var/log/cron.log && chmod 666 /var/log/cron.log
+# Copy entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# Copy Nginx configuration
-COPY nginx.prod.conf /etc/nginx/nginx.conf
-
-# Copy the start script and make it executable
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
-
-# Expose the default Nginx port
+# Expose port 80
 EXPOSE 80
 
-# Start services
-CMD ["/start.sh"]
+# Set environment variables
+ENV EVENT_FILE_PATH=/app/data/events.json
+
+# Start the entrypoint script
+ENTRYPOINT ["/entrypoint.sh"]

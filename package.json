@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "http-proxy-middleware": "^3.0.0",
+    "playwright": "^1.49.0",
     "puppeteer": "^22.6.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
