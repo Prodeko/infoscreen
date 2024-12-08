@@ -115,7 +115,7 @@ const getLocaleTimeString = () => {
  * that can be read by the frontend.
  */
 const scrapeAndSaveEventsToJSONFile = async () => {
-  const FILE_PATH = "public/events.json";
+  const FILE_PATH = process.env.EVENT_FILE_PATH || "public/events.json";
   const timestamp = getLocaleTimeString();
   console.log(`Starting scrape ${timestamp}`);
 

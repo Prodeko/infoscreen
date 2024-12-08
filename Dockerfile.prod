@@ -1,0 +1,72 @@
+# Stage 1: Build the React application
+FROM ubuntu:22.04 AS builder
+
+# Install Node.js and npm
+RUN apt-get update && \
+    apt-get install -y curl gnupg && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set the working directory
+WORKDIR /app
+
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy all project files to the container
+COPY . .
+
+# Build the React application
+RUN npm run build
+
+# Stage 2: Set up cron and Nginx for serving the application and running the script
+FROM --platform=linux/amd64 ubuntu:20.04
+
+# Set an environment variable for the output path
+ENV EVENT_FILE_PATH="/app/data/events.json"
+
+# Install required packages
+RUN apt-get update && \
+    apt-get install -y curl gnupg ca-certificates && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs nginx cron bash chromium-browser && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the React build files from the builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy application files
+COPY package*.json ./
+COPY scrape.js ./
+
+# Install dependencies for scrape.js
+RUN npm install
+
+# Create a directory to store the generated JSON file and set permissions
+RUN mkdir -p /app/data && chmod 777 /app/data
+
+# Create a cron job configuration file and set permissions
+RUN echo "*/5 * * * * root node /app/scrape.js >> /var/log/cron.log 2>&1" > /etc/cron.d/scrape-cron && \
+    chmod 644 /etc/cron.d/scrape-cron
+
+# Apply the cron job and set permissions for the cron log
+RUN crontab /etc/cron.d/scrape-cron && \
+    touch /var/log/cron.log && chmod 666 /var/log/cron.log
+
+# Copy Nginx configuration
+COPY nginx.prod.conf /etc/nginx/nginx.conf
+
+# Copy the start script and make it executable
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+# Expose the default Nginx port
+EXPOSE 80
+
+# Start services
+CMD ["/start.sh"]
