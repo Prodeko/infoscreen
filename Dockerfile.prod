@@ -40,7 +40,7 @@ COPY package*.json /app/
 # Set the working directory
 WORKDIR /app
 
-# Install dependencies for the scrape script
+# Install dependencies for the scrape script ("Urgent" TODO: Create separate package.json for scrape script)
 RUN npm install
 
 # Install Playwright browsers
@@ -60,6 +60,7 @@ EXPOSE 80
 
 # Set environment variables
 ENV EVENT_FILE_PATH=/app/data/events.json
+ENV ENVIRONMENT=prod
 
 # Start the entrypoint script
 ENTRYPOINT ["/entrypoint.sh"]

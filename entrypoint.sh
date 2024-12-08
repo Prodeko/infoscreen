@@ -5,9 +5,9 @@ echo "Running scrape script at startup..."
 node /app/scrapePlaywright.js
 
 # Start nginx
-echo "Starting nginx..."
 service nginx start
+echo "Started nginx"
 
 # Start cron in the foreground
-echo "Starting cron..."
 cron -f
+echo "Started cron"

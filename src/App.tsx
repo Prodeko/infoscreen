@@ -1,6 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
 import { PiForkKnifeBold, PiHandWavingFill } from 'react-icons/pi'
 
+const execEnv = process.env.ENVIRONMENT || 'dev'
+const onAirPass = process.env.ON_AIR_PASS
+
+if (!onAirPass) {
+	throw new Error(
+		'Environment variable ON_AIR_PASS is not set. Cannot fetch viewers.',
+	)
+}
+
 /**
  * Custom hook to get the current time from the browser.
  * Updates once every second.
@@ -42,7 +51,9 @@ const useAutoRefreshingIlmoEvents = (refreshIntervalMS: number = 60 * 1000) => {
 	 */
 	const setIlmoEvents = useCallback(async () => {
 		try {
-			const response = await fetch('/events.json')
+			const response = await fetch(
+				execEnv === 'prod' ? '/data/events.json' : '/events.json',
+			)
 			const data = await response.json()
 			const { open, upcoming } = data
 			if (open) setOpenIlmos(open)
@@ -138,10 +149,9 @@ const useAutoRefreshingViewerCount = (
 	const fetchViewerCount = useCallback(async () => {
 		try {
 			const response = await fetch(
-				'https://kiltiskamera.prodeko.org/on_air?password=',
+				`https://kiltiskamera.prodeko.org/on_air?password=${onAirPass}`,
 			)
 			const data = await response.json()
-			console.log(data)
 			setOnAir(data.onAir)
 		} catch (error) {
 			console.error(
