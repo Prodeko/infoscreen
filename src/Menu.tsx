@@ -149,7 +149,6 @@ const RestaurantMenu = ({
 }
 
 export const Menu = ({
-	rotationInterval
 }: {
 	rotationInterval?: number
 }) => {
