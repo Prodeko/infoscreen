@@ -23,7 +23,7 @@ const useAutoRefreshingViewerCount = (
 
 	const fetchViewerCount = useCallback(async () => {
 		try {
-			const response = await fetch(`https://kiltiskamera.prodeko.org/on_air`)
+			const response = await fetch(`https://kiltiskamera.prodeko.org/on_air?password=${import.meta.env.VITE_KILTISKAMERA_ON_AIR_PASSWORD}`)
 			const data = await response.json()
 			setOnAir(data.onAir)
 		} catch (error) {
