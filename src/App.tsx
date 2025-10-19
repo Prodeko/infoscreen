@@ -2,12 +2,67 @@ import { useCallback, useEffect, useState } from 'react'
 import McKinseyLogo from './McKinseyLogo'
 import { Menu } from './Menu'
 import Rotator from './Rotator'
+import type {
+	Menu as MenuType,
+	Restaurant,
+	RestaurantDailyMenu,
+} from './types'
 
-/**
- * Custom hook to get the current time from the browser.
- * Updates once every second.
- * @returns The current time as a Date object.
- */
+//const RESTAURANT_IDS = ['7', '52', '2'] // TUAS, A Bloc, T-talo
+const RESTAURANT_IDS = ['7', '52', '2'] // TUAS, A Bloc, T-talo
+
+const useAutoRefreshingMenus = (refreshIntervalMS: number = 60 * 60 * 1000) => {
+	const [menus, setMenus] = useState<Record<string, MenuType> | null>(null)
+	const [restaurants, setRestaurants] = useState<Record<
+		string,
+		Restaurant
+	> | null>(null)
+
+	const fetchMenus = async () => {
+		try {
+			const response = await fetch('/kanttiinitproxy/menus/')
+			const data = await response.json()
+			setMenus(data)
+		} catch (error) {
+			console.error('Failed to fetch menus. Maybe the server is down?', error)
+		}
+	}
+
+	const fetchRestaurants = async () => {
+		try {
+			const response = await fetch('/kanttiinitproxy/restaurants/')
+			const data = (await response.json()) as Restaurant[]
+			const restaurantMap = data.reduce(
+				(acc, restaurant) => {
+					acc[restaurant.id] = restaurant
+					return acc
+				},
+				{} as Record<string, Restaurant>,
+			)
+			setRestaurants(restaurantMap)
+		} catch (error) {
+			console.error(
+				'Failed to fetch restaurants. Maybe the server is down?',
+				error,
+			)
+		}
+	}
+
+	// Refresh the menus every `refreshIntervalMS` milliseconds
+	useEffect(() => {
+		const interval = setInterval(fetchMenus, refreshIntervalMS)
+		return () => clearInterval(interval)
+	}, [refreshIntervalMS])
+
+	// Fetch menus and restaurants on mount
+	useEffect(() => {
+		fetchMenus()
+		fetchRestaurants()
+	}, [])
+
+	return { menus, restaurants }
+}
+
 const useClock = () => {
 	const [time, setTime] = useState<Date>(new Date())
 
@@ -79,7 +134,7 @@ const Time = () => {
 }
 
 const Viewers = () => {
-	const { onAir } = useAutoRefreshingViewerCount(1000)
+	const { onAir } = useAutoRefreshingViewerCount(2000)
 
 	return (
 		<div className="flex items-center justify-center p-4 rounded-lg shadow-inner relative">
@@ -103,11 +158,39 @@ const Viewers = () => {
 }
 
 const App = () => {
+	const { menus, restaurants } = useAutoRefreshingMenus()
+
+	const today = new Date()
+	const todayKey = `${today.getFullYear()}-${String(
+		today.getMonth() + 1,
+	).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+
+	// The API's openingHours array is likely Monday-indexed (0=Mon, 6=Sun).
+	// Date.getDay() is Sunday-indexed (0=Sun, 1=Mon).
+	// We need to convert Sunday from 0 to 6.
+	const dayOfWeek = today.getDay() === 0 ? 6 : today.getDay() - 1
+
+	const todaysMenus: RestaurantDailyMenu[] | null =
+		menus && restaurants
+			? RESTAURANT_IDS.map((id) => {
+					const restaurant = restaurants[id]
+					const menu = menus[id]?.[todayKey]
+					const openingHours = restaurant?.openingHours[dayOfWeek]
+
+					return {
+						id: restaurant.id,
+						name: restaurant.name,
+						menu: menu || null,
+						openingHours: openingHours || null,
+					}
+				})
+			: null
+
 	return (
 		<main className="grid grid-rows-1 grid-cols-[8fr_1fr] h-screen">
 			<div className="h-full p-4">
 				<Rotator defaultRotationInterval={10000}>
-					<Menu rotationInterval={30000} />
+					<Menu rotationInterval={30000} todaysMenus={todaysMenus} />
 					<McKinseyLogo rotationInterval={10000} />
 				</Rotator>
 			</div>

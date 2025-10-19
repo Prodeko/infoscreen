@@ -57,7 +57,7 @@ const Rotator = ({
 	return (
 		<div className="relative h-full">
 			{childrenArray.length > 1 && (
-				<div className="absolute top-0 right-0 text-xs text-gray-400">
+				<div className="absolute top-0 right-0 text-md text-gray-400">
 					Next in {Math.ceil(countdown)}s...
 				</div>
 			)}

@@ -20,3 +20,10 @@ export interface Restaurant {
 export interface Restaurants {
 	[id: string]: Restaurant
 }
+
+export interface RestaurantDailyMenu {
+	id: number
+	name: string
+	menu: Meal[] | null
+	openingHours: string | null
+}
