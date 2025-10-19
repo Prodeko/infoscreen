@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import McKinseyLogo from './McKinseyLogo'
 import { Menu } from './Menu'
 import Rotator from './Rotator'
