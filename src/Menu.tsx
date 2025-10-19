@@ -60,7 +60,7 @@ const MenuRow = ({ meal }: { meal: Meal }) => {
 	return (
 		<div className="grid grid-cols-[6fr_1fr] gap-2">
 			<div className="flex flex-col">
-				<p className="text-lg font-bold">{meal.title}</p>
+				<p className="text-xl font-bold">{meal.title}</p>
 				<p className="text-sm italic">{meal.properties.join(', ')}</p>
 			</div>
 		</div>
