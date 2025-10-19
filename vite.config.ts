@@ -15,5 +15,14 @@ export default defineConfig(({ command, mode }) => {
 
 	return {
 		plugins: [react()],
+		server: {
+			proxy: {
+				'/kanttiinitproxy': {
+					target: 'https://kitchen.kanttiinit.fi',
+					changeOrigin: true,
+					rewrite: (path) => path.replace(/^\/kanttiinitproxy/, ''),
+				},
+			},
+		},
 	}
 })

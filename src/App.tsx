@@ -1,4 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
+import McKinseyLogo from './McKinseyLogo'
+import { Menu } from './Menu'
+import Rotator from './Rotator'
 
 /**
  * Custom hook to get the current time from the browser.
@@ -23,7 +26,11 @@ const useAutoRefreshingViewerCount = (
 
 	const fetchViewerCount = useCallback(async () => {
 		try {
-			const response = await fetch(`https://kiltiskamera.prodeko.org/on_air?password=${import.meta.env.VITE_KILTISKAMERA_ON_AIR_PASSWORD}`)
+			const response = await fetch(
+				`https://kiltiskamera.prodeko.org/on_air?password=${
+					import.meta.env.VITE_KILTISKAMERA_ON_AIR_PASSWORD
+				}`,
+			)
 			const data = await response.json()
 			setOnAir(data.onAir)
 		} catch (error) {
@@ -98,12 +105,11 @@ const Viewers = () => {
 const App = () => {
 	return (
 		<main className="grid grid-rows-1 grid-cols-[8fr_1fr] h-screen">
-			<div className="h-full p-4 flex">
-				<img
-					className="p-16"
-					src="/McKinsey_logo.svg"
-					alt="McKinsey sponsor logo"
-				/>
+			<div className="h-full p-4">
+				<Rotator defaultRotationInterval={10000}>
+					<Menu rotationInterval={30000} />
+					<McKinseyLogo rotationInterval={10000} />
+				</Rotator>
 			</div>
 			<div className="bg-stone-100 h-full text-center flex flex-col justify-between shadow-md p-4">
 				<Time />
