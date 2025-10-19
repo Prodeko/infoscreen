@@ -27,3 +27,27 @@ export interface RestaurantDailyMenu {
 	menu: Meal[] | null
 	openingHours: string | null
 }
+
+export type TiedoteMessage = {
+	id: number
+	category: string
+	tags: string[]
+	is_new: boolean
+	header: string
+	pub_date: string
+	start_date: string
+	end_date: string
+	deadline_date: string
+	show_deadline: boolean
+	visible: boolean
+	content: string
+}
+
+export type TiedoteCategory = {
+	id: number
+	title: string
+	order: number
+	messages: TiedoteMessage[]
+}
+
+export type TiedoteMessageWithCategory = TiedoteMessage & { categoryTitle: string }

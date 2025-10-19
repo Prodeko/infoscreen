@@ -1,14 +1,16 @@
-import { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import McKinseyLogo from './McKinseyLogo'
 import { Menu } from './Menu'
 import Rotator from './Rotator'
+import Tiedote from './Tiedote'
 import type {
 	Menu as MenuType,
 	Restaurant,
 	RestaurantDailyMenu,
+	TiedoteCategory,
+	TiedoteMessageWithCategory,
 } from './types'
 
-//const RESTAURANT_IDS = ['7', '52', '2'] // TUAS, A Bloc, T-talo
 const RESTAURANT_IDS = ['7', '52', '2'] // TUAS, A Bloc, T-talo
 
 const useAutoRefreshingMenus = (refreshIntervalMS: number = 60 * 60 * 1000) => {
@@ -61,6 +63,28 @@ const useAutoRefreshingMenus = (refreshIntervalMS: number = 60 * 60 * 1000) => {
 	}, [])
 
 	return { menus, restaurants }
+}
+
+const useAutoRefreshingTiedote = (refreshIntervalMS: number = 60 * 60 * 1000) => {
+	const [tiedote, setTiedote] = useState<TiedoteCategory[] | null>(null)
+
+	const fetchTiedote = async () => {
+		try {
+			const response = await fetch('/tiedoteproxy/content/')
+			const data = await response.json()
+			setTiedote(data)
+		} catch (error) {
+			console.error('Failed to fetch tiedote. Maybe the server is down?', error)
+		}
+	}
+
+	useEffect(() => {
+		fetchTiedote()
+		const interval = setInterval(fetchTiedote, refreshIntervalMS)
+		return () => clearInterval(interval)
+	}, [refreshIntervalMS])
+
+	return tiedote
 }
 
 const useClock = () => {
@@ -159,6 +183,15 @@ const Viewers = () => {
 
 const App = () => {
 	const { menus, restaurants } = useAutoRefreshingMenus()
+	const tiedote = useAutoRefreshingTiedote()
+
+	const allTiedoteMessages: TiedoteMessageWithCategory[] | undefined =
+		tiedote?.flatMap((category) =>
+			category.messages.map((message) => ({
+				...message,
+				categoryTitle: category.title,
+			})),
+		)
 
 	const today = new Date()
 	const todayKey = `${today.getFullYear()}-${String(
@@ -191,7 +224,8 @@ const App = () => {
 			<div className="h-full p-4">
 				<Rotator defaultRotationInterval={10000}>
 					<Menu rotationInterval={30000} todaysMenus={todaysMenus} />
-					<McKinseyLogo rotationInterval={10000} />
+					<Tiedote messages={allTiedoteMessages} rotationInterval={15000} />
+					<McKinseyLogo rotationInterval={5000} />
 				</Rotator>
 			</div>
 			<div className="bg-stone-100 h-full text-center flex flex-col justify-between shadow-md p-4">

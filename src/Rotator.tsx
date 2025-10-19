@@ -1,7 +1,15 @@
-import { useState, useEffect, Children, ReactElement, useRef } from 'react'
+import {
+	useState,
+	useEffect,
+	Children,
+	ReactElement,
+	useRef,
+	cloneElement,
+} from 'react'
 
 interface RotatorChildProps {
 	rotationInterval?: number
+	rotation?: number
 }
 
 interface RotatorProps {
@@ -14,7 +22,11 @@ const Rotator = ({
 	defaultRotationInterval = 10000,
 }: RotatorProps) => {
 	const [currentIndex, setCurrentIndex] = useState(0)
+	const [round, setRound] = useState(0)
 	const [isFading, setIsFading] = useState(false)
+
+	const intervalRef = useRef<NodeJS.Timeout | null>(null)
+	const prevIndexRef = useRef(currentIndex)
 
 	const childrenArray = Children.toArray(
 		children,
@@ -32,18 +44,39 @@ const Rotator = ({
 	}, [currentIndex, rotationInterval])
 
 	useEffect(() => {
+		if (childrenArray.length <= 1) {
+			prevIndexRef.current = currentIndex
+			return
+		}
+
+		if (
+			prevIndexRef.current === childrenArray.length - 1 &&
+			currentIndex === 0
+		) {
+			setRound((r) => r + 1)
+		}
+
+		prevIndexRef.current = currentIndex
+	}, [childrenArray.length, currentIndex])
+
+	useEffect(() => {
 		if (childrenArray.length < 2) {
 			return
 		}
 
-		const timer = setInterval(() => {
+		if (intervalRef.current) {
+			clearInterval(intervalRef.current)
+		}
+
+		intervalRef.current = setInterval(() => {
 			const newCountdown = countdownRef.current - 1
 			if (newCountdown <= 0) {
 				setIsFading(true)
 				setTimeout(() => {
-					setCurrentIndex(
-						(prevIndex) => (prevIndex + 1) % childrenArray.length,
-					)
+					setCurrentIndex((prevIndex) => {
+						const nextIndex = (prevIndex + 1) % childrenArray.length
+						return nextIndex
+					})
 					setIsFading(false)
 				}, 500) // This should match the fade-out duration
 			} else {
@@ -51,7 +84,11 @@ const Rotator = ({
 			}
 		}, 1000)
 
-		return () => clearInterval(timer)
+		return () => {
+			if (intervalRef.current) {
+				clearInterval(intervalRef.current)
+			}
+		}
 	}, [childrenArray.length])
 
 	return (
@@ -66,7 +103,7 @@ const Rotator = ({
 					isFading ? 'opacity-0' : 'opacity-100'
 				}`}
 			>
-				{currentChild}
+				{cloneElement(currentChild, { rotation: round })}
 			</div>
 		</div>
 	)

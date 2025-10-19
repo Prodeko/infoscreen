@@ -22,6 +22,11 @@ export default defineConfig(({ command, mode }) => {
 					changeOrigin: true,
 					rewrite: (path) => path.replace(/^\/kanttiinitproxy/, ''),
 				},
+				'/tiedoteproxy': {
+					target: 'https://prodeko.org/fi/palvelut/viikkotiedote/api',
+					changeOrigin: true,
+					rewrite: (path) => path.replace(/^\/tiedoteproxy/, ''),
+				},
 			},
 		},
 	}
