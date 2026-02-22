@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
+import Hsl from './Hsl'
 import McKinseyLogo from './McKinseyLogo'
 import { Menu } from './Menu'
 import Rotator from './Rotator'
+import SidebarDepartures from './SidebarDepartures'
+import Stocks from './Stocks'
 import Tiedote from './Tiedote'
+import { useAutoRefreshingHsl } from './useAutoRefreshingHsl'
 import type {
 	Menu as MenuType,
 	Restaurant,
@@ -11,7 +15,7 @@ import type {
 	TiedoteMessageWithCategory,
 } from './types'
 
-const RESTAURANT_IDS = ['7', '52', '2'] // TUAS, A Bloc, T-talo
+const RESTAURANT_IDS = ['7', '52', '2'] // TUAS, A Bloc, T-talo, Täffä
 
 const useAutoRefreshingMenus = (refreshIntervalMS: number = 60 * 60 * 1000) => {
 	const [menus, setMenus] = useState<Record<string, MenuType> | null>(null)
@@ -72,6 +76,7 @@ const useAutoRefreshingTiedote = (refreshIntervalMS: number = 60 * 60 * 1000) =>
 		try {
 			const response = await fetch('/tiedoteproxy/content/')
 			const data = await response.json()
+			console.log("data: ", data)
 			setTiedote(data)
 		} catch (error) {
 			console.error('Failed to fetch tiedote. Maybe the server is down?', error)
@@ -86,6 +91,7 @@ const useAutoRefreshingTiedote = (refreshIntervalMS: number = 60 * 60 * 1000) =>
 
 	return tiedote
 }
+
 
 const useClock = () => {
 	const [time, setTime] = useState<Date>(new Date())
@@ -105,10 +111,11 @@ const useAutoRefreshingViewerCount = (
 
 	const fetchViewerCount = useCallback(async () => {
 		try {
+			const params = new URLSearchParams({
+				password: import.meta.env.VITE_KILTISKAMERA_ON_AIR_PASSWORD,
+			})
 			const response = await fetch(
-				`https://kiltiskamera.prodeko.org/on_air?password=${
-					import.meta.env.VITE_KILTISKAMERA_ON_AIR_PASSWORD
-				}`,
+				`https://kiltiskamera.prodeko.org/on_air?${params.toString()}`,
 			)
 			const data = await response.json()
 			setOnAir(data.onAir)
@@ -163,9 +170,8 @@ const Viewers = () => {
 	return (
 		<div className="flex items-center justify-center p-4 rounded-lg shadow-inner relative">
 			<div
-				className={`absolute inset-0 rounded-lg ${
-					onAir ? 'bg-red-200 animate-pulse' : 'bg-green-200'
-				}`}
+				className={`absolute inset-0 rounded-lg ${onAir ? 'bg-red-200 animate-pulse' : 'bg-green-200'
+					}`}
 			/>
 			<div className="relative z-10">
 				{onAir ? (
@@ -184,6 +190,7 @@ const Viewers = () => {
 const App = () => {
 	const { menus, restaurants } = useAutoRefreshingMenus()
 	const tiedote = useAutoRefreshingTiedote()
+	const hsl = useAutoRefreshingHsl(60 * 1000)
 
 	const allTiedoteMessages: TiedoteMessageWithCategory[] | undefined =
 		tiedote?.flatMap((category) =>
@@ -206,31 +213,36 @@ const App = () => {
 	const todaysMenus: RestaurantDailyMenu[] | null =
 		menus && restaurants
 			? RESTAURANT_IDS.map((id) => {
-					const restaurant = restaurants[id]
-					const menu = menus[id]?.[todayKey]
-					const openingHours = restaurant?.openingHours[dayOfWeek]
+				const restaurant = restaurants[id]
+				const menu = menus[id]?.[todayKey]
+				const openingHours = restaurant?.openingHours[dayOfWeek]
 
-					return {
-						id: restaurant.id,
-						name: restaurant.name,
-						menu: menu || null,
-						openingHours: openingHours || null,
-					}
-				})
+				return {
+					id: restaurant.id,
+					name: restaurant.name,
+					menu: menu || null,
+					openingHours: openingHours || null,
+				}
+			})
 			: null
 
 	return (
 		<main className="grid grid-rows-1 grid-cols-[8fr_1fr] h-screen">
 			<div className="h-full p-4">
-				<Rotator defaultRotationInterval={10000}>
-					<Menu rotationInterval={30000} todaysMenus={todaysMenus} />
-					<Tiedote messages={allTiedoteMessages} rotationInterval={15000} />
-					<McKinseyLogo rotationInterval={5000} />
-				</Rotator>
+					<Rotator defaultRotationInterval={10000}>
+						<Menu rotationInterval={30000} todaysMenus={todaysMenus} />
+						<Tiedote messages={allTiedoteMessages} rotationInterval={15000} />
+						<Hsl data={hsl} rotationInterval={15000} />
+						<Stocks rotationInterval={20000} />
+						<McKinseyLogo rotationInterval={5000} />
+					</Rotator>
 			</div>
-			<div className="bg-stone-100 h-full text-center flex flex-col justify-between shadow-md p-4">
+			<div className="bg-stone-100 h-full text-center flex flex-col gap-4 shadow-md p-4">
 				<Time />
-				<Viewers />
+				<SidebarDepartures data={hsl} />
+				<div className="mt-auto">
+					<Viewers />
+				</div>
 			</div>
 		</main>
 	)

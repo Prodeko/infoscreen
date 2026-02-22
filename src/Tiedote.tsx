@@ -15,7 +15,7 @@ const Tiedote = ({
 			</div>
 		)
 	}
-    console.log(rotation)
+    console.log(rotation, messages)
 
 	const message = messages[(rotation || 0) % messages.length]
 
