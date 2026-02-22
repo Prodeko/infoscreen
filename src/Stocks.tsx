@@ -163,7 +163,7 @@ const useAutoRefreshingStocks = (refreshIntervalMS: number = 60 * 1000) => {
 }
 
 const Stocks = (_props: StocksProps) => {
-	const { quotesById, isLoading, lastUpdatedAt } = useAutoRefreshingStocks()
+	const { quotesById } = useAutoRefreshingStocks()
 
 	const indexStocks = useMemo(
 		() => STOCKS.filter((stock) => stock.group === 'index'),
