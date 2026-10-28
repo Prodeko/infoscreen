@@ -1,0 +1,28 @@
+# Lints and builds every push and pull request. Deploying is manual, on the
+# Raspberry Pi; see README.md.
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npx @biomejs/biome ci .
+      - run: npm run build
+        env:
+          # The build refuses to run without these; any value will do here.
+          VITE_KILTISKAMERA_ON_AIR_PASSWORD: ci
+          VITE_HSL_SUBSCRIPTION_KEY: ci
