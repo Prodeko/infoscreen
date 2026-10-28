@@ -14,7 +14,7 @@ npm install
 npm run dev
 ```
 
-Diat haetaan prodeko.org-sivustolta (`https://prodeko.org/infoscreen/slides.json`). Paikallisesti voi käyttää esimerkkidiojä:
+Diat haetaan prodeko.org-sivustolta (`https://prodeko.org/fi/infoscreen.json`). Paikallisesti voi käyttää esimerkkidioja:
 
 ```
 SLIDES_URL=http://localhost:3000/dev/slides.json npm run dev
@@ -26,7 +26,7 @@ Käytössä on [TypeScript](https://www.typescriptlang.org/), [ESLint](https://e
 
 ## Konfigurointi
 
-- `SLIDES_URL` (ympäristömuuttuja): diojen JSON-syöte. Oletus `https://prodeko.org/infoscreen/slides.json`.
+- `SLIDES_URL` (ympäristömuuttuja): diojen JSON-syöte. Oletus `https://prodeko.org/fi/infoscreen.json`.
 - `lib/config.ts`: diojen vaihtoväli ja päivitystiheydet.
 
 Diasyöte on lista muotoa:

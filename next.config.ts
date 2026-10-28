@@ -1,9 +1,9 @@
 import type { NextConfig } from 'next'
 
 // Where the slides JSON is published. The prodeko.org Hugo site builds it
-// from its content/infoscreen folder.
+// from site/data/infoscreen.yaml in Prodeko/prodeko-org.
 const SLIDES_URL =
-  process.env.SLIDES_URL || 'https://prodeko.org/infoscreen/slides.json'
+  process.env.SLIDES_URL || 'https://prodeko.org/fi/infoscreen.json'
 
 const nextConfig: NextConfig = {
   compiler: {
