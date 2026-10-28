@@ -88,12 +88,23 @@ const HSL_GROUP_DEFINITIONS: HSLGroupDefinition[] = [
 			{ id: 'HSL:2222226', nodeType: 'stop' },
 		],
 	},
+	// Line 52's nearest stops to TUAS: Tietotie towards Aalto-yliopisto (M) and
+	// Laivamiehenpolku on Maarintie towards Otaniemi.
+	{
+		id: 'tietotie',
+		title: 'Tietotie',
+		locations: [
+			{ id: 'HSL:2222223', nodeType: 'stop' },
+			{ id: 'HSL:2222229', nodeType: 'stop' },
+		],
+	},
+	// Maari, the tram 15 stop next to TUAS, both directions.
 	{
 		id: 'ratikka',
-		title: 'Ratikkapysäkki',
+		title: 'Ratikka, Maari',
 		locations: [
-			{ id: 'HSL:2222406', nodeType: 'stop' },
-			{ id: 'HSL:2222405', nodeType: 'stop' },
+			{ id: 'HSL:2222404', nodeType: 'stop' },
+			{ id: 'HSL:2222403', nodeType: 'stop' },
 		],
 	},
 ]
