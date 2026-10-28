@@ -12,6 +12,8 @@ The main area rotates through these slides:
 | Lunch menus (TUAS, A Bloc, T-talo) with opening hours | [Kanttiinit](https://kanttiinit.fi) | Flags a restaurant that closes within 30 minutes |
 | Slides from prodeko.org | `prodeko.org/fi/infoscreen.json` | Edited at prodeko.org/admin → Infoscreen. Hidden when there are none |
 | Weekly bulletin (viikkotiedote) | viikkotiedote API on old.prodeko.org (the old Django site) | Hidden when there is nothing to show |
+| This week's events from the guild's Google calendars (Tapahtumat, Yleiset, Excut, Fuksit, PoRa) | Public iCalendar feeds | Calendars are listed in `src/calendarApi.ts`. Hidden when the week has no events |
+| The most-voted active PTER ideas | `pter.prodeko.org/api/top-ideas` | Hidden when there are none |
 | HSL departures and disruptions: Aalto metro, Innopolis, tram stop | Digitransit | Needs `HSL_SUBSCRIPTION_KEY` |
 | Stock prices: S&P 500 (through the SPY ETF) and the Magnificent 7 | [Twelve Data](https://twelvedata.com) | Needs `TWELVE_DATA_API_KEY` (free plan: 8 symbols/min, 800/day, no indices). Refreshes every 15 minutes. Hidden without data |
 | McKinsey logo | `public/` | Sponsor |
