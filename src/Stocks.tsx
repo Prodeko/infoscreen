@@ -28,18 +28,13 @@ type StocksProps = {
 }
 
 const STOCKS: StockDefinition[] = [
+	// Twelve Data's free plan has no indices, so the S&P 500 is shown through
+	// SPY, an ETF that tracks it: same % change, about a tenth of the price.
 	{
 		id: 'sp500',
-		symbol: '^GSPC',
-		label: 'S&P 500',
-		name: 'S&P 500',
-		group: 'index',
-	},
-	{
-		id: 'helsinki',
-		symbol: '^OMXHPI',
-		label: 'OMX Helsinki',
-		name: 'OMX Helsinki',
+		symbol: 'SPY',
+		label: 'S&P 500 (SPY)',
+		name: 'SPDR S&P 500 ETF',
 		group: 'index',
 	},
 	{ id: 'aapl', symbol: 'AAPL', label: 'AAPL', name: 'Apple', group: 'mag7' },
@@ -69,37 +64,41 @@ const STOCKS: StockDefinition[] = [
 	{ id: 'tsla', symbol: 'TSLA', label: 'TSLA', name: 'Tesla', group: 'mag7' },
 ]
 
-// Yahoo's spark API (unofficial, no key needed) returns every symbol in one
-// request; one request per symbol gets rate limited.
-// query1.finance.yahoo.com/v8/finance/spark?symbols=AAPL,MSFT&range=1d&interval=1d
-type YahooSparkResponse = Record<
-	string,
-	{
-		chartPreviousClose?: number | null
-		close?: (number | null)[] | null
-		timestamp?: number[] | null
-	} | null
->
+// Twelve Data's /quote endpoint, several symbols per request. The free plan
+// allows 8 symbols a minute and 800 a day, which is why STOCKS has 8 entries
+// and the slide refreshes every 15 minutes. The proxy in vite.config.ts adds
+// the API key, so it never reaches the browser.
+type TwelveDataQuote = {
+	close?: string
+	previous_close?: string
+	percent_change?: string
+	timestamp?: number
+	status?: string
+}
 
-const last = <T,>(values: T[] | null | undefined) =>
-	values ? values[values.length - 1] : undefined
+type TwelveDataResponse = Record<string, TwelveDataQuote>
 
-const parseSparkQuote = (
+const parseNumber = (value: string | undefined) => {
+	if (value == null) {
+		return null
+	}
+	const parsed = Number.parseFloat(value)
+	return Number.isFinite(parsed) ? parsed : null
+}
+
+const parseTwelveDataQuote = (
 	stock: StockDefinition,
-	response: YahooSparkResponse,
+	response: TwelveDataResponse,
 ): StockQuote | null => {
-	const spark = response[stock.symbol]
-	const price = last(spark?.close)
-	if (price == null) {
+	const quote = response[stock.symbol]
+	if (!quote || quote.status === 'error') {
 		return null
 	}
 
-	const previousClose = spark?.chartPreviousClose ?? null
-	const changePercent =
-		previousClose != null && previousClose > 0
-			? ((price - previousClose) / previousClose) * 100
-			: null
-	const time = last(spark?.timestamp)
+	const price = parseNumber(quote.close)
+	if (price == null) {
+		return null
+	}
 
 	return {
 		id: stock.id,
@@ -108,9 +107,11 @@ const parseSparkQuote = (
 		group: stock.group,
 		name: stock.name,
 		price,
-		previousClose,
-		changePercent,
-		asOf: time ? new Date(time * 1000).toISOString() : null,
+		previousClose: parseNumber(quote.previous_close),
+		changePercent: parseNumber(quote.percent_change),
+		asOf: quote.timestamp
+			? new Date(quote.timestamp * 1000).toISOString()
+			: null,
 	}
 }
 
@@ -144,7 +145,7 @@ const getChangeColor = (value: number | null) => {
 }
 
 export const useAutoRefreshingStocks = (
-	refreshIntervalMS: number = 5 * 60 * 1000,
+	refreshIntervalMS: number = 15 * 60 * 1000,
 ) => {
 	const [quotesById, setQuotesById] = useState<Record<string, StockQuote>>({})
 	const [isLoading, setIsLoading] = useState(true)
@@ -154,16 +155,19 @@ export const useAutoRefreshingStocks = (
 		try {
 			const symbols = STOCKS.map((stock) => stock.symbol).join(',')
 			const response = await fetch(
-				`/stocksproxy/v8/finance/spark?symbols=${encodeURIComponent(symbols)}&range=1d&interval=1d`,
+				`/stocksproxy/quote?symbol=${encodeURIComponent(symbols)}`,
 			)
 			if (!response.ok) {
 				throw new Error(`Stocks request failed with status ${response.status}`)
 			}
 
-			const data = (await response.json()) as YahooSparkResponse
+			const json = await response.json()
+			// One symbol comes back as a bare quote, several keyed by symbol
+			const data: TwelveDataResponse =
+				typeof json.symbol === 'string' ? { [json.symbol]: json } : json
 			const nextQuotes: Record<string, StockQuote> = {}
 			for (const stock of STOCKS) {
-				const quote = parseSparkQuote(stock, data)
+				const quote = parseTwelveDataQuote(stock, data)
 				if (quote) {
 					nextQuotes[quote.id] = quote
 				}
@@ -174,7 +178,10 @@ export const useAutoRefreshingStocks = (
 				setLastUpdatedAt(new Date())
 			}
 		} catch (error) {
-			console.error('Failed to fetch stocks. Maybe Yahoo is down?', error)
+			console.error(
+				'Failed to fetch stocks. Is TWELVE_DATA_API_KEY set?',
+				error,
+			)
 		}
 		setIsLoading(false)
 	}, [])
@@ -206,13 +213,11 @@ const Stocks = ({ quotesById }: StocksProps) => {
 			<div className="flex items-start justify-between">
 				<div>
 					<h1 className="text-4xl font-bold">Market Snapshot</h1>
-					<p className="text-stone-500 text-lg">
-						S&P 500, OMX Helsinki, ja S&P 7
-					</p>
+					<p className="text-stone-500 text-lg">S&P 500 ja Magnificent Seven</p>
 				</div>
 			</div>
 
-			<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+			<div className="grid grid-cols-1 gap-4">
 				{indexStocks.map((stock) => {
 					const quote = quotesById[stock.id]
 					return (

@@ -45,12 +45,19 @@ export default defineConfig(({ command, mode }) => {
 					changeOrigin: true,
 					rewrite: (path) => path.replace(/^\/hsldata/, ''),
 				},
-				// Yahoo's chart API: unofficial, no key. The Stocks slide hides itself
-				// if it stops answering.
+				// Twelve Data. The key is added here, on the server, so it is not
+				// part of the page. Without it the Stocks slide stays hidden.
 				'/stocksproxy': {
-					target: 'https://query1.finance.yahoo.com',
+					target: 'https://api.twelvedata.com',
 					changeOrigin: true,
-					rewrite: (path) => path.replace(/^\/stocksproxy/, ''),
+					rewrite: (path) => {
+						const url = new URL(
+							path.replace(/^\/stocksproxy/, ''),
+							'http://localhost',
+						)
+						url.searchParams.set('apikey', env.TWELVE_DATA_API_KEY ?? '')
+						return url.pathname + url.search
+					},
 				},
 			},
 		},

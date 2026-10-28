@@ -13,7 +13,7 @@ The main area rotates through these slides:
 | Slides from prodeko.org | `prodeko.org/fi/infoscreen.json` | Edited at prodeko.org/admin → Infoscreen. Hidden when there are none |
 | Weekly bulletin (viikkotiedote) | viikkotiedote API on old.prodeko.org (the old Django site) | Hidden when there is nothing to show |
 | HSL departures and disruptions: Aalto metro, Innopolis, tram stop | Digitransit | Needs `VITE_HSL_SUBSCRIPTION_KEY` |
-| Stock prices: S&P 500, OMX Helsinki, the Magnificent 7 | Yahoo Finance (unofficial, no key) | Refreshes every 5 minutes. Hidden when Yahoo doesn't answer |
+| Stock prices: S&P 500 (through the SPY ETF) and the Magnificent 7 | [Twelve Data](https://twelvedata.com) | Needs `TWELVE_DATA_API_KEY` (free plan: 8 symbols/min, 800/day, no indices). Refreshes every 15 minutes. Hidden without data |
 | McKinsey logo | `public/` | Sponsor |
 
 The sidebar always shows the date and time, the next HSL departures, and
