@@ -15,7 +15,6 @@ const Tiedote = ({
 			</div>
 		)
 	}
-    console.log(rotation, messages)
 
 	const message = messages[(rotation || 0) % messages.length]
 
@@ -33,6 +32,7 @@ const Tiedote = ({
 			<h2 className="text-3xl font-semibold mb-4">{message.header}</h2>
 			<div
 				className="prose prose-xl"
+				// biome-ignore lint/security/noDangerouslySetInnerHtml: bulletin HTML from the prodeko.org API
 				dangerouslySetInnerHTML={{ __html: message.content }}
 			/>
 		</div>

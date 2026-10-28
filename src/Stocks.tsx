@@ -63,7 +63,9 @@ const parseStooqQuote = (
 	const price = parseNumber(closeRaw)
 	const open = parseNumber(openRaw)
 	const changePercent =
-		open != null && open > 0 && price != null ? ((price - open) / open) * 100 : null
+		open != null && open > 0 && price != null
+			? ((price - open) / open) * 100
+			: null
 	const asOf =
 		date && time && date !== 'N/D' && time !== 'N/D' ? `${date} ${time}` : null
 
@@ -183,7 +185,6 @@ const Stocks = (_props: StocksProps) => {
 						S&P 500, OMX Helsinki, ja S&P 7
 					</p>
 				</div>
-
 			</div>
 
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -215,8 +216,12 @@ const Stocks = (_props: StocksProps) => {
 				<div className="grid grid-cols-[1fr_1.4fr_1fr_1fr] gap-x-3 gap-y-2 items-center">
 					<p className="text-sm font-semibold text-stone-500">$</p>
 					<p className="text-sm font-semibold text-stone-500">Nimi</p>
-					<p className="text-sm font-semibold text-stone-500 text-right">Hinta</p>
-					<p className="text-sm font-semibold text-stone-500 text-right">Muutos</p>
+					<p className="text-sm font-semibold text-stone-500 text-right">
+						Hinta
+					</p>
+					<p className="text-sm font-semibold text-stone-500 text-right">
+						Muutos
+					</p>
 					{mag7Stocks.map((stock) => {
 						const quote = quotesById[stock.id]
 						return (

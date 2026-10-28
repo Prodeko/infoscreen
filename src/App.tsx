@@ -4,16 +4,18 @@ import McKinseyLogo from './McKinseyLogo'
 import { Menu } from './Menu'
 import Rotator from './Rotator'
 import SidebarDepartures from './SidebarDepartures'
+import Slides from './Slides'
 import Stocks from './Stocks'
 import Tiedote from './Tiedote'
-import { useAutoRefreshingHsl } from './useAutoRefreshingHsl'
 import type {
 	Menu as MenuType,
 	Restaurant,
 	RestaurantDailyMenu,
+	Slide,
 	TiedoteCategory,
 	TiedoteMessageWithCategory,
 } from './types'
+import { useAutoRefreshingHsl } from './useAutoRefreshingHsl'
 
 const RESTAURANT_IDS = ['7', '52', '2'] // TUAS, A Bloc, T-talo, Täffä
 
@@ -24,66 +26,69 @@ const useAutoRefreshingMenus = (refreshIntervalMS: number = 60 * 60 * 1000) => {
 		Restaurant
 	> | null>(null)
 
-	const fetchMenus = async () => {
-		try {
-			const response = await fetch('/kanttiinitproxy/menus/')
-			const data = await response.json()
-			setMenus(data)
-		} catch (error) {
-			console.error('Failed to fetch menus. Maybe the server is down?', error)
-		}
-	}
-
-	const fetchRestaurants = async () => {
-		try {
-			const response = await fetch('/kanttiinitproxy/restaurants/')
-			const data = (await response.json()) as Restaurant[]
-			const restaurantMap = data.reduce(
-				(acc, restaurant) => {
-					acc[restaurant.id] = restaurant
-					return acc
-				},
-				{} as Record<string, Restaurant>,
-			)
-			setRestaurants(restaurantMap)
-		} catch (error) {
-			console.error(
-				'Failed to fetch restaurants. Maybe the server is down?',
-				error,
-			)
-		}
-	}
-
-	// Refresh the menus every `refreshIntervalMS` milliseconds
+	// Fetch menus and restaurants on mount, then refresh the menus every
+	// `refreshIntervalMS` milliseconds
 	useEffect(() => {
+		const fetchMenus = async () => {
+			try {
+				const response = await fetch(
+					`/kanttiinitproxy/menus?restaurants=${RESTAURANT_IDS.join(',')}`,
+				)
+				const data = await response.json()
+				setMenus(data)
+			} catch (error) {
+				console.error('Failed to fetch menus. Maybe the server is down?', error)
+			}
+		}
+
+		const fetchRestaurants = async () => {
+			try {
+				const response = await fetch('/kanttiinitproxy/restaurants')
+				const data = (await response.json()) as Restaurant[]
+				const restaurantMap = data.reduce(
+					(acc, restaurant) => {
+						acc[restaurant.id] = restaurant
+						return acc
+					},
+					{} as Record<string, Restaurant>,
+				)
+				setRestaurants(restaurantMap)
+			} catch (error) {
+				console.error(
+					'Failed to fetch restaurants. Maybe the server is down?',
+					error,
+				)
+			}
+		}
+
+		fetchMenus()
+		fetchRestaurants()
 		const interval = setInterval(fetchMenus, refreshIntervalMS)
 		return () => clearInterval(interval)
 	}, [refreshIntervalMS])
 
-	// Fetch menus and restaurants on mount
-	useEffect(() => {
-		fetchMenus()
-		fetchRestaurants()
-	}, [])
-
 	return { menus, restaurants }
 }
 
-const useAutoRefreshingTiedote = (refreshIntervalMS: number = 60 * 60 * 1000) => {
+const useAutoRefreshingTiedote = (
+	refreshIntervalMS: number = 60 * 60 * 1000,
+) => {
 	const [tiedote, setTiedote] = useState<TiedoteCategory[] | null>(null)
 
-	const fetchTiedote = async () => {
-		try {
-			const response = await fetch('/tiedoteproxy/content/')
-			const data = await response.json()
-			console.log("data: ", data)
-			setTiedote(data)
-		} catch (error) {
-			console.error('Failed to fetch tiedote. Maybe the server is down?', error)
-		}
-	}
-
 	useEffect(() => {
+		const fetchTiedote = async () => {
+			try {
+				const response = await fetch('/tiedoteproxy/content/')
+				const data = await response.json()
+				setTiedote(data)
+			} catch (error) {
+				console.error(
+					'Failed to fetch tiedote. Maybe the server is down?',
+					error,
+				)
+			}
+		}
+
 		fetchTiedote()
 		const interval = setInterval(fetchTiedote, refreshIntervalMS)
 		return () => clearInterval(interval)
@@ -92,6 +97,34 @@ const useAutoRefreshingTiedote = (refreshIntervalMS: number = 60 * 60 * 1000) =>
 	return tiedote
 }
 
+const useAutoRefreshingSlides = (refreshIntervalMS: number = 5 * 60 * 1000) => {
+	const [slides, setSlides] = useState<Slide[] | null>(null)
+
+	useEffect(() => {
+		const fetchSlides = async () => {
+			try {
+				const response = await fetch('/slidesproxy/fi/infoscreen.json')
+				if (!response.ok) {
+					throw new Error(
+						`Slides request failed with status ${response.status}`,
+					)
+				}
+				setSlides(await response.json())
+			} catch (error) {
+				console.error(
+					'Failed to fetch slides. Maybe the server is down?',
+					error,
+				)
+			}
+		}
+
+		fetchSlides()
+		const interval = setInterval(fetchSlides, refreshIntervalMS)
+		return () => clearInterval(interval)
+	}, [refreshIntervalMS])
+
+	return slides
+}
 
 const useClock = () => {
 	const [time, setTime] = useState<Date>(new Date())
@@ -170,8 +203,9 @@ const Viewers = () => {
 	return (
 		<div className="flex items-center justify-center p-4 rounded-lg shadow-inner relative">
 			<div
-				className={`absolute inset-0 rounded-lg ${onAir ? 'bg-red-200 animate-pulse' : 'bg-green-200'
-					}`}
+				className={`absolute inset-0 rounded-lg ${
+					onAir ? 'bg-red-200 animate-pulse' : 'bg-green-200'
+				}`}
 			/>
 			<div className="relative z-10">
 				{onAir ? (
@@ -190,6 +224,7 @@ const Viewers = () => {
 const App = () => {
 	const { menus, restaurants } = useAutoRefreshingMenus()
 	const tiedote = useAutoRefreshingTiedote()
+	const slides = useAutoRefreshingSlides()
 	const hsl = useAutoRefreshingHsl(60 * 1000)
 
 	const allTiedoteMessages: TiedoteMessageWithCategory[] | undefined =
@@ -213,29 +248,34 @@ const App = () => {
 	const todaysMenus: RestaurantDailyMenu[] | null =
 		menus && restaurants
 			? RESTAURANT_IDS.map((id) => {
-				const restaurant = restaurants[id]
-				const menu = menus[id]?.[todayKey]
-				const openingHours = restaurant?.openingHours[dayOfWeek]
+					const restaurant = restaurants[id]
+					const menu = menus[id]?.[todayKey]
+					const openingHours = restaurant?.openingHours[dayOfWeek]
 
-				return {
-					id: restaurant.id,
-					name: restaurant.name,
-					menu: menu || null,
-					openingHours: openingHours || null,
-				}
-			})
+					return {
+						id: restaurant.id,
+						name: restaurant.name,
+						menu: menu || null,
+						openingHours: openingHours || null,
+					}
+				})
 			: null
 
 	return (
 		<main className="grid grid-rows-1 grid-cols-[8fr_1fr] h-screen">
 			<div className="h-full p-4">
-					<Rotator defaultRotationInterval={10000}>
-						<Menu rotationInterval={30000} todaysMenus={todaysMenus} />
+				<Rotator defaultRotationInterval={10000}>
+					<Menu rotationInterval={30000} todaysMenus={todaysMenus} />
+					{slides && slides.length > 0 && (
+						<Slides slides={slides} rotationInterval={15000} />
+					)}
+					{allTiedoteMessages && allTiedoteMessages.length > 0 && (
 						<Tiedote messages={allTiedoteMessages} rotationInterval={15000} />
-						<Hsl data={hsl} rotationInterval={15000} />
-						<Stocks rotationInterval={20000} />
-						<McKinseyLogo rotationInterval={5000} />
-					</Rotator>
+					)}
+					<Hsl data={hsl} rotationInterval={15000} />
+					<Stocks rotationInterval={20000} />
+					<McKinseyLogo rotationInterval={5000} />
+				</Rotator>
 			</div>
 			<div className="bg-stone-100 h-full text-center flex flex-col gap-4 shadow-md p-4">
 				<Time />

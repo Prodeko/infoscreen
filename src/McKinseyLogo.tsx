@@ -15,4 +15,4 @@ const McKinseyLogo = ({
 	)
 }
 
-export default McKinseyLogo;
+export default McKinseyLogo

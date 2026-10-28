@@ -25,13 +25,14 @@ const useClosingSoon = (openingHours: string | null) => {
 			const closingTimeStr = parts[1]
 			const [hours, minutes] = closingTimeStr.split(':').map(Number)
 
-			if (isNaN(hours) || isNaN(minutes)) return
+			if (Number.isNaN(hours) || Number.isNaN(minutes)) return
 
 			const now = new Date()
 			const closingTime = new Date()
 			closingTime.setHours(hours, minutes, 0, 0)
 
-			const diffInMinutes = (closingTime.getTime() - now.getTime()) / (1000 * 60)
+			const diffInMinutes =
+				(closingTime.getTime() - now.getTime()) / (1000 * 60)
 
 			if (diffInMinutes > 0 && diffInMinutes < 30) {
 				setIsClosingSoon(true)
@@ -118,9 +119,7 @@ export const Menu = ({
 							key={restaurant.id}
 							className="bg-white rounded-lg shadow-md p-4"
 						>
-							<h1 className="text-2xl font-bold">
-								{restaurant.name}
-							</h1>
+							<h1 className="text-2xl font-bold">{restaurant.name}</h1>
 							<p>No menu for today</p>
 						</div>
 					))}

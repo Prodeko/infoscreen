@@ -1,10 +1,11 @@
-import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
+import { defineConfig, loadEnv } from 'vite'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
+	const env = loadEnv(mode, process.cwd(), '')
+
 	if (command === 'build') {
-		const env = loadEnv(mode, process.cwd(), '')
 		const requiredEnvKeys = [
 			'VITE_KILTISKAMERA_ON_AIR_PASSWORD',
 			'VITE_HSL_SUBSCRIPTION_KEY',
@@ -29,6 +30,13 @@ export default defineConfig(({ command, mode }) => {
 					target: 'https://prodeko.org/fi/palvelut/viikkotiedote/api',
 					changeOrigin: true,
 					rewrite: (path) => path.replace(/^\/tiedoteproxy/, ''),
+				},
+				// Slides from prodeko.org/fi/infoscreen.json. SLIDES_ORIGIN points it
+				// elsewhere, e.g. a local `hugo server` of Prodeko/prodeko-org.
+				'/slidesproxy': {
+					target: env.SLIDES_ORIGIN || 'https://prodeko.org',
+					changeOrigin: true,
+					rewrite: (path) => path.replace(/^\/slidesproxy/, ''),
 				},
 				'/hsldata': {
 					target: 'https://api.digitransit.fi',

@@ -119,8 +119,9 @@ const HSL_QUERY_LOCATIONS = createQueryLocations(HSL_GROUP_DEFINITIONS)
 export const HSL_GROUPS: HSLGroup[] = HSL_GROUP_DEFINITIONS.map((group) => ({
 	id: group.id,
 	title: group.title,
-	aliases: HSL_QUERY_LOCATIONS.filter((location) => location.groupId === group.id)
-		.map((location) => location.alias),
+	aliases: HSL_QUERY_LOCATIONS.filter(
+		(location) => location.groupId === group.id,
+	).map((location) => location.alias),
 }))
 
 const HSL_GROUP_BY_ALIAS: Record<string, HSLGroup> = Object.fromEntries(
@@ -170,8 +171,7 @@ ${HSL_QUERY_LOCATIONS.map(buildLocationQuery).join('\n')}
 `
 
 const HSL_SUBSCRIPTION_KEY = import.meta.env.VITE_HSL_SUBSCRIPTION_KEY || ''
-export const HSL_ENDPOINT =
-	`/hsldata/routing/v2/hsl/gtfs/v1?digitransit-subscription-key=${encodeURIComponent(HSL_SUBSCRIPTION_KEY)}`
+export const HSL_ENDPOINT = `/hsldata/routing/v2/hsl/gtfs/v1?digitransit-subscription-key=${encodeURIComponent(HSL_SUBSCRIPTION_KEY)}`
 
 export const getDepartureUnix = (stoptime: HSLStoptime) => {
 	if (stoptime.serviceDay == null) {
@@ -203,7 +203,9 @@ export const formatHslDepartureDisplay = (
 	minuteThreshold: number = 15,
 ) => {
 	const minutes = getMinutesUntilDeparture(departureUnix)
-	return minutes > minuteThreshold ? formatHslTime(departureUnix) : `${minutes} min`
+	return minutes > minuteThreshold
+		? formatHslTime(departureUnix)
+		: `${minutes} min`
 }
 
 type GetDeparturesOptions = {
@@ -228,7 +230,11 @@ export const getHslDepartures = (
 
 		for (const stoptime of stop?.stoptimesWithoutPatterns ?? []) {
 			const departureUnix = getDepartureUnix(stoptime)
-			if (departureUnix == null || departureUnix < fromUnix || departureUnix > toUnix) {
+			if (
+				departureUnix == null ||
+				departureUnix < fromUnix ||
+				departureUnix > toUnix
+			) {
 				continue
 			}
 

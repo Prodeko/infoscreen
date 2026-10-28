@@ -1,10 +1,11 @@
 import {
-	useState,
-	useEffect,
 	Children,
-	ReactElement,
-	useRef,
 	cloneElement,
+	type ReactElement,
+	type ReactNode,
+	useEffect,
+	useRef,
+	useState,
 } from 'react'
 
 interface RotatorChildProps {
@@ -13,7 +14,8 @@ interface RotatorChildProps {
 }
 
 interface RotatorProps {
-	children: ReactElement<RotatorChildProps>[]
+	// Children may be conditional; false and null are skipped
+	children: ReactNode
 	defaultRotationInterval?: number // in milliseconds
 }
 
@@ -25,13 +27,14 @@ const Rotator = ({
 	const [round, setRound] = useState(0)
 	const [isFading, setIsFading] = useState(false)
 
-	const intervalRef = useRef<NodeJS.Timeout | null>(null)
+	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 	const prevIndexRef = useRef(currentIndex)
 
 	const childrenArray = Children.toArray(
 		children,
 	) as ReactElement<RotatorChildProps>[]
-	const currentChild = childrenArray[currentIndex]
+	// The number of children can shrink, e.g. when a feed comes back empty
+	const currentChild = childrenArray[currentIndex % childrenArray.length]
 	const rotationInterval =
 		currentChild.props.rotationInterval || defaultRotationInterval
 
@@ -39,6 +42,7 @@ const Rotator = ({
 	const countdownRef = useRef(countdown)
 	countdownRef.current = countdown
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: restart the countdown whenever the slide changes
 	useEffect(() => {
 		setCountdown(rotationInterval / 1000)
 	}, [currentIndex, rotationInterval])
@@ -110,4 +114,3 @@ const Rotator = ({
 }
 
 export default Rotator
-

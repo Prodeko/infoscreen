@@ -50,4 +50,17 @@ export type TiedoteCategory = {
 	messages: TiedoteMessage[]
 }
 
-export type TiedoteMessageWithCategory = TiedoteMessage & { categoryTitle: string }
+export type TiedoteMessageWithCategory = TiedoteMessage & {
+	categoryTitle: string
+}
+
+// One entry of prodeko.org/fi/infoscreen.json
+export type Slide = {
+	id: string
+	title: string
+	// HTML, rendered from Markdown
+	description: string
+	highlight: boolean
+	// Absolute URL
+	image?: string
+}

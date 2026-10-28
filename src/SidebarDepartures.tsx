@@ -1,9 +1,9 @@
 import {
-	HSL_ALL_ALIASES,
 	getHslDepartures,
 	getMinutesUntilDeparture,
+	HSL_ALL_ALIASES,
 	type HSLData,
-} from './hsl'
+} from './hslApi'
 
 type SidebarDeparturesProps = {
 	data: HSLData | null
@@ -55,12 +55,12 @@ const SidebarDepartures = ({ data }: SidebarDeparturesProps) => {
 								<p className="text-xs text-stone-500 truncate">
 									{departure.headsign}
 								</p>
-								</div>
-								<p className="text-sm font-mono text-right whitespace-nowrap">
-									{getMinutesUntilDeparture(departure.departureUnix)} min
-								</p>
 							</div>
-						))}
+							<p className="text-sm font-mono text-right whitespace-nowrap">
+								{getMinutesUntilDeparture(departure.departureUnix)} min
+							</p>
+						</div>
+					))}
 				</div>
 			) : (
 				<p className="text-sm text-stone-500">Ei tulevia lähtöjä.</p>

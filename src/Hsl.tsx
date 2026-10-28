@@ -1,13 +1,13 @@
 import {
+	formatHslDepartureDisplay,
+	getHslAlerts,
+	getHslDepartures,
 	HSL_ALL_ALIASES,
 	HSL_GROUPS,
 	HSL_MAX_GROUP_DEPARTURES,
-	formatHslDepartureDisplay,
-	getHslDepartures,
-	getHslAlerts,
 	type HSLData,
 	type HSLDeparture,
-} from './hsl'
+} from './hslApi'
 
 type HSLSlideProps = {
 	data: HSLData | null
