@@ -144,12 +144,8 @@ const useAutoRefreshingViewerCount = (
 
 	const fetchViewerCount = useCallback(async () => {
 		try {
-			const params = new URLSearchParams({
-				password: import.meta.env.VITE_KILTISKAMERA_ON_AIR_PASSWORD,
-			})
-			const response = await fetch(
-				`https://kiltiskamera.prodeko.org/on_air?${params.toString()}`,
-			)
+			// The proxy in vite.config.ts adds the password
+			const response = await fetch('/kiltiskameraproxy/on_air')
 			const data = await response.json()
 			setOnAir(data.onAir)
 		} catch (error) {

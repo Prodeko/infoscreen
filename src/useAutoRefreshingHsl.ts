@@ -13,11 +13,6 @@ export const useAutoRefreshingHsl = (refreshIntervalMS: number = 60 * 1000) => {
 	useEffect(() => {
 		const fetchHsl = async () => {
 			try {
-				if (!import.meta.env.VITE_HSL_SUBSCRIPTION_KEY) {
-					console.error('VITE_HSL_SUBSCRIPTION_KEY is not set.')
-					return
-				}
-
 				const response = await fetch(HSL_ENDPOINT, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
