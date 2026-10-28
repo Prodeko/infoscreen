@@ -11,9 +11,9 @@ The main area rotates through these slides:
 | --- | --- | --- |
 | Lunch menus (TUAS, A Bloc, T-talo) with opening hours | [Kanttiinit](https://kanttiinit.fi) | Flags a restaurant that closes within 30 minutes |
 | Slides from prodeko.org | `prodeko.org/fi/infoscreen.json` | Edited at prodeko.org/admin → Infoscreen. Hidden when there are none |
-| Weekly bulletin (viikkotiedote) | prodeko.org viikkotiedote API | Hidden when there is nothing to show |
+| Weekly bulletin (viikkotiedote) | viikkotiedote API on old.prodeko.org (the old Django site) | Hidden when there is nothing to show |
 | HSL departures and disruptions: Aalto metro, Innopolis, tram stop | Digitransit | Needs `VITE_HSL_SUBSCRIPTION_KEY` |
-| Stock prices: S&P 500, OMX Helsinki, the Magnificent 7 | Stooq | |
+| Stock prices: S&P 500, OMX Helsinki, the Magnificent 7 | Yahoo Finance (unofficial, no key) | Refreshes every 5 minutes. Hidden when Yahoo doesn't answer |
 | McKinsey logo | `public/` | Sponsor |
 
 The sidebar always shows the date and time, the next HSL departures, and
@@ -57,7 +57,7 @@ npm run build
 
 ## Building and deploying
 
-SSH into the Raspberry Pi, pull the new contents of the repo and run:
+SSH into the Raspberry Pi (who has access, and how, is kept in the board's own documents, not in this public repo), pull the new contents of the repo and run:
 
 ```
 npm install

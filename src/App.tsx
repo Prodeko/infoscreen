@@ -5,7 +5,7 @@ import { Menu } from './Menu'
 import Rotator from './Rotator'
 import SidebarDepartures from './SidebarDepartures'
 import Slides from './Slides'
-import Stocks from './Stocks'
+import Stocks, { useAutoRefreshingStocks } from './Stocks'
 import Tiedote from './Tiedote'
 import type {
 	Menu as MenuType,
@@ -225,6 +225,7 @@ const App = () => {
 	const { menus, restaurants } = useAutoRefreshingMenus()
 	const tiedote = useAutoRefreshingTiedote()
 	const slides = useAutoRefreshingSlides()
+	const { quotesById } = useAutoRefreshingStocks()
 	const hsl = useAutoRefreshingHsl(60 * 1000)
 
 	const allTiedoteMessages: TiedoteMessageWithCategory[] | undefined =
@@ -273,7 +274,9 @@ const App = () => {
 						<Tiedote messages={allTiedoteMessages} rotationInterval={15000} />
 					)}
 					<Hsl data={hsl} rotationInterval={15000} />
-					<Stocks rotationInterval={20000} />
+					{Object.keys(quotesById).length > 0 && (
+						<Stocks quotesById={quotesById} rotationInterval={20000} />
+					)}
 					<McKinseyLogo rotationInterval={5000} />
 				</Rotator>
 			</div>

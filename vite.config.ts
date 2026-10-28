@@ -26,8 +26,10 @@ export default defineConfig(({ command, mode }) => {
 					changeOrigin: true,
 					rewrite: (path) => path.replace(/^\/kanttiinitproxy/, ''),
 				},
+				// The bulletin still lives on the old Django site. Move this when
+				// viikkotiedote gets a new home.
 				'/tiedoteproxy': {
-					target: 'https://prodeko.org/fi/palvelut/viikkotiedote/api',
+					target: 'https://old.prodeko.org/fi/palvelut/viikkotiedote/api',
 					changeOrigin: true,
 					rewrite: (path) => path.replace(/^\/tiedoteproxy/, ''),
 				},
@@ -43,8 +45,10 @@ export default defineConfig(({ command, mode }) => {
 					changeOrigin: true,
 					rewrite: (path) => path.replace(/^\/hsldata/, ''),
 				},
+				// Yahoo's chart API: unofficial, no key. The Stocks slide hides itself
+				// if it stops answering.
 				'/stocksproxy': {
-					target: 'https://stooq.com',
+					target: 'https://query1.finance.yahoo.com',
 					changeOrigin: true,
 					rewrite: (path) => path.replace(/^\/stocksproxy/, ''),
 				},

@@ -6,79 +6,111 @@ type StockDefinition = {
 	id: string
 	symbol: string
 	label: string
+	name: string
 	group: StockGroup
 }
 
-type StockQuote = {
+export type StockQuote = {
 	id: string
 	symbol: string
 	label: string
 	group: StockGroup
 	name: string
 	price: number | null
-	open: number | null
+	previousClose: number | null
 	changePercent: number | null
 	asOf: string | null
 }
 
 type StocksProps = {
+	quotesById: Record<string, StockQuote>
 	rotationInterval?: number
 }
 
 const STOCKS: StockDefinition[] = [
-	{ id: 'sp500', symbol: '^spx', label: 'S&P 500', group: 'index' },
-	{ id: 'helsinki', symbol: '^hex', label: 'OMX Helsinki', group: 'index' },
-	{ id: 'aapl', symbol: 'aapl.us', label: 'AAPL', group: 'mag7' },
-	{ id: 'msft', symbol: 'msft.us', label: 'MSFT', group: 'mag7' },
-	{ id: 'amzn', symbol: 'amzn.us', label: 'AMZN', group: 'mag7' },
-	{ id: 'googl', symbol: 'googl.us', label: 'GOOGL', group: 'mag7' },
-	{ id: 'meta', symbol: 'meta.us', label: 'META', group: 'mag7' },
-	{ id: 'nvda', symbol: 'nvda.us', label: 'NVDA', group: 'mag7' },
-	{ id: 'tsla', symbol: 'tsla.us', label: 'TSLA', group: 'mag7' },
+	{
+		id: 'sp500',
+		symbol: '^GSPC',
+		label: 'S&P 500',
+		name: 'S&P 500',
+		group: 'index',
+	},
+	{
+		id: 'helsinki',
+		symbol: '^OMXHPI',
+		label: 'OMX Helsinki',
+		name: 'OMX Helsinki',
+		group: 'index',
+	},
+	{ id: 'aapl', symbol: 'AAPL', label: 'AAPL', name: 'Apple', group: 'mag7' },
+	{
+		id: 'msft',
+		symbol: 'MSFT',
+		label: 'MSFT',
+		name: 'Microsoft',
+		group: 'mag7',
+	},
+	{ id: 'amzn', symbol: 'AMZN', label: 'AMZN', name: 'Amazon', group: 'mag7' },
+	{
+		id: 'googl',
+		symbol: 'GOOGL',
+		label: 'GOOGL',
+		name: 'Alphabet',
+		group: 'mag7',
+	},
+	{
+		id: 'meta',
+		symbol: 'META',
+		label: 'META',
+		name: 'Meta Platforms',
+		group: 'mag7',
+	},
+	{ id: 'nvda', symbol: 'NVDA', label: 'NVDA', name: 'NVIDIA', group: 'mag7' },
+	{ id: 'tsla', symbol: 'TSLA', label: 'TSLA', name: 'Tesla', group: 'mag7' },
 ]
 
-const parseNumber = (value: string | undefined) => {
-	if (!value || value === 'N/D') {
-		return null
-	}
-	const parsed = Number.parseFloat(value)
-	return Number.isFinite(parsed) ? parsed : null
-}
+// Yahoo's spark API (unofficial, no key needed) returns every symbol in one
+// request; one request per symbol gets rate limited.
+// query1.finance.yahoo.com/v8/finance/spark?symbols=AAPL,MSFT&range=1d&interval=1d
+type YahooSparkResponse = Record<
+	string,
+	{
+		chartPreviousClose?: number | null
+		close?: (number | null)[] | null
+		timestamp?: number[] | null
+	} | null
+>
 
-const parseStooqQuote = (
+const last = <T,>(values: T[] | null | undefined) =>
+	values ? values[values.length - 1] : undefined
+
+const parseSparkQuote = (
 	stock: StockDefinition,
-	csvContent: string,
+	response: YahooSparkResponse,
 ): StockQuote | null => {
-	const line = csvContent.trim().split('\n')[0]
-	if (!line) {
+	const spark = response[stock.symbol]
+	const price = last(spark?.close)
+	if (price == null) {
 		return null
 	}
 
-	const values = line.split(',')
-	if (values.length < 9) {
-		return null
-	}
-
-	const [symbol, date, time, openRaw, , , closeRaw, , nameRaw] = values
-	const price = parseNumber(closeRaw)
-	const open = parseNumber(openRaw)
+	const previousClose = spark?.chartPreviousClose ?? null
 	const changePercent =
-		open != null && open > 0 && price != null
-			? ((price - open) / open) * 100
+		previousClose != null && previousClose > 0
+			? ((price - previousClose) / previousClose) * 100
 			: null
-	const asOf =
-		date && time && date !== 'N/D' && time !== 'N/D' ? `${date} ${time}` : null
+	const time = last(spark?.timestamp)
 
 	return {
 		id: stock.id,
-		symbol: symbol || stock.symbol.toUpperCase(),
+		symbol: stock.symbol,
 		label: stock.label,
 		group: stock.group,
-		name: nameRaw || stock.label,
+		name: stock.name,
 		price,
-		open,
+		previousClose,
 		changePercent,
-		asOf,
+		asOf: time ? new Date(time * 1000).toISOString() : null,
 	}
 }
 
@@ -111,43 +143,38 @@ const getChangeColor = (value: number | null) => {
 	return 'text-stone-700'
 }
 
-const useAutoRefreshingStocks = (refreshIntervalMS: number = 60 * 1000) => {
+export const useAutoRefreshingStocks = (
+	refreshIntervalMS: number = 5 * 60 * 1000,
+) => {
 	const [quotesById, setQuotesById] = useState<Record<string, StockQuote>>({})
 	const [isLoading, setIsLoading] = useState(true)
 	const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null)
 
 	const fetchStocks = useCallback(async () => {
-		const results = await Promise.allSettled(
-			STOCKS.map(async (stock) => {
-				const response = await fetch(
-					`/stocksproxy/q/l/?s=${encodeURIComponent(stock.symbol)}&f=sd2t2ohlcvn&e=csv`,
-				)
-
-				if (!response.ok) {
-					throw new Error(
-						`Failed to fetch ${stock.symbol} with status ${response.status}`,
-					)
-				}
-
-				const csvContent = await response.text()
-				const quote = parseStooqQuote(stock, csvContent)
-				if (!quote) {
-					throw new Error(`Failed to parse response for ${stock.symbol}`)
-				}
-				return quote
-			}),
-		)
-
-		const nextQuotes: Record<string, StockQuote> = {}
-		for (const result of results) {
-			if (result.status === 'fulfilled') {
-				nextQuotes[result.value.id] = result.value
+		try {
+			const symbols = STOCKS.map((stock) => stock.symbol).join(',')
+			const response = await fetch(
+				`/stocksproxy/v8/finance/spark?symbols=${encodeURIComponent(symbols)}&range=1d&interval=1d`,
+			)
+			if (!response.ok) {
+				throw new Error(`Stocks request failed with status ${response.status}`)
 			}
-		}
 
-		if (Object.keys(nextQuotes).length > 0) {
-			setQuotesById((previous) => ({ ...previous, ...nextQuotes }))
-			setLastUpdatedAt(new Date())
+			const data = (await response.json()) as YahooSparkResponse
+			const nextQuotes: Record<string, StockQuote> = {}
+			for (const stock of STOCKS) {
+				const quote = parseSparkQuote(stock, data)
+				if (quote) {
+					nextQuotes[quote.id] = quote
+				}
+			}
+
+			if (Object.keys(nextQuotes).length > 0) {
+				setQuotesById((previous) => ({ ...previous, ...nextQuotes }))
+				setLastUpdatedAt(new Date())
+			}
+		} catch (error) {
+			console.error('Failed to fetch stocks. Maybe Yahoo is down?', error)
 		}
 		setIsLoading(false)
 	}, [])
@@ -164,9 +191,7 @@ const useAutoRefreshingStocks = (refreshIntervalMS: number = 60 * 1000) => {
 	return { quotesById, isLoading, lastUpdatedAt }
 }
 
-const Stocks = (_props: StocksProps) => {
-	const { quotesById } = useAutoRefreshingStocks()
-
+const Stocks = ({ quotesById }: StocksProps) => {
 	const indexStocks = useMemo(
 		() => STOCKS.filter((stock) => stock.group === 'index'),
 		[],
