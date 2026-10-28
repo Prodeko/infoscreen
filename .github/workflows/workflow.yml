@@ -1,42 +1,26 @@
-# To configure this workflow:
-#
-# 1. Set up a secret in your repository named AZURE_CREDENTIALS
-#    with the value of your Azure publish profile.
-
-env:
-  AZURE_WEBAPP_NAME: infoscreeni
-  AZURE_WEBAPP_PACKAGE_PATH: '.'
-  NODE_VERSION: '24'
+# Lints and builds every push and pull request. There is no deploy step:
+# the old Azure app (infoscreeni) is gone, and where the infoscreen is hosted
+# next is still open.
 
 on:
   push:
     branches:
       - master
+  pull_request:
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      # Setup Node.js
-      - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version-file: .nvmrc
+          cache: npm
 
-      # Install dependencies and build
-      - name: npm install and build
-        run: |
-          npm ci
-          npm run lint
-          npm run build
-
-      # Deploy web app
-      - name: Deploy to Azure App Service
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_CREDENTIALS }}
-          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
