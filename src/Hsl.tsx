@@ -34,7 +34,7 @@ const Hsl = ({ data }: HSLSlideProps) => {
 	return (
 		<div className="flex flex-col gap-4 h-full">
 			<h1 className="text-4xl font-bold">HSL lähdöt</h1>
-			<div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
+			<div className="grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1 min-h-0">
 				{HSL_GROUPS.map((group) => {
 					const departures = getGroupDepartures(data, group.aliases)
 
