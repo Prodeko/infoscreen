@@ -170,8 +170,8 @@ ${HSL_QUERY_LOCATIONS.map(buildLocationQuery).join('\n')}
 }
 `
 
-const HSL_SUBSCRIPTION_KEY = import.meta.env.VITE_HSL_SUBSCRIPTION_KEY || ''
-export const HSL_ENDPOINT = `/hsldata/routing/v2/hsl/gtfs/v1?digitransit-subscription-key=${encodeURIComponent(HSL_SUBSCRIPTION_KEY)}`
+// The proxy in vite.config.ts adds the subscription key
+export const HSL_ENDPOINT = '/hsldata/routing/v2/hsl/gtfs/v1'
 
 export const getDepartureUnix = (stoptime: HSLStoptime) => {
 	if (stoptime.serviceDay == null) {

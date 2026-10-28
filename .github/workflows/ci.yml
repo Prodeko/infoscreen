@@ -22,7 +22,3 @@ jobs:
       - run: npm ci
       - run: npx @biomejs/biome ci .
       - run: npm run build
-        env:
-          # The build refuses to run without these; any value will do here.
-          VITE_KILTISKAMERA_ON_AIR_PASSWORD: ci
-          VITE_HSL_SUBSCRIPTION_KEY: ci

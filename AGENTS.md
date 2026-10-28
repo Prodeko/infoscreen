@@ -11,8 +11,6 @@ This repository is a Vite + React + TypeScript frontend for the Prodeko infoscre
 - `npm install`: install dependencies.
 - `npm run dev`: start the Vite dev server with API proxies defined in `vite.config.ts`.
 - `npm run build`: run TypeScript checks and create a production build.
-  - Requires `VITE_KILTISKAMERA_ON_AIR_PASSWORD` to be set during build.
-  - Example: `export VITE_KILTISKAMERA_ON_AIR_PASSWORD=... && npm run build`
 - `npm run preview`: serve the built app locally from `dist/`.
 - `docker build -f Dockerfile.prod .`: build the production image (Nginx serving static files).
 
@@ -42,5 +40,5 @@ There is currently no automated test suite in this repository.
   - linked issue/task when applicable.
 
 ## Security & Configuration Tips
-- Never commit secrets. Keep `VITE_KILTISKAMERA_ON_AIR_PASSWORD` in environment variables only.
+- Never commit secrets. Keys and passwords live in `.env` and are added by the proxy in `vite.config.ts`; never read them through `import.meta.env`, which puts them in the page.
 - Review proxy targets in `vite.config.ts` carefully when changing API integrations.
