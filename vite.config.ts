@@ -47,6 +47,19 @@ export default defineConfig(({ mode }) => {
 					changeOrigin: true,
 					rewrite: (path) => path.replace(/^\/slidesproxy/, ''),
 				},
+				// The guild's public Google calendars, as iCalendar feeds.
+				'/calendarproxy': {
+					target: 'https://calendar.google.com',
+					changeOrigin: true,
+					rewrite: (path) => path.replace(/^\/calendarproxy/, ''),
+				},
+				// The most-voted PTER ideas. PTER_ORIGIN points it elsewhere, e.g. a
+				// local `pnpm dev` of Prodeko/pter on http://localhost:3000.
+				'/pterproxy': {
+					target: env.PTER_ORIGIN || 'https://pter.prodeko.org',
+					changeOrigin: true,
+					rewrite: (path) => path.replace(/^\/pterproxy/, ''),
+				},
 				'/hsldata': {
 					target: 'https://api.digitransit.fi',
 					changeOrigin: true,

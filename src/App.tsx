@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
+import { type CalendarEvent, fetchWeekEvents } from './calendarApi'
 import Hsl from './Hsl'
 import McKinseyLogo from './McKinseyLogo'
 import { Menu } from './Menu'
+import PterIdeas, { type PterIdea } from './PterIdeas'
 import Rotator from './Rotator'
 import SidebarDepartures from './SidebarDepartures'
 import Slides from './Slides'
@@ -16,6 +18,7 @@ import type {
 	TiedoteMessageWithCategory,
 } from './types'
 import { useAutoRefreshingHsl } from './useAutoRefreshingHsl'
+import WeekCalendar from './WeekCalendar'
 
 const RESTAURANT_IDS = ['7', '52', '2'] // TUAS, A Bloc, T-talo, Täffä
 
@@ -126,6 +129,55 @@ const useAutoRefreshingSlides = (refreshIntervalMS: number = 5 * 60 * 1000) => {
 	return slides
 }
 
+// The week shown is the one the fetch falls in, so on Monday the slide moves on
+// to the new week at the first refresh after midnight.
+const useAutoRefreshingWeekEvents = (
+	refreshIntervalMS: number = 60 * 60 * 1000,
+) => {
+	const [events, setEvents] = useState<CalendarEvent[] | null>(null)
+
+	useEffect(() => {
+		const fetchEvents = async () => setEvents(await fetchWeekEvents())
+
+		fetchEvents()
+		const interval = setInterval(fetchEvents, refreshIntervalMS)
+		return () => clearInterval(interval)
+	}, [refreshIntervalMS])
+
+	return events
+}
+
+const PTER_IDEA_COUNT = 5
+
+const useAutoRefreshingPterIdeas = (
+	refreshIntervalMS: number = 10 * 60 * 1000,
+) => {
+	const [ideas, setIdeas] = useState<PterIdea[] | null>(null)
+
+	useEffect(() => {
+		const fetchIdeas = async () => {
+			try {
+				const response = await fetch(
+					`/pterproxy/api/top-ideas?limit=${PTER_IDEA_COUNT}`,
+				)
+				if (!response.ok) {
+					throw new Error(`PTER request failed with status ${response.status}`)
+				}
+				const data = (await response.json()) as { ideas: PterIdea[] }
+				setIdeas(data.ideas)
+			} catch (error) {
+				console.error('Failed to fetch PTER ideas. Maybe PTER is down?', error)
+			}
+		}
+
+		fetchIdeas()
+		const interval = setInterval(fetchIdeas, refreshIntervalMS)
+		return () => clearInterval(interval)
+	}, [refreshIntervalMS])
+
+	return ideas
+}
+
 const useClock = () => {
 	const [time, setTime] = useState<Date>(new Date())
 
@@ -223,6 +275,8 @@ const App = () => {
 	const slides = useAutoRefreshingSlides()
 	const { quotesById } = useAutoRefreshingStocks()
 	const hsl = useAutoRefreshingHsl(60 * 1000)
+	const weekEvents = useAutoRefreshingWeekEvents()
+	const pterIdeas = useAutoRefreshingPterIdeas()
 
 	const allTiedoteMessages: TiedoteMessageWithCategory[] | undefined =
 		tiedote?.flatMap((category) =>
@@ -268,6 +322,12 @@ const App = () => {
 					)}
 					{allTiedoteMessages && allTiedoteMessages.length > 0 && (
 						<Tiedote messages={allTiedoteMessages} rotationInterval={15000} />
+					)}
+					{weekEvents && weekEvents.length > 0 && (
+						<WeekCalendar events={weekEvents} rotationInterval={20000} />
+					)}
+					{pterIdeas && pterIdeas.length > 0 && (
+						<PterIdeas ideas={pterIdeas} rotationInterval={15000} />
 					)}
 					<Hsl data={hsl} rotationInterval={15000} />
 					{Object.keys(quotesById).length > 0 && (
