@@ -4,8 +4,7 @@ import styled from 'styled-components'
 import Layout from '../layouts/layout'
 import Slides from '../components/slides'
 import Sidebar from '../components/sidebar'
-import { getSlides } from '../hooks'
-import '../assets/global.less'
+import { useSlides } from '../hooks'
 
 const SlidesContainer = styled.div`
   position: relative;
@@ -13,8 +12,8 @@ const SlidesContainer = styled.div`
   margin-left: 20px;
 `
 
-const Index: NextPage = (): JSX.Element => {
-  const slides = getSlides()
+const Index: NextPage = () => {
+  const slides = useSlides()
 
   return (
     <Layout>

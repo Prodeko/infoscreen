@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-import moment from 'moment'
 import { RestaurantData, Menu, Course } from '../types'
 
 const RestaurantContainer = styled.div``
@@ -26,8 +25,9 @@ interface Props {
   data: RestaurantData
 }
 
-const Restaurant: React.FC<Props> = ({ data }): JSX.Element => {
-  const dateIndex = moment().isoWeekday() - 1
+const Restaurant: React.FC<Props> = ({ data }) => {
+  // openingHours is indexed Monday = 0
+  const dateIndex = (new Date().getDay() + 6) % 7
 
   return (
     <RestaurantContainer>
@@ -42,11 +42,9 @@ const Restaurant: React.FC<Props> = ({ data }): JSX.Element => {
             m.courses.length === 0 ? (
               <MenuItem key={0}>Ruokalistaa ei saatavilla</MenuItem>
             ) : (
-              m.courses.map(
-                (c: Course, i: number): JSX.Element => (
-                  <MenuItem key={i}>{c.title}</MenuItem>
-                ),
-              )
+              m.courses.map((c: Course, i: number): React.ReactElement => (
+                <MenuItem key={i}>{c.title}</MenuItem>
+              ))
             ),
           )
         )}

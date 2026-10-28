@@ -1,15 +1,13 @@
 import React from 'react'
-import Document, { DocumentContext, DocumentInitialProps } from 'next/document'
+import Document, {
+  DocumentContext,
+  DocumentInitialProps,
+  Html,
+  Head,
+  Main,
+  NextScript,
+} from 'next/document'
 import { ServerStyleSheet } from 'styled-components'
-import * as Sentry from '@sentry/browser'
-
-process.on('unhandledRejection', (err) => {
-  Sentry.captureException(err)
-})
-
-process.on('uncaughtException', (err) => {
-  Sentry.captureException(err)
-})
 
 export default class MyDocument extends Document {
   static async getInitialProps(
@@ -28,15 +26,22 @@ export default class MyDocument extends Document {
       const initialProps = await Document.getInitialProps(ctx)
       return {
         ...initialProps,
-        styles: (
-          <>
-            {initialProps.styles}
-            {sheet.getStyleElement()}
-          </>
-        ),
+        styles: [initialProps.styles, sheet.getStyleElement()],
       }
     } finally {
       sheet.seal()
     }
+  }
+
+  render(): React.ReactElement {
+    return (
+      <Html lang="fi">
+        <Head />
+        <body>
+          <Main />
+          <NextScript />
+        </body>
+      </Html>
+    )
   }
 }

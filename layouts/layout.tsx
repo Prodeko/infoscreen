@@ -1,7 +1,7 @@
 import React from 'react'
-import Head from '../components/head'
-import Header from '../components/header'
+import Head from 'next/head'
 import styled from 'styled-components'
+import Header from '../components/header'
 
 const ContentContainer = styled.div`
   display: flex;
@@ -11,12 +11,15 @@ const ContentContainer = styled.div`
 `
 
 interface Props {
-  children: JSX.Element[] | JSX.Element
+  children: React.ReactNode
 }
 
-const Layout: React.FC<Props> = ({ children }): JSX.Element => (
+const Layout: React.FC<Props> = ({ children }) => (
   <>
-    <Head />
+    <Head>
+      <title>Prodeko Infoscreen</title>
+      <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+    </Head>
     <Header />
     <ContentContainer>{children}</ContentContainer>
   </>

@@ -1,10 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import { API_URL_ROOT } from '../config'
 
-const SlideContainer = styled.div<{ highlight: boolean }>`
-  border: ${({ highlight }) => highlight && '4px solid blue'};
-  margin: ${({ highlight }) => highlight && '-4px'};
+const SlideContainer = styled.div<{ $highlight: boolean }>`
+  border: ${({ $highlight }) => $highlight && '4px solid blue'};
+  margin: ${({ $highlight }) => $highlight && '-4px'};
   width: ${({ theme }) => theme.slideWidth};
   border-radius: ${({ theme }) => theme.borderRadius};
   padding: ${({ theme }) => theme.contentPadding};
@@ -45,44 +44,21 @@ interface Props {
   title: string
   highlight: boolean
   description: string
-  image: string
+  image?: string
 }
 
-const Slide: React.FC<Props> = ({
-  title,
-  highlight,
-  description,
-  image,
-}): JSX.Element => {
-  const content = description.replace(
-    /img alt="" (.*)src="*([^"]+)"/g,
-    `$1img alt="" src=${API_URL_ROOT}$2`,
-  )
-
-  return (
-    <SlideContainer highlight={highlight}>
-      <SlideHeader>{title}</SlideHeader>
-      {image && (
-        <SlideImg>
-          <Img
-            src={
-              process.env.NODE_ENV === 'production'
-                ? image
-                : `${API_URL_ROOT}${image}`
-            }
-          />
-        </SlideImg>
-      )}
-      {content && (
-        <SlideContent
-          dangerouslySetInnerHTML={{
-            __html:
-              process.env.NODE_ENV === 'production' ? description : content,
-          }}
-        />
-      )}
-    </SlideContainer>
-  )
-}
+const Slide: React.FC<Props> = ({ title, highlight, description, image }) => (
+  <SlideContainer $highlight={highlight}>
+    <SlideHeader>{title}</SlideHeader>
+    {image && (
+      <SlideImg>
+        <Img src={image} alt="" />
+      </SlideImg>
+    )}
+    {description && (
+      <SlideContent dangerouslySetInnerHTML={{ __html: description }} />
+    )}
+  </SlideContainer>
+)
 
 export default Slide

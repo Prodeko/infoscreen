@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { getTime } from '../hooks'
+import { useClock } from '../hooks'
 
 const TimeContainer = styled.span`
   position: absolute;
@@ -20,18 +20,15 @@ const StyledDate = styled.p`
   letter-spacing: 2px;
 `
 
-const Time: React.FC = (): JSX.Element => {
-  const dateTime = getTime()
+const Time: React.FC = () => {
+  const clock = useClock()
 
-  if (!dateTime) return null
-
-  const time = dateTime.split(',')[0]
-  const date = dateTime.split(',')[1]
+  if (!clock) return null
 
   return (
     <TimeContainer>
-      {time}
-      <StyledDate>{date}</StyledDate>
+      {clock.time}
+      <StyledDate>{clock.date}</StyledDate>
     </TimeContainer>
   )
 }

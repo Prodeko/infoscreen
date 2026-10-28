@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-import ContentLoader from 'react-content-loader'
 
 const Container = styled.div`
   position: absolute;
@@ -42,7 +41,7 @@ const Dots = styled.div`
   }
 `
 
-export const DotLoader: React.FC = (): JSX.Element => (
+export const DotLoader: React.FC = () => (
   <Container>
     <Dots>
       <div />
@@ -50,16 +49,4 @@ export const DotLoader: React.FC = (): JSX.Element => (
       <div />
     </Dots>
   </Container>
-)
-
-export const LineLoader: React.FC = (): JSX.Element => (
-  <ContentLoader
-    height={40}
-    width={400}
-    speed={2}
-    foregroundColor="#f3f3f3"
-    backgroundColor="#ecebeb"
-  >
-    <rect x="0" y="22" rx="3" ry="3" width="350" height="22" />
-  </ContentLoader>
 )

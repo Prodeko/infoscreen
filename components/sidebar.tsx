@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import Restaurants from './restaurants'
-import Transport from './transport'
-import { SIDEBAR_SWITCH_INTERVAL } from '../config'
 
 const SidebarContainer = styled.div`
   height: 100%;
@@ -15,23 +13,10 @@ const SidebarContainer = styled.div`
   overflow: hidden;
 `
 
-const Sidebar: React.FC = (): JSX.Element => {
-  // const [show, setShow] = useState(true)
-
-  // useEffect(() => {
-  //   const timeout = setInterval(() => {
-  //     setShow((t) => !t)
-  //   }, SIDEBAR_SWITCH_INTERVAL)
-  //   return () => {
-  //     clearInterval(timeout)
-  //   }
-  // }, [])
-
-  return (
-    <SidebarContainer>
-      <Restaurants />
-    </SidebarContainer>
-  )
-}
+const Sidebar: React.FC = () => (
+  <SidebarContainer>
+    <Restaurants />
+  </SidebarContainer>
+)
 
 export default Sidebar

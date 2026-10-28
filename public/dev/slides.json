@@ -1,0 +1,15 @@
+[
+  {
+    "id": "sample-highlight",
+    "title": "Sample slide",
+    "description": "<p>This is local sample data from <code>public/dev/slides.json</code>.</p>",
+    "highlight": true
+  },
+  {
+    "id": "sample-image",
+    "title": "Slide with an image",
+    "description": "<p>Images are absolute URLs.</p>",
+    "highlight": false,
+    "image": "/static/images/header.jpg"
+  }
+]

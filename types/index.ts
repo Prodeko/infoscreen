@@ -14,10 +14,12 @@ export interface Theme {
 }
 
 export interface Slide {
-  id: number
+  id: string | number
   title: string
+  // HTML, rendered from the slide's Markdown body
   description: string
   highlight: boolean
+  // Absolute URL
   image?: string
 }
 
@@ -31,57 +33,6 @@ export interface Menu {
 
 export interface RestaurantData {
   name: string
-  openingHours: Record<string, unknown>
+  openingHours: (string | null)[]
   menus: Menu[]
-}
-
-interface Stop {
-  name: string
-  vehicleMode: string
-  __typename: 'Stop'
-}
-
-interface Route {
-  longName: string
-  shortName: string
-  __typename: 'Route'
-}
-
-interface Trip {
-  route: Route
-  __typename: 'Trip'
-}
-
-interface Stoptime {
-  headsign: string
-  realtime: boolean
-  realtimeDeparture: number
-  scheduledDeparture: number
-  serviceDay: number
-  trip: Trip
-  __typename: 'Stoptime'
-}
-
-interface BusPlace {
-  stoptimes: Stoptime[]
-  stop: Stop
-  __typename: 'DepartureRow'
-}
-
-interface BikePlace {
-  bikesAvailable: number
-  name: string
-  spacesAvailable: number
-  __typename: 'BikeRentalStation'
-}
-
-export type Place = BikePlace | BusPlace
-
-export function isBikePlace(
-  busOrBikePlace: Place,
-): busOrBikePlace is BikePlace {
-  if ((busOrBikePlace as BikePlace).__typename === 'BikeRentalStation') {
-    return true
-  }
-  return false
 }

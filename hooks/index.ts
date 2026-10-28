@@ -1,118 +1,106 @@
-import { useState, useEffect } from 'react'
-import moment, { MomentInput } from 'moment'
-import { FETCH_TIME_INTERVAL, FETCH_SLIDES_INTERVAL } from '../config'
+import { useState, useEffect, useSyncExternalStore } from 'react'
+import {
+  FETCH_SLIDES_INTERVAL,
+  FETCH_MENUS_INTERVAL,
+  TIME_ZONE,
+} from '../lib/config'
 import { RestaurantData, Slide } from '../types'
 
-type FetchReturn = Slide[] & MomentInput
-
-export const useFetch = (url: string, fetchInterval = 0): FetchReturn => {
-  const [data, setData] = useState(null)
+// Calls `load` now and then every `interval` ms. A failed load keeps the
+// previous data, so a network blip doesn't blank the screen.
+const usePolling = <T>(load: () => Promise<T>, interval: number): T | null => {
+  const [data, setData] = useState<T | null>(null)
 
   useEffect(() => {
-    const fetchData = async (): Promise<void> => {
-      fetch(url, {
-        headers: {
-          accepts: 'application/json',
-        },
-      })
-        .then((res) => {
-          return res.json()
+    let cancelled = false
+    const run = (): void => {
+      load()
+        .then((d) => {
+          if (!cancelled) setData(d)
         })
-        .then((json) => {
-          setData(json)
-        })
+        .catch((err) => console.error(err))
     }
-
-    let interval
-    if (fetchInterval !== 0) {
-      interval = setInterval(() => fetchData(), fetchInterval)
-    }
-    fetchData()
+    run()
+    const id = setInterval(run, interval)
     return () => {
-      clearInterval(interval)
+      cancelled = true
+      clearInterval(id)
     }
-  }, [])
+  }, [load, interval])
 
   return data
 }
 
-export const getTime = (): string => {
-  const [time, setTime] = useState(null)
-  const serverTime = useFetch('/time', FETCH_TIME_INTERVAL)
-
-  useEffect(() => {
-    const sTime = moment(serverTime, 'YYYY-MM-DD HH:mm:ss').format(
-      'HH:mm:ss,DD.MM.YYYY',
-    )
-    setTime(sTime)
-    const timeout = setInterval(() => {
-      setTime((t: MomentInput): string =>
-        moment(t, 'HH:mm:ss').add(1, 'seconds').format('HH:mm:ss,DD.MM.YYYY'),
-      )
-    }, 1000)
-    return () => {
-      clearInterval(timeout)
-    }
-  }, [serverTime])
-
-  return time
+const fetchJson = async <T>(url: string): Promise<T> => {
+  const res = await fetch(url, { headers: { accept: 'application/json' } })
+  if (!res.ok) throw new Error(`${url}: ${res.status}`)
+  return res.json()
 }
 
-export const getRestaurantData = (): RestaurantData[] => {
-  const [data, setData] = useState([])
+// YYYY-MM-DD in Helsinki time
+export const today = (): string =>
+  new Intl.DateTimeFormat('sv-SE', { timeZone: TIME_ZONE }).format(new Date())
 
-  const restaurants = [
-    { id: 2, name: 'T-talo' },
-    { id: 7, name: 'TUAS' },
-    { id: 52, name: 'A Bloc' }
-  ]
-  const date = moment().format('YYYY-MM-DD')
-
-  useEffect(() => {
-    function fetchData(url: string): Promise<Response> {
-      return fetch(url, {
-        headers: {
-          accepts: 'application/json',
-        },
-      })
-    }
-
-    const promises = []
-
-    restaurants.forEach((r) =>
-      promises.push(fetchData(`/restaurants/${r.id}/menu?day=${date}`)),
-    )
-
-    Promise.all(promises)
-      .then((results) => Promise.all(results.map((r) => r.json())))
-      .then((data) => setData(data))
-  }, [])
-
-  return data
+const subscribeToSeconds = (onTick: () => void): (() => void) => {
+  const id = setInterval(onTick, 1000)
+  return () => clearInterval(id)
 }
 
-const defaultSlides = [
+// Null on the server, so the clock doesn't cause a hydration mismatch
+export const useClock = (): { time: string; date: string } | null => {
+  const seconds = useSyncExternalStore(
+    subscribeToSeconds,
+    () => Math.floor(Date.now() / 1000),
+    () => null,
+  )
+
+  if (seconds === null) return null
+  const now = new Date(seconds * 1000)
+  return {
+    time: now.toLocaleTimeString('fi-FI', {
+      timeZone: TIME_ZONE,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    }),
+    date: now.toLocaleDateString('fi-FI', {
+      timeZone: TIME_ZONE,
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }),
+  }
+}
+
+const restaurants = [
+  { id: 2, name: 'T-talo' },
+  { id: 7, name: 'TUAS' },
+  { id: 52, name: 'A Bloc' },
+]
+
+const loadMenus = (): Promise<RestaurantData[]> =>
+  Promise.all(
+    restaurants.map((r) =>
+      fetchJson<RestaurantData>(`/api/restaurants/${r.id}/menu?day=${today()}`),
+    ),
+  )
+
+export const useRestaurantData = (): RestaurantData[] | null =>
+  usePolling(loadMenus, FETCH_MENUS_INTERVAL)
+
+const defaultSlides: Slide[] = [
   {
     id: -1,
     title: '',
     description:
-      "<div style='position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 100px;'>🌈🦄<div/>",
+      "<div style='position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 100px;'>🌈🦄</div>",
     highlight: false,
   },
 ]
 
-export const getSlides = (): Slide[] => {
-  const [slides, setSlides] = useState(defaultSlides)
-  const data: Slide[] = useFetch('/slides', FETCH_SLIDES_INTERVAL)
+const loadSlides = (): Promise<Slide[]> => fetchJson<Slide[]>('/api/slides')
 
-  useEffect(() => {
-    let slides: Slide[] = []
-    if (data && data.length > 0) {
-      slides = slides.concat(data)
-    }
-
-    slides.length === 0 ? setSlides(defaultSlides) : setSlides(slides)
-  }, [data])
-
-  return slides
+export const useSlides = (): Slide[] => {
+  const data = usePolling(loadSlides, FETCH_SLIDES_INTERVAL)
+  return data && data.length > 0 ? data : defaultSlides
 }

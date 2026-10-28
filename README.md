@@ -1,40 +1,53 @@
 # Prodeko infoscreen :tv:
 
-Prodekon kiltahuoneen infoscreen - ruokalistat, julkinen liikenne, tiedottaminen, tapahtumamainonta.
+Prodekon kiltahuoneen infoscreen - ruokalistat, tiedottaminen, tapahtumamainonta.
 
 ---
 
 ### Kehittäminen
 
-Paikallinen kehittäminen onnistuu seuraavilla komennoilla:
+Vaatii Node.js 22 tai uudemman (`.nvmrc`:ssä 24).
 
 ```
+nvm use
 npm install
 npm run dev
 ```
 
+Diat haetaan prodeko.org-sivustolta (`https://prodeko.org/infoscreen/slides.json`). Paikallisesti voi käyttää esimerkkidiojä:
+
+```
+SLIDES_URL=http://localhost:3000/dev/slides.json npm run dev
+```
+
 ### Koodityyli
 
-Tiedostot src/tsconfig.json, .eslintrc ja .prettierrc sisältävät koodin tyyppi- ja tyylimäärittelyjä. Käytössä on [Typescript](https://www.typescriptlang.org/), [ESLint](https://eslint.org/) ja [Prettier](https://prettier.io/)
+Käytössä on [TypeScript](https://www.typescriptlang.org/), [ESLint](https://eslint.org/) ja [Prettier](https://prettier.io/). `npm run lint` ja `npm run typecheck` tarkistavat koodin.
 
 ## Konfigurointi
 
-Infoscreenin toimintaa on mahdollista muokata src/config kansiosta löytyvien tiedostojen avulla.
+- `SLIDES_URL` (ympäristömuuttuja): diojen JSON-syöte. Oletus `https://prodeko.org/infoscreen/slides.json`.
+- `lib/config.ts`: diojen vaihtoväli ja päivitystiheydet.
 
-Saatavilla olevat muuttujat (tässä dev.env.js):
+Diasyöte on lista muotoa:
 
+```json
+[
+  {
+    "id": "syysjuhla",
+    "title": "Syysjuhla",
+    "description": "<p>HTML-sisältö</p>",
+    "highlight": false,
+    "image": "https://prodeko.org/kuva.jpg"
+  }
+]
 ```
-API_URL_ROOT: 'https://prodeko.org/',
-API_URL: 'https://prodeko.org/fi/infoscreen/api',
-SLIDE_CHANGE_INTERVAL: 5000,
-SIDEBAR_SWITCH_INTERVAL: 15000,
-FETCH_TIME_INTERVAL: 600000,
-FETCH_SLIDES_INTERVAL: 10000,
-```
+
+`image` on vapaaehtoinen ja aina absoluuttinen URL.
+
+Ruokalistat tulevat [Kanttiinit](https://kanttiinit.fi)-rajapinnasta. Molemmat syötteet välitetään Next.js:n rewritejen kautta (`next.config.ts`), joten selain ei tarvitse CORS-otsakkeita.
 
 ## Käyttöönotto
-
-Production build ja servaus
 
 ```
 npm run build && npm run start
@@ -42,8 +55,9 @@ npm run build && npm run start
 
 ## Rakennuspalikat
 
-- [React](https://reactjs.org/) - Javascript UI-kirjasto
-- [Next.js](https://nextjs.org/) - React framework
+- [React](https://react.dev/)
+- [Next.js](https://nextjs.org/)
+- [styled-components](https://styled-components.com/)
 
 ## Kehittäjät
 
@@ -51,4 +65,4 @@ npm run build && npm run start
 
 ## Lisenssi
 
-MIT lisenssi - [LICENSE](LICENSE).
+MIT lisenssi - [LICENSE](LICENCE).
