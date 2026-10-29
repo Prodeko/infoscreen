@@ -1,5 +1,6 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig, loadEnv } from 'vite'
+import { ilmoSignups } from './server/ilmoSignups'
 
 // Strips `prefix` from a proxied path and adds a query parameter. Secrets are
 // added this way, on the server running `vite preview`, so they never become
@@ -25,7 +26,8 @@ export default defineConfig(({ mode }) => {
 		''
 
 	return {
-		plugins: [react()],
+		// ilmoSignups serves /api/ilmo-signups, see server/ilmoSignups.ts
+		plugins: [react(), ilmoSignups()],
 		server: {
 			proxy: {
 				'/kanttiinitproxy': {
@@ -59,6 +61,24 @@ export default defineConfig(({ mode }) => {
 					target: env.PTER_ORIGIN || 'https://pter.prodeko.org',
 					changeOrigin: true,
 					rewrite: (path) => path.replace(/^\/pterproxy/, ''),
+				},
+				// Elections at vaalit.prodeko.org (vaaliplatta), public API
+				'/vaaliproxy': {
+					target: 'https://vaalit.prodeko.org',
+					changeOrigin: true,
+					rewrite: (path) => path.replace(/^\/vaaliproxy/, ''),
+				},
+				// HSL city bike stations through citybik.es (no key)
+				'/citybikesproxy': {
+					target: 'https://api.citybik.es',
+					changeOrigin: true,
+					rewrite: (path) => path.replace(/^\/citybikesproxy/, ''),
+				},
+				// Open-Meteo forecast (no key)
+				'/weatherproxy': {
+					target: 'https://api.open-meteo.com',
+					changeOrigin: true,
+					rewrite: (path) => path.replace(/^\/weatherproxy/, ''),
 				},
 				'/hsldata': {
 					target: 'https://api.digitransit.fi',

@@ -7,10 +7,14 @@ import {
 	useRef,
 	useState,
 } from 'react'
+import StaleNote from './StaleNote'
 
 interface RotatorChildProps {
 	rotationInterval?: number
 	rotation?: number
+	// Freshness of the slide's data, for the stale-data note
+	updatedAt?: Date | null
+	isStale?: boolean
 }
 
 interface RotatorProps {
@@ -108,6 +112,11 @@ const Rotator = ({
 				}`}
 			>
 				{cloneElement(currentChild, { rotation: round })}
+				<StaleNote
+					updatedAt={currentChild.props.updatedAt ?? null}
+					isStale={currentChild.props.isStale ?? false}
+					className="absolute bottom-0 left-0"
+				/>
 			</div>
 		</div>
 	)

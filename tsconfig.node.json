@@ -5,7 +5,10 @@
 		"module": "ESNext",
 		"moduleResolution": "bundler",
 		"allowSyntheticDefaultImports": true,
-		"strict": true
+		"strict": true,
+		"target": "ES2022",
+		"lib": ["ES2022", "DOM"],
+		"types": ["node"]
 	},
-	"include": ["vite.config.ts"]
+	"include": ["vite.config.ts", "server"]
 }
