@@ -13,21 +13,22 @@ The main area rotates through these slides:
 | Slides from prodeko.org | `prodeko.org/fi/infoscreen.json` | Edited at prodeko.org/admin → Infoscreen. A slide with a "show until" date disappears after that day. Hidden when there are none |
 | Event sign-ups: open now and opening soon | [Ilmo](https://ilmo.prodeko.org) | Read on the server by `server/ilmoSignups.ts`, see the comment there. Hidden when there are none |
 | The open election: application count and the newest applications | [vaalit.prodeko.org](https://vaalit.prodeko.org) | Shown only while an election is open |
+| Countdown to the next big event | `prodeko.org/fi/infoscreen-countdowns.json` | Edited at prodeko.org/admin → Infoscreen → Laskurit. Hidden when none is ahead |
 | Weekly bulletin (viikkotiedote) | viikkotiedote API on old.prodeko.org (the old Django site) | Hidden when there is nothing to show |
 | This week's events from the guild's Google calendars (Tapahtumat, Yleiset, Excut, Fuksit, PoRa) | Public iCalendar feeds | Calendars are listed in `src/calendarApi.ts`. Hidden when the week has no events |
 | Namukilke: this week's most bought products and the most liked open wishes | namu2's `/api/infoscreen` | Needs `NAMU_INFOSCREEN_KEY`, the same value as namu2's `INFOSCREEN_API_KEY`. Hidden without it |
 | The most-voted active PTER ideas | `pter.prodeko.org/api/top-ideas` | Hidden when there are none |
-| HSL departures and disruptions: Aalto metro, Innopolis, Tietotie (bus 52), Maari (tram 15) | Digitransit | Needs `HSL_SUBSCRIPTION_KEY`. Each group shows the walk from TUAS; departures one could not walk to in time are left out |
+| HSL departures and disruptions: Aalto metro, Innopolis, Tietotie (bus 52), Maari (tram 15) | Digitransit | Needs `HSL_SUBSCRIPTION_KEY`. Each group shows the walk from TUAS; departures one could not walk to in time are left out. Free city bikes at the four nearest stations ([citybik.es](https://citybik.es)) next to the disruption notices, hidden off-season |
 | Rain radar for southern Finland | [FMI open data](https://en.ilmatieteenlaitos.fi/open-data) | Radar and background map both from FMI's WMS, no key |
 | Stock prices: S&P 500 (through the SPY ETF) and the Magnificent 7 | [Twelve Data](https://twelvedata.com) | Needs `TWELVE_DATA_API_KEY` (free plan: 8 symbols/min, 800/day, no indices). Refreshes every 15 minutes. Hidden without data |
 | McKinsey logo | `public/` | Sponsor |
 
-The sidebar shows the date and time, a countdown to the next big event
-(edited at prodeko.org/admin → Infoscreen → Laskurit, read from
-`prodeko.org/fi/infoscreen-countdowns.json`; hidden when none is ahead), the weather in Otaniemi
-([Open-Meteo](https://open-meteo.com)), the next HSL departures, free city
-bikes at the four nearest stations ([citybik.es](https://citybik.es), hidden
-off-season), and whether someone is watching Kiltiskamera.
+The sidebar shows the date and time (with today's flag day, if any, from
+`src/flagDays.ts`), the weather in Otaniemi
+([Open-Meteo](https://open-meteo.com)), the next HSL departures, the two
+coffee pots from [kahvikilke](https://kahvi.prodeko.org), what the guild
+room's Spotify is playing (only while something plays, see below), and
+whether someone is watching Kiltiskamera.
 
 Slides that lead somewhere (sign-ups, elections, bulletin, calendar, PTER,
 and prodeko.org slides with a link) show a QR code to that page in the bottom
@@ -63,6 +64,9 @@ with `SLIDES_ORIGIN=http://localhost:1313` in `.env`.
 
 The screen is 1920×1080; size the browser window to match.
 
+To work on one slide, add `?slide=N` to the address (counting from 0) and
+the rotation stays on that slide.
+
 ## Checks
 
 ```
@@ -73,6 +77,25 @@ npm run build
 The keys and passwords in `.env` are read by the proxy in `vite.config.ts`
 when the server starts, not at build time, so `npm run build` needs none of
 them and none of them are in the built page.
+
+## Spotify ("Nyt soi")
+
+The sidebar card shows what the guild room's Spotify account is playing. It
+needs a Spotify app and one sign-in by that account; until then the card
+stays hidden.
+
+1. At https://developer.spotify.com/dashboard, signed in with the guild
+   room account, create an app. Choose *Web API*, and add the redirect URI
+   `http://127.0.0.1:8888/callback` exactly.
+2. Put the app's client ID and secret in `.env` as `SPOTIFY_CLIENT_ID` and
+   `SPOTIFY_CLIENT_SECRET`, on any computer with a browser.
+3. Run `npm run spotify-login`, open the link it prints, sign in with the
+   guild room account and allow access. It prints `SPOTIFY_REFRESH_TOKEN=…`.
+4. Put all three lines in the Pi's `.env` and restart the service.
+
+The tokens and the secret stay on the Pi (`server/spotify.ts`); the page only
+sees the song. If the card stops showing while music plays, the refresh
+token has probably been revoked: run step 3 again.
 
 ## Building and deploying
 

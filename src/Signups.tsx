@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import QrLink from './QrLink'
+
 // Same shape as SignupsResponse in server/ilmoSignups.ts
 export type Signup = {
 	name: string
@@ -16,41 +18,131 @@ export type Signup = {
 
 export type Signups = { open: Signup[]; upcoming: Signup[] }
 
-const MAX_PER_COLUMN = 5
+const MAX_OPEN = 3
+const MAX_UPCOMING = 3
+const FALLBACK_COLOR = '#002851' // Prodeko navy
 
-const dayAndTime = (iso: string) =>
-	new Date(iso).toLocaleString('fi-FI', {
-		weekday: 'short',
-		day: 'numeric',
-		month: 'numeric',
-		hour: '2-digit',
-		minute: '2-digit',
-	})
+const clock = (date: Date) =>
+	date.toLocaleTimeString('fi-FI', { hour: '2-digit', minute: '2-digit' })
+
+// "ma 3.5."
+const day = (iso: string) => {
+	const date = new Date(iso)
+	const weekday = date.toLocaleDateString('fi-FI', { weekday: 'short' })
+	return `${weekday} ${date.getDate()}.${date.getMonth() + 1}.`
+}
+
+// "tänään 12.00", "huomenna 12.00", "pe 30.10. 12.00"
+const when = (iso: string) => {
+	const date = new Date(iso)
+	const midnight = (d: Date) => new Date(d).setHours(0, 0, 0, 0)
+	const days = Math.round((midnight(date) - midnight(new Date())) / 86_400_000)
+	if (days === 0) return `tänään ${clock(date)}`
+	if (days === 1) return `huomenna ${clock(date)}`
+	return `${day(iso)} ${clock(date)}`
+}
 
 // Ilmo counts the waiting list in registrations, so a full event can have
 // more registrations than places
-const places = (signup: Signup) => {
-	if (!signup.places) {
-		return `${signup.registrations} ilmoittautunutta`
+const Capacity = ({ signup }: { signup: Signup }) => {
+	const color = signup.color ?? FALLBACK_COLOR
+	const { registrations, places } = signup
+
+	if (!places) {
+		return (
+			<p className="text-5xl font-bold tabular-nums">
+				{registrations}{' '}
+				<span className="text-2xl font-normal text-[#5A6475]">
+					ilmoittautunutta
+				</span>
+			</p>
+		)
 	}
-	if (signup.registrations >= signup.places) {
-		return `Täynnä, ${signup.registrations} ilmoittautunutta`
-	}
-	return `${signup.registrations}/${signup.places} paikkaa täytetty`
+
+	const full = registrations >= places
+	const fill = Math.min(1, registrations / places)
+
+	return (
+		<div>
+			<div className="h-6 rounded-full bg-[#E3E7ED] overflow-hidden">
+				<div
+					className="h-full rounded-full"
+					style={{ width: `${fill * 100}%`, backgroundColor: color }}
+				/>
+			</div>
+			<p className="mt-3 text-5xl font-bold tabular-nums">
+				{full ? (
+					<>
+						Täynnä{' '}
+						{registrations > places && (
+							<span className="text-2xl font-normal text-[#5A6475]">
+								{registrations - places} jonossa
+							</span>
+						)}
+					</>
+				) : (
+					<>
+						{registrations}
+						<span className="text-2xl font-normal text-[#5A6475]">
+							{' '}
+							/ {places} paikkaa
+						</span>
+					</>
+				)}
+			</p>
+		</div>
+	)
 }
 
-const SignupCard = ({ signup, detail }: { signup: Signup; detail: string }) => (
-	<li
-		className="bg-white rounded-lg shadow-md p-4 border-l-8"
-		style={{ borderColor: signup.color ?? '#a8a29e' }}
-	>
-		<p className="text-2xl font-bold">{signup.name}</p>
-		<p className="text-lg text-stone-600">
-			{[signup.organization, dayAndTime(signup.eventStart), signup.location]
-				.filter(Boolean)
-				.join(' · ')}
+// Ilmo banners are 3:1. Some fail to load (the static server sends a few
+// with the wrong content type), so fall back to the organizer's color.
+const Banner = ({ signup }: { signup: Signup }) => {
+	const [failed, setFailed] = useState(false)
+
+	if (signup.image && !failed) {
+		return (
+			<img
+				src={signup.image}
+				alt=""
+				onError={() => setFailed(true)}
+				className="w-full object-cover rounded-md"
+				style={{ aspectRatio: '3 / 1' }}
+			/>
+		)
+	}
+
+	return (
+		<div
+			className="w-full rounded-md flex items-end p-4"
+			style={{
+				aspectRatio: '3 / 1',
+				backgroundColor: signup.color ?? FALLBACK_COLOR,
+			}}
+		>
+			<span className="text-3xl font-bold text-white">
+				{signup.organization}
+			</span>
+		</div>
+	)
+}
+
+const OpenEvent = ({ signup }: { signup: Signup }) => (
+	<li className="flex flex-col gap-5 min-w-0">
+		<Banner signup={signup} />
+		<div>
+			<h3 className="text-3xl font-bold leading-tight line-clamp-2 min-h-[2lh]">
+				{signup.name}
+			</h3>
+			<p className="mt-1 text-2xl text-[#5A6475]">
+				{[signup.organization, day(signup.eventStart)]
+					.filter(Boolean)
+					.join(', ')}
+			</p>
+		</div>
+		<Capacity signup={signup} />
+		<p className="text-2xl text-[#5A6475]">
+			Sulkeutuu {when(signup.signupEnd)}
 		</p>
-		<p className="text-lg font-semibold mt-1">{detail}</p>
 	</li>
 )
 
@@ -60,53 +152,51 @@ const Signups = ({
 	signups: Signups
 	rotationInterval?: number
 }) => {
-	const data = signups
-
-	const open = data.open.slice(0, MAX_PER_COLUMN)
-	const upcoming = data.upcoming.slice(0, MAX_PER_COLUMN)
+	const open = signups.open.slice(0, MAX_OPEN)
+	const moreOpen = signups.open.length - open.length
+	const upcoming = signups.upcoming.slice(0, MAX_UPCOMING)
 
 	return (
-		<div className="relative h-full flex flex-col gap-4 p-4">
-			<div className="flex items-baseline justify-between">
-				<h1 className="text-4xl font-bold">Ilmoittautumiset</h1>
-				<p className="text-lg text-stone-500">ilmo.prodeko.org</p>
-			</div>
-			<div className="grid grid-cols-2 gap-6 min-h-0">
+		<div className="relative h-full flex flex-col p-6 text-[#002851]">
+			{open.length > 0 && (
 				<section>
-					<h2 className="text-3xl font-semibold mb-3 text-emerald-700">
-						Ilmo auki
-					</h2>
-					<ul className="flex flex-col gap-3">
+					<h2 className="text-5xl font-bold mb-6">Ilmoittaudu nyt</h2>
+					<ul className="grid grid-cols-3 gap-10">
 						{open.map((signup) => (
-							<SignupCard
-								key={signup.url}
-								signup={signup}
-								detail={`${places(signup)} · sulkeutuu ${dayAndTime(signup.signupEnd)}`}
-							/>
+							<OpenEvent key={signup.url} signup={signup} />
 						))}
-						{open.length === 0 && (
-							<p className="text-xl text-stone-500">Ei avoimia ilmoja.</p>
-						)}
 					</ul>
+					{moreOpen > 0 && (
+						<p className="mt-4 text-xl text-[#5A6475]">
+							Ja {moreOpen} muuta osoitteessa ilmo.prodeko.org
+						</p>
+					)}
 				</section>
-				<section>
-					<h2 className="text-3xl font-semibold mb-3 text-sky-700">
-						Ilmo aukeaa
-					</h2>
-					<ul className="flex flex-col gap-3">
+			)}
+
+			{upcoming.length > 0 && (
+				<section className="mt-auto pt-6 pr-48 border-t-2 border-[#E3E7ED]">
+					<h2 className="text-4xl font-bold mb-4">Aukeaa pian</h2>
+					<ul className="flex flex-col gap-2">
 						{upcoming.map((signup) => (
-							<SignupCard
-								key={signup.url}
-								signup={signup}
-								detail={`Aukeaa ${dayAndTime(signup.signupStart)}`}
-							/>
+							<li key={signup.url} className="flex items-baseline gap-6">
+								<span className="w-96 shrink-0 text-4xl font-bold tabular-nums">
+									{when(signup.signupStart)}
+								</span>
+								<span className="text-3xl font-semibold truncate">
+									{signup.name}
+								</span>
+								{signup.organization && (
+									<span className="text-2xl text-[#5A6475] shrink-0">
+										{signup.organization}
+									</span>
+								)}
+							</li>
 						))}
-						{upcoming.length === 0 && (
-							<p className="text-xl text-stone-500">Ei tulevia ilmoja.</p>
-						)}
 					</ul>
 				</section>
-			</div>
+			)}
+
 			<QrLink url="https://ilmo.prodeko.org" />
 		</div>
 	)

@@ -1,3 +1,4 @@
+import CityBikes from './CityBikes'
 import {
 	formatHslDepartureDisplay,
 	getGroupWalkMinutes,
@@ -80,26 +81,33 @@ const Hsl = ({ data }: HSLSlideProps) => {
 					)
 				})}
 			</div>
-			<div
-				className={`rounded-lg shadow-md p-4 mt-auto ${
-					alerts.length > 0 ? 'bg-amber-50 border border-amber-200' : 'bg-white'
-				}`}
-			>
-				<h2 className="text-2xl font-semibold mb-2">Häiriötiedotteet</h2>
-				{alerts.length > 0 ? (
-					<div className="space-y-2">
-						{alerts.map((alert) => (
-							<div key={alert.id}>
-								<p className="font-semibold text-base">{alert.header}</p>
-								{alert.description && (
-									<p className="text-sm text-stone-700">{alert.description}</p>
-								)}
-							</div>
-						))}
-					</div>
-				) : (
-					<p className="text-stone-500">Ei aktiivisia häiriötiedotteita.</p>
-				)}
+			<div className="grid grid-cols-[1fr_auto] gap-4 mt-auto">
+				<div
+					className={`rounded-lg shadow-md p-4 ${
+						alerts.length > 0
+							? 'bg-amber-50 border border-amber-200'
+							: 'bg-white'
+					}`}
+				>
+					<h2 className="text-2xl font-semibold mb-2">Häiriötiedotteet</h2>
+					{alerts.length > 0 ? (
+						<div className="space-y-2">
+							{alerts.map((alert) => (
+								<div key={alert.id}>
+									<p className="font-semibold text-base">{alert.header}</p>
+									{alert.description && (
+										<p className="text-sm text-stone-700">
+											{alert.description}
+										</p>
+									)}
+								</div>
+							))}
+						</div>
+					) : (
+						<p className="text-stone-500">Ei aktiivisia häiriötiedotteita.</p>
+					)}
+				</div>
+				<CityBikes />
 			</div>
 		</div>
 	)
