@@ -39,6 +39,8 @@ type HSLRawAlert = {
 export type HSLStopData = {
 	id: string
 	name?: string | null
+	lat?: number | null
+	lon?: number | null
 	alerts?: HSLRawAlert[] | null
 	stoptimesWithoutPatterns?: HSLStoptime[] | null
 }
@@ -154,6 +156,8 @@ const buildLocationQuery = (location: HSLQueryLocation) => `
   ${location.alias}: ${location.nodeType}(id: $${location.alias}) {
     id
     name
+    lat
+    lon
     alerts {
       alertHeaderText
       alertDescriptionText
@@ -219,7 +223,58 @@ export const formatHslDepartureDisplay = (
 		: `${minutes} min`
 }
 
+// Walking times are measured from TUAS's main door on Maarintie, as the crow
+// flies with a detour factor for the paths in between, at an unhurried pace.
+// A metro station gets extra minutes for the escalators down to the platform.
+const WALK_FROM = { lat: 60.18688, lon: 24.81838 }
+const WALK_DETOUR = 1.3
+const WALK_METRES_PER_MINUTE = 80
+const STATION_EXTRA_MINUTES = 2
+
+const NODE_TYPE_BY_ALIAS: Record<string, HSLNodeType> = Object.fromEntries(
+	HSL_QUERY_LOCATIONS.map((location) => [location.alias, location.nodeType]),
+)
+
+const distanceMetres = (
+	a: { lat: number; lon: number },
+	b: { lat: number; lon: number },
+) => {
+	const rad = Math.PI / 180
+	const dLat = (b.lat - a.lat) * rad
+	const dLon = (b.lon - a.lon) * rad
+	const h =
+		Math.sin(dLat / 2) ** 2 +
+		Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLon / 2) ** 2
+	return 2 * 6371000 * Math.asin(Math.sqrt(h))
+}
+
+/** Minutes to walk from TUAS to the stop or station behind `alias`; null when its position is not known. */
+export const getWalkMinutes = (data: HSLData, alias: string) => {
+	const stop = data[alias]
+	if (stop?.lat == null || stop?.lon == null) {
+		return null
+	}
+	const metres =
+		distanceMetres(WALK_FROM, { lat: stop.lat, lon: stop.lon }) * WALK_DETOUR
+	const extra =
+		NODE_TYPE_BY_ALIAS[alias] === 'station' ? STATION_EXTRA_MINUTES : 0
+	return Math.max(1, Math.ceil(metres / WALK_METRES_PER_MINUTE) + extra)
+}
+
+/** The shortest walk to any of a group's stops, for its heading. */
+export const getGroupWalkMinutes = (
+	data: HSLData,
+	aliases: readonly string[],
+) => {
+	const minutes = aliases
+		.map((alias) => getWalkMinutes(data, alias))
+		.filter((m): m is number => m != null)
+	return minutes.length > 0 ? Math.min(...minutes) : null
+}
+
 type GetDeparturesOptions = {
+	// Leave out departures that leave before one could walk to the stop
+	reachableOnly?: boolean
 	fromUnix?: number
 	toUnix?: number
 	limit?: number
@@ -238,12 +293,16 @@ export const getHslDepartures = (
 	for (const alias of aliases) {
 		const stop = data[alias]
 		const group = HSL_GROUP_BY_ALIAS[alias]
+		const walkMinutes = options.reachableOnly
+			? (getWalkMinutes(data, alias) ?? 0)
+			: 0
+		const earliestUnix = Math.max(fromUnix, nowUnix + walkMinutes * 60)
 
 		for (const stoptime of stop?.stoptimesWithoutPatterns ?? []) {
 			const departureUnix = getDepartureUnix(stoptime)
 			if (
 				departureUnix == null ||
-				departureUnix < fromUnix ||
+				departureUnix < (options.reachableOnly ? earliestUnix : fromUnix) ||
 				departureUnix > toUnix
 			) {
 				continue

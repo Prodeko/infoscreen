@@ -1,4 +1,5 @@
 import { CALENDARS, type CalendarEvent, startOfWeek } from './calendarApi'
+import QrLink from './QrLink'
 
 type WeekCalendarProps = {
 	events: CalendarEvent[]
@@ -30,7 +31,7 @@ const WeekCalendar = ({ events }: WeekCalendarProps) => {
 	})
 
 	return (
-		<div className="flex flex-col gap-4 h-full">
+		<div className="relative flex flex-col gap-4 h-full">
 			<div className="flex items-baseline justify-between">
 				<h1 className="text-4xl font-bold">Tämän viikon tapahtumat</h1>
 				<div className="flex gap-4">
@@ -93,6 +94,7 @@ const WeekCalendar = ({ events }: WeekCalendarProps) => {
 					)
 				})}
 			</div>
+			<QrLink url="https://prodeko.org/fi/tapahtumat/" />
 		</div>
 	)
 }

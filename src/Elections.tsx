@@ -1,3 +1,5 @@
+import QrLink from './QrLink'
+
 // The guild's elections from vaalit.prodeko.org (vaaliplatta). Its API is
 // public: the election with its positions, each with its applications.
 
@@ -44,7 +46,7 @@ const Elections = ({
 	const openPositions = data.positions.filter((p) => p.state === 'open').length
 
 	return (
-		<div className="h-full flex flex-col gap-4 p-4">
+		<div className="relative h-full flex flex-col gap-4 p-4">
 			<div className="flex items-baseline justify-between">
 				<h1 className="text-4xl font-bold">{data.name}</h1>
 				<p className="text-lg text-stone-500">vaalit.prodeko.org</p>
@@ -84,6 +86,7 @@ const Elections = ({
 					))}
 				</ul>
 			)}
+			<QrLink url="https://vaalit.prodeko.org" />
 		</div>
 	)
 }

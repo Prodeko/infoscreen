@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import CityBikes from './CityBikes'
+import Countdown from './Countdown'
 import { type CalendarEvent, fetchWeekEvents } from './calendarApi'
 import Elections, { type VaaliElection } from './Elections'
 import Hsl from './Hsl'
@@ -169,7 +170,29 @@ const Viewers = () => {
 	)
 }
 
+// The lunch menus are only of use during the day: they leave the rotation at
+// 18:00 and come back at 07:00, when night mode ends.
+const MENUS_FROM_HOUR = 7
+const MENUS_UNTIL_HOUR = 18
+
+const isLunchHour = () => {
+	const hour = new Date().getHours()
+	return hour >= MENUS_FROM_HOUR && hour < MENUS_UNTIL_HOUR
+}
+
+const useIsLunchTime = () => {
+	const [isLunchTime, setIsLunchTime] = useState(isLunchHour)
+
+	useEffect(() => {
+		const interval = setInterval(() => setIsLunchTime(isLunchHour()), 60 * 1000)
+		return () => clearInterval(interval)
+	}, [])
+
+	return isLunchTime
+}
+
 const App = () => {
+	const isLunchTime = useIsLunchTime()
 	useNightMode()
 	const menusPoll = usePolling(loadMenus, 60 * 60 * 1000)
 	const tiedotePoll = usePolling(loadTiedote, 60 * 60 * 1000)
@@ -236,11 +259,13 @@ const App = () => {
 		<main className="grid grid-rows-1 grid-cols-[8fr_1fr] h-screen">
 			<div className="h-full p-4">
 				<Rotator defaultRotationInterval={10000}>
-					<Menu
-						rotationInterval={30000}
-						todaysMenus={todaysMenus}
-						{...freshness(menusPoll)}
-					/>
+					{isLunchTime && (
+						<Menu
+							rotationInterval={30000}
+							todaysMenus={todaysMenus}
+							{...freshness(menusPoll)}
+						/>
+					)}
 					{slides && slides.length > 0 && (
 						<Slides
 							slides={slides}
@@ -294,6 +319,7 @@ const App = () => {
 			</div>
 			<div className="bg-stone-100 h-full text-center flex flex-col gap-4 shadow-md p-4">
 				<Time />
+				<Countdown />
 				<Weather />
 				<SidebarDepartures data={hsl} />
 				<CityBikes />

@@ -1,5 +1,6 @@
 import {
 	formatHslDepartureDisplay,
+	getGroupWalkMinutes,
 	getHslAlerts,
 	getHslDepartures,
 	HSL_ALL_ALIASES,
@@ -18,7 +19,10 @@ const getGroupDepartures = (
 	data: HSLData,
 	aliases: readonly string[],
 ): HSLDeparture[] =>
-	getHslDepartures(data, aliases, { limit: HSL_MAX_GROUP_DEPARTURES })
+	getHslDepartures(data, aliases, {
+		limit: HSL_MAX_GROUP_DEPARTURES,
+		reachableOnly: true,
+	})
 
 const Hsl = ({ data }: HSLSlideProps) => {
 	if (!data) {
@@ -37,13 +41,21 @@ const Hsl = ({ data }: HSLSlideProps) => {
 			<div className="grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1 min-h-0">
 				{HSL_GROUPS.map((group) => {
 					const departures = getGroupDepartures(data, group.aliases)
+					const walkMinutes = getGroupWalkMinutes(data, group.aliases)
 
 					return (
 						<div
 							key={group.id}
 							className="bg-white rounded-lg shadow-md p-4 flex flex-col gap-3"
 						>
-							<h2 className="text-2xl font-semibold">{group.title}</h2>
+							<div className="flex items-baseline justify-between gap-2">
+								<h2 className="text-2xl font-semibold">{group.title}</h2>
+								{walkMinutes != null && (
+									<p className="text-lg text-stone-500 whitespace-nowrap">
+										<span className="emoji">🚶</span> {walkMinutes} min
+									</p>
+								)}
+							</div>
 							<div className="space-y-2">
 								{departures.length > 0 ? (
 									departures.map((departure) => (

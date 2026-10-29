@@ -65,4 +65,6 @@ export type Slide = {
 	image?: string
 	// YYYY-MM-DD; the slide shows through the end of this day
 	until?: string
+	// Absolute URL; shown as a QR code
+	link?: string
 }

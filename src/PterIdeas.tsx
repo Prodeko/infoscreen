@@ -1,3 +1,5 @@
+import QrLink from './QrLink'
+
 export type PterIdea = {
 	id: number
 	title: string
@@ -10,7 +12,7 @@ type PterIdeasProps = {
 }
 
 const PterIdeas = ({ ideas }: PterIdeasProps) => (
-	<div className="flex flex-col gap-6 h-full p-4">
+	<div className="relative flex flex-col gap-6 h-full p-4">
 		<div className="flex items-baseline justify-between">
 			<h1 className="text-4xl font-bold">PTER – suosituimmat ideat</h1>
 			<p className="text-2xl text-stone-600">
@@ -31,6 +33,7 @@ const PterIdeas = ({ ideas }: PterIdeasProps) => (
 				</li>
 			))}
 		</ol>
+		<QrLink url="https://pter.prodeko.org" />
 	</div>
 )
 

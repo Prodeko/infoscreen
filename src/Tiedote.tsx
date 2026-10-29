@@ -1,3 +1,4 @@
+import QrLink from './QrLink'
 import type { TiedoteMessageWithCategory } from './types'
 
 const Tiedote = ({
@@ -27,7 +28,7 @@ const Tiedote = ({
 	}
 
 	return (
-		<div className="p-8">
+		<div className="relative h-full p-8">
 			<h1 className="text-4xl font-bold mb-4">{message.categoryTitle}</h1>
 			<h2 className="text-3xl font-semibold mb-4">{message.header}</h2>
 			<div
@@ -35,6 +36,7 @@ const Tiedote = ({
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: bulletin HTML from the prodeko.org API
 				dangerouslySetInnerHTML={{ __html: message.content }}
 			/>
+			<QrLink url="https://tiedotteet.prodeko.org" />
 		</div>
 	)
 }

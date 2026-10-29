@@ -1,3 +1,4 @@
+import QrLink from './QrLink'
 import type { Slide } from './types'
 
 // Slides edited at prodeko.org/admin (Infoscreen), published as
@@ -15,7 +16,7 @@ const Slides = ({
 
 	return (
 		<div
-			className={`flex flex-col h-full p-8 rounded-lg ${
+			className={`relative flex flex-col h-full p-8 rounded-lg ${
 				slide.highlight ? 'border-8 border-blue-800' : ''
 			}`}
 		>
@@ -32,6 +33,7 @@ const Slides = ({
 				// biome-ignore lint/security/noDangerouslySetInnerHtml: rendered from Markdown edited in the prodeko.org admin
 				dangerouslySetInnerHTML={{ __html: slide.description }}
 			/>
+			{slide.link && <QrLink url={slide.link} />}
 		</div>
 	)
 }

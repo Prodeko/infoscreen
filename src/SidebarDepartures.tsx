@@ -24,6 +24,7 @@ const SidebarDepartures = ({ data }: SidebarDeparturesProps) => {
 	const nowUnix = Math.floor(Date.now() / 1000)
 	const departures = getHslDepartures(data, HSL_ALL_ALIASES, {
 		fromUnix: nowUnix,
+		reachableOnly: true,
 	})
 	const nextDepartureByStop = new Map<string, (typeof departures)[number]>()
 
