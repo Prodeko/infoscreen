@@ -62,6 +62,9 @@ with `SLIDES_ORIGIN=http://localhost:1313` in `.env`.
 
 The screen is 1920×1080; size the browser window to match.
 
+To work on one slide, add `?slide=N` to the address (counting from 0) and
+the rotation stays on that slide.
+
 ## Checks
 
 ```
