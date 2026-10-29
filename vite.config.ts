@@ -114,6 +114,13 @@ export default defineConfig(({ mode }) => {
 						kiltiskameraPassword,
 					),
 				},
+				// Biliskilke (Bilis-2) /api/infoscreen, public like the rest of the
+				// app. BILIS_ORIGIN points it elsewhere, e.g. a local Bilis-2.
+				'/bilisproxy': {
+					target: env.BILIS_ORIGIN || 'https://bilis2.prodeko.org',
+					changeOrigin: true,
+					rewrite: (path) => path.replace(/^\/bilisproxy/, ''),
+				},
 				// Twelve Data. Without a key the Stocks slide stays hidden.
 				'/stocksproxy': {
 					target: 'https://api.twelvedata.com',

@@ -16,6 +16,7 @@ The main area rotates through these slides:
 | Countdown to the next big event | `prodeko.org/fi/infoscreen-countdowns.json` | Edited at prodeko.org/admin → Infoscreen → Laskurit. Hidden when none is ahead |
 | Weekly bulletin (viikkotiedote) | viikkotiedote API on old.prodeko.org (the old Django site) | Hidden when there is nothing to show |
 | This week's events from the guild's Google calendars (Tapahtumat, Yleiset, Excut, Fuksit, PoRa) | Public iCalendar feeds | Calendars are listed in `src/calendarApi.ts`. Hidden when the week has no events |
+| Biliskilke: this season's and the all-time top 10, and the latest games | Bilis-2's `/api/infoscreen` (bilis2.prodeko.org) | Public like the app itself. Hidden until the endpoint exists |
 | The most-voted active PTER ideas | `pter.prodeko.org/api/top-ideas` | Hidden when there are none |
 | HSL departures and disruptions: Aalto metro, Innopolis, Tietotie (bus 52), Maari (tram 15) | Digitransit | Needs `HSL_SUBSCRIPTION_KEY`. Each group shows the walk from TUAS; departures one could not walk to in time are left out. Free city bikes at the four nearest stations ([citybik.es](https://citybik.es)) next to the disruption notices, hidden off-season |
 | Rain radar for southern Finland | [FMI open data](https://en.ilmatieteenlaitos.fi/open-data) | Radar and background map both from FMI's WMS, no key |
