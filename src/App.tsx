@@ -6,6 +6,7 @@ import Elections, { type VaaliElection } from './Elections'
 import Hsl from './Hsl'
 import McKinseyLogo from './McKinseyLogo'
 import { Menu } from './Menu'
+import Namukilke, { type NamuStats } from './Namukilke'
 import PterIdeas, { type PterIdea } from './PterIdeas'
 import RainMap from './RainMap'
 import Rotator from './Rotator'
@@ -81,6 +82,10 @@ const loadElection = async () => {
 		? fetchJson<VaaliElection>(`/vaaliproxy/api/election/${open.id}`)
 		: null
 }
+
+// Namukilke's stats; the proxy adds the key. Without one namu answers 401,
+// the load fails and the slide stays hidden.
+const loadNamuStats = () => fetchJson<NamuStats>('/namuproxy/api/infoscreen')
 
 const useClock = () => {
 	const [time, setTime] = useState<Date>(new Date())
@@ -205,6 +210,7 @@ const App = () => {
 	const pterPoll = usePolling(loadPterIdeas, 10 * 60 * 1000)
 	const signupsPoll = usePolling(loadSignups, 5 * 60 * 1000)
 	const electionPoll = usePolling(loadElection, 10 * 60 * 1000)
+	const namuPoll = usePolling(loadNamuStats, 10 * 60 * 1000)
 	const { quotesById } = useAutoRefreshingStocks()
 	const hslPoll = useAutoRefreshingHsl(60 * 1000)
 
@@ -313,6 +319,15 @@ const App = () => {
 							{...freshness(pterPoll)}
 						/>
 					)}
+					{namuPoll.data &&
+						(namuPoll.data.topProducts.length > 0 ||
+							namuPoll.data.topWishes.length > 0) && (
+							<Namukilke
+								stats={namuPoll.data}
+								rotationInterval={15000}
+								{...freshness(namuPoll)}
+							/>
+						)}
 					<Hsl data={hsl} rotationInterval={15000} {...freshness(hslPoll)} />
 					<RainMap rotationInterval={15000} />
 					{Object.keys(quotesById).length > 0 && (

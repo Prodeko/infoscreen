@@ -98,6 +98,15 @@ export default defineConfig(({ mode }) => {
 						kiltiskameraPassword,
 					),
 				},
+				// Namukilke (namu2) /api/infoscreen. The key is sent as a header from
+				// here, so it's not part of the page. NAMU_ORIGIN points it elsewhere,
+				// e.g. a local namu2.
+				'/namuproxy': {
+					target: env.NAMU_ORIGIN || 'https://namu.prodeko.org',
+					changeOrigin: true,
+					rewrite: (path) => path.replace(/^\/namuproxy/, ''),
+					headers: { 'x-infoscreen-key': env.NAMU_INFOSCREEN_KEY ?? '' },
+				},
 				// Twelve Data. Without a key the Stocks slide stays hidden.
 				'/stocksproxy': {
 					target: 'https://api.twelvedata.com',

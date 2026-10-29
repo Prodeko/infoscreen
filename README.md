@@ -15,6 +15,7 @@ The main area rotates through these slides:
 | The open election: application count and the newest applications | [vaalit.prodeko.org](https://vaalit.prodeko.org) | Shown only while an election is open |
 | Weekly bulletin (viikkotiedote) | viikkotiedote API on old.prodeko.org (the old Django site) | Hidden when there is nothing to show |
 | This week's events from the guild's Google calendars (Tapahtumat, Yleiset, Excut, Fuksit, PoRa) | Public iCalendar feeds | Calendars are listed in `src/calendarApi.ts`. Hidden when the week has no events |
+| Namukilke: this week's most bought products and the most liked open wishes | namu2's `/api/infoscreen` | Needs `NAMU_INFOSCREEN_KEY`, the same value as namu2's `INFOSCREEN_API_KEY`. Hidden without it |
 | The most-voted active PTER ideas | `pter.prodeko.org/api/top-ideas` | Hidden when there are none |
 | HSL departures and disruptions: Aalto metro, Innopolis, Tietotie (bus 52), Maari (tram 15) | Digitransit | Needs `HSL_SUBSCRIPTION_KEY`. Each group shows the walk from TUAS; departures one could not walk to in time are left out |
 | Rain radar for southern Finland | [FMI open data](https://en.ilmatieteenlaitos.fi/open-data) | Radar and background map both from FMI's WMS, no key |
@@ -88,6 +89,7 @@ Create a `.env` file in the project root first:
 KILTISKAMERA_ON_AIR_PASSWORD=secretpassword
 HSL_SUBSCRIPTION_KEY=your_hsl_subscription_key
 TWELVE_DATA_API_KEY=your_twelve_data_key
+NAMU_INFOSCREEN_KEY=same_as_namu2_INFOSCREEN_API_KEY
 ```
 
 The older `VITE_KILTISKAMERA_ON_AIR_PASSWORD` and `VITE_HSL_SUBSCRIPTION_KEY`
