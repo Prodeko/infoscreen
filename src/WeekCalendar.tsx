@@ -2,6 +2,11 @@ import { useLayoutEffect, useRef } from 'react'
 import { CALENDARS, type CalendarEvent, startOfWeek } from './calendarApi'
 import QrLink from './QrLink'
 
+// Google Calendar locations are often full addresses ("Niittykummun koulu,
+// Vuoritontuntie 18, 02200 Espoo, Suomi"); the place is the part before the
+// first comma
+const placeName = (location: string) => location.split(',')[0].trim()
+
 type WeekCalendarProps = {
 	events: CalendarEvent[]
 	rotationInterval?: number
@@ -114,15 +119,19 @@ const WeekCalendar = ({ events }: WeekCalendarProps) => {
 										className={`w-1.5 shrink-0 rounded-full ${event.calendar.color}`}
 									/>
 									<div className="min-w-0 flex-1">
-										<p className="font-mono text-base text-stone-600">
-											{event.allDay || !sameDay(event.start, day)
-												? 'Koko päivän'
-												: formatTime(event.start)}
-										</p>
+										{event.allDay || !sameDay(event.start, day) ? (
+											<p className="text-base text-stone-600 whitespace-nowrap">
+												Koko päivä
+											</p>
+										) : (
+											<p className="font-mono text-base text-stone-600">
+												{formatTime(event.start)}
+											</p>
+										)}
 										<FitTitle text={event.title} />
 										{event.location && (
-											<p className="text-base text-stone-500 truncate">
-												{event.location}
+											<p className="text-base text-stone-500 break-words">
+												{placeName(event.location)}
 											</p>
 										)}
 									</div>
