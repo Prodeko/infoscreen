@@ -1,7 +1,8 @@
 import StaleNote from './StaleNote'
 import { fetchJson, usePolling } from './usePolling'
 
-// HSL city bike stations closest to the guild room. IDs are HSL's own
+// HSL city bike stations closest to the guild room, on the HSL slide next to
+// the disruption notices. IDs are HSL's own
 // (smoove:<number>); the data comes from citybik.es, which needs no key.
 const STATIONS = [
 	{ id: 'smoove:541', name: 'Korkeakouluaukio' },
@@ -56,18 +57,20 @@ const CityBikes = () => {
 	}
 
 	return (
-		<div className="bg-white rounded-lg shadow-md p-3 text-left">
+		<div className="bg-white rounded-lg shadow-md p-4 text-left">
 			<h2 className="text-2xl font-semibold mb-2">Kaupunkipyörät</h2>
-			<ul className="flex flex-col gap-1">
+			<ul className="flex gap-6">
 				{data.map((station) => (
-					<li key={station.id} className="flex justify-between gap-2">
-						<span className="truncate">{station.name}</span>
+					<li key={station.id} className="flex flex-col items-center">
 						<span
-							className={`font-mono font-bold ${
+							className={`text-3xl font-mono font-bold ${
 								station.bikes === 0 ? 'text-red-600' : ''
 							}`}
 						>
 							{station.bikes}
+						</span>
+						<span className="text-base text-stone-600 whitespace-nowrap">
+							{station.name}
 						</span>
 					</li>
 				))}

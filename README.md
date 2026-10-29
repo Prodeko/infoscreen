@@ -13,20 +13,20 @@ The main area rotates through these slides:
 | Slides from prodeko.org | `prodeko.org/fi/infoscreen.json` | Edited at prodeko.org/admin → Infoscreen. A slide with a "show until" date disappears after that day. Hidden when there are none |
 | Event sign-ups: open now and opening soon | [Ilmo](https://ilmo.prodeko.org) | Read on the server by `server/ilmoSignups.ts`, see the comment there. Hidden when there are none |
 | The open election: application count and the newest applications | [vaalit.prodeko.org](https://vaalit.prodeko.org) | Shown only while an election is open |
+| Countdown to the next big event | `prodeko.org/fi/infoscreen-countdowns.json` | Edited at prodeko.org/admin → Infoscreen → Laskurit. Hidden when none is ahead |
 | Weekly bulletin (viikkotiedote) | viikkotiedote API on old.prodeko.org (the old Django site) | Hidden when there is nothing to show |
 | This week's events from the guild's Google calendars (Tapahtumat, Yleiset, Excut, Fuksit, PoRa) | Public iCalendar feeds | Calendars are listed in `src/calendarApi.ts`. Hidden when the week has no events |
 | The most-voted active PTER ideas | `pter.prodeko.org/api/top-ideas` | Hidden when there are none |
-| HSL departures and disruptions: Aalto metro, Innopolis, Tietotie (bus 52), Maari (tram 15) | Digitransit | Needs `HSL_SUBSCRIPTION_KEY`. Each group shows the walk from TUAS; departures one could not walk to in time are left out |
+| HSL departures and disruptions: Aalto metro, Innopolis, Tietotie (bus 52), Maari (tram 15) | Digitransit | Needs `HSL_SUBSCRIPTION_KEY`. Each group shows the walk from TUAS; departures one could not walk to in time are left out. Free city bikes at the four nearest stations ([citybik.es](https://citybik.es)) next to the disruption notices, hidden off-season |
 | Rain radar for southern Finland | [FMI open data](https://en.ilmatieteenlaitos.fi/open-data) | Radar and background map both from FMI's WMS, no key |
 | Stock prices: S&P 500 (through the SPY ETF) and the Magnificent 7 | [Twelve Data](https://twelvedata.com) | Needs `TWELVE_DATA_API_KEY` (free plan: 8 symbols/min, 800/day, no indices). Refreshes every 15 minutes. Hidden without data |
 | McKinsey logo | `public/` | Sponsor |
 
-The sidebar shows the date and time, a countdown to the next big event
-(edited at prodeko.org/admin → Infoscreen → Laskurit, read from
-`prodeko.org/fi/infoscreen-countdowns.json`; hidden when none is ahead), the weather in Otaniemi
-([Open-Meteo](https://open-meteo.com)), the next HSL departures, free city
-bikes at the four nearest stations ([citybik.es](https://citybik.es), hidden
-off-season), and whether someone is watching Kiltiskamera.
+The sidebar shows the date and time (with today's flag day, if any, from
+`src/flagDays.ts`), the weather in Otaniemi
+([Open-Meteo](https://open-meteo.com)), the next HSL departures, the two
+coffee pots from [kahvikilke](https://kahvi.prodeko.org), and whether
+someone is watching Kiltiskamera.
 
 Slides that lead somewhere (sign-ups, elections, bulletin, calendar, PTER,
 and prodeko.org slides with a link) show a QR code to that page in the bottom

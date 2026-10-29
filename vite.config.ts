@@ -89,6 +89,12 @@ export default defineConfig(({ mode }) => {
 						hslSubscriptionKey,
 					),
 				},
+				// Coffee pot status from kahvikilke; /api/status is public.
+				'/kahviproxy': {
+					target: 'https://kahvi.prodeko.org',
+					changeOrigin: true,
+					rewrite: (path) => path.replace(/^\/kahviproxy/, ''),
+				},
 				'/kiltiskameraproxy': {
 					target: 'https://kiltiskamera.prodeko.org',
 					changeOrigin: true,
