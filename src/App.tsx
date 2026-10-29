@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import Biliskilke, { type BilisStats } from './Biliskilke'
 import Coffee from './Coffee'
 import Countdown, { type CountdownEntry, getNextCountdown } from './Countdown'
 import { type CalendarEvent, fetchWeekEvents } from './calendarApi'
@@ -88,6 +89,8 @@ const loadElection = async () => {
 // Namukilke's stats; the proxy adds the key. Without one namu answers 401,
 // the load fails and the slide stays hidden.
 const loadNamuStats = () => fetchJson<NamuStats>('/namuproxy/api/infoscreen')
+// Biliskilke's leaderboards and latest games (public, like the app itself)
+const loadBilisStats = () => fetchJson<BilisStats>('/bilisproxy/api/infoscreen')
 
 const useClock = () => {
 	const [time, setTime] = useState<Date>(new Date())
@@ -220,6 +223,7 @@ const App = () => {
 	const signupsPoll = usePolling(loadSignups, 5 * 60 * 1000)
 	const electionPoll = usePolling(loadElection, 10 * 60 * 1000)
 	const namuPoll = usePolling(loadNamuStats, 10 * 60 * 1000)
+	const bilisPoll = usePolling(loadBilisStats, 2 * 60 * 1000)
 	const { quotesById } = useAutoRefreshingStocks()
 	const hslPoll = useAutoRefreshingHsl(60 * 1000)
 
@@ -343,6 +347,13 @@ const App = () => {
 								{...freshness(namuPoll)}
 							/>
 						)}
+					{bilisPoll.data && bilisPoll.data.overall.length > 0 && (
+						<Biliskilke
+							stats={bilisPoll.data}
+							rotationInterval={20000}
+							{...freshness(bilisPoll)}
+						/>
+					)}
 					<Hsl data={hsl} rotationInterval={15000} {...freshness(hslPoll)} />
 					<RainMap rotationInterval={15000} />
 					{Object.keys(quotesById).length > 0 && (
