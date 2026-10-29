@@ -1,5 +1,6 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig, loadEnv } from 'vite'
+import { buildVersion } from './server/buildVersion'
 import { ilmoSignups } from './server/ilmoSignups'
 import { spotify } from './server/spotify'
 
@@ -37,6 +38,8 @@ export default defineConfig(({ mode }) => {
 				clientSecret: env.SPOTIFY_CLIENT_SECRET ?? '',
 				refreshToken: env.SPOTIFY_REFRESH_TOKEN ?? '',
 			}),
+			// Writes dist/version.json; the page reloads when it changes
+			buildVersion(),
 		],
 		server: {
 			proxy: {

@@ -29,6 +29,7 @@ import type {
 import { useAutoRefreshingHsl } from './useAutoRefreshingHsl'
 import { useNightMode } from './useNightMode'
 import { fetchJson, usePolling } from './usePolling'
+import { useReloadOnNewBuild } from './useReloadOnNewBuild'
 import Weather from './Weather'
 import WeekCalendar from './WeekCalendar'
 
@@ -214,6 +215,7 @@ const useIsLunchTime = () => {
 const App = () => {
 	const isLunchTime = useIsLunchTime()
 	useNightMode()
+	useReloadOnNewBuild()
 	const menusPoll = usePolling(loadMenus, 60 * 60 * 1000)
 	const tiedotePoll = usePolling(loadTiedote, 60 * 60 * 1000)
 	const slidesPoll = usePolling(loadSlides, 5 * 60 * 1000)

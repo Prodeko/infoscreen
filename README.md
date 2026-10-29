@@ -124,6 +124,12 @@ service after changing `.env`: the proxy reads it on start.
 
 There is a systemd service in /etc/systemd/system/infoscreen.service which runs the preview server. Chrome is started on boot in kiosk mode and the configuration is in ~/.config/autostart/infoscreen.desktop.
 
+The screen reloads itself within five minutes of a new build:
+`npm run build` writes `dist/version.json`, and the page reloads when the
+build id there changes. `vite preview` serves the new files without a
+restart. Restart the service only after changing `.env` or `vite.config.ts`,
+which are read when it starts.
+
 The API proxies in `vite.config.ts` are what make the data sources reachable,
 so the screen has to be served by `vite preview` (or `vite`), not as plain
 static files.
