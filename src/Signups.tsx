@@ -50,9 +50,9 @@ const Capacity = ({ signup }: { signup: Signup }) => {
 
 	if (!places) {
 		return (
-			<p className="text-5xl font-bold tabular-nums">
+			<p className="text-4xl font-bold tabular-nums">
 				{registrations}{' '}
-				<span className="text-2xl font-normal text-[#5A6475]">
+				<span className="text-xl font-normal text-[#5A6475]">
 					ilmoittautunutta
 				</span>
 			</p>
@@ -64,18 +64,18 @@ const Capacity = ({ signup }: { signup: Signup }) => {
 
 	return (
 		<div>
-			<div className="h-6 rounded-full bg-[#E3E7ED] overflow-hidden">
+			<div className="h-4 rounded-full bg-[#E3E7ED] overflow-hidden">
 				<div
 					className="h-full rounded-full"
 					style={{ width: `${fill * 100}%`, backgroundColor: color }}
 				/>
 			</div>
-			<p className="mt-3 text-5xl font-bold tabular-nums">
+			<p className="mt-2 text-4xl font-bold tabular-nums">
 				{full ? (
 					<>
 						Täynnä{' '}
 						{registrations > places && (
-							<span className="text-2xl font-normal text-[#5A6475]">
+							<span className="text-xl font-normal text-[#5A6475]">
 								{registrations - places} jonossa
 							</span>
 						)}
@@ -83,7 +83,7 @@ const Capacity = ({ signup }: { signup: Signup }) => {
 				) : (
 					<>
 						{registrations}
-						<span className="text-2xl font-normal text-[#5A6475]">
+						<span className="text-xl font-normal text-[#5A6475]">
 							{' '}
 							/ {places} paikkaa
 						</span>
@@ -127,22 +127,20 @@ const Banner = ({ signup }: { signup: Signup }) => {
 }
 
 const OpenEvent = ({ signup }: { signup: Signup }) => (
-	<li className="flex flex-col gap-5 min-w-0">
+	<li className="flex flex-col gap-3 min-w-0">
 		<Banner signup={signup} />
 		<div>
-			<h3 className="text-3xl font-bold leading-tight line-clamp-2 min-h-[2lh]">
+			<h3 className="text-2xl font-bold leading-tight line-clamp-2 min-h-[2lh]">
 				{signup.name}
 			</h3>
-			<p className="mt-1 text-2xl text-[#5A6475]">
+			<p className="mt-1 text-xl text-[#5A6475]">
 				{[signup.organization, day(signup.eventStart)]
 					.filter(Boolean)
 					.join(', ')}
 			</p>
 		</div>
 		<Capacity signup={signup} />
-		<p className="text-2xl text-[#5A6475]">
-			Sulkeutuu {when(signup.signupEnd)}
-		</p>
+		<p className="text-xl text-[#5A6475]">Sulkeutuu {when(signup.signupEnd)}</p>
 	</li>
 )
 
@@ -160,7 +158,7 @@ const Signups = ({
 		<div className="relative h-full flex flex-col p-6 text-[#002851]">
 			{open.length > 0 && (
 				<section>
-					<h2 className="text-5xl font-bold mb-6">Ilmoittaudu nyt</h2>
+					<h2 className="text-4xl font-bold mb-5">Ilmoittaudu nyt</h2>
 					<ul className="grid grid-cols-3 gap-10">
 						{open.map((signup) => (
 							<OpenEvent key={signup.url} signup={signup} />
@@ -176,18 +174,18 @@ const Signups = ({
 
 			{upcoming.length > 0 && (
 				<section className="mt-auto pt-6 pr-48 border-t-2 border-[#E3E7ED]">
-					<h2 className="text-4xl font-bold mb-4">Aukeaa pian</h2>
+					<h2 className="text-3xl font-bold mb-3">Aukeaa pian</h2>
 					<ul className="flex flex-col gap-2">
 						{upcoming.map((signup) => (
 							<li key={signup.url} className="flex items-baseline gap-6">
-								<span className="w-96 shrink-0 text-4xl font-bold tabular-nums">
+								<span className="w-72 shrink-0 text-3xl font-bold tabular-nums">
 									{when(signup.signupStart)}
 								</span>
-								<span className="text-3xl font-semibold truncate">
+								<span className="text-2xl font-semibold truncate">
 									{signup.name}
 								</span>
 								{signup.organization && (
-									<span className="text-2xl text-[#5A6475] shrink-0">
+									<span className="text-xl text-[#5A6475] shrink-0">
 										{signup.organization}
 									</span>
 								)}
