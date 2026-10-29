@@ -75,12 +75,18 @@ const Weather = () => {
 						<p className="text-stone-500">{hour.time}</p>
 						<p className="emoji">{hour.icon}</p>
 						<p className="font-semibold">{Math.round(hour.temperature)}°</p>
-						<p className="text-xs text-sky-700">
-							{hour.rain > 0 ? `${hour.rain}%` : ''}
+						{/* The % is in the caption below: "57%" doesn't fit a column */}
+						<p className="text-xs text-sky-700 tabular-nums">
+							{hour.rain > 0 ? hour.rain : '\u00a0'}
 						</p>
 					</div>
 				))}
 			</div>
+			{hours.some((hour) => hour.rain > 0) && (
+				<p className="text-[0.65rem] text-sky-700 text-center">
+					sateen todennäköisyys, %
+				</p>
+			)}
 			<StaleNote updatedAt={updatedAt} isStale={isStale} className="mt-1" />
 		</div>
 	)
