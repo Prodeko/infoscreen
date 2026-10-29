@@ -1,6 +1,7 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig, loadEnv } from 'vite'
 import { ilmoSignups } from './server/ilmoSignups'
+import { spotify } from './server/spotify'
 
 // Strips `prefix` from a proxied path and adds a query parameter. Secrets are
 // added this way, on the server running `vite preview`, so they never become
@@ -26,8 +27,17 @@ export default defineConfig(({ mode }) => {
 		''
 
 	return {
-		// ilmoSignups serves /api/ilmo-signups, see server/ilmoSignups.ts
-		plugins: [react(), ilmoSignups()],
+		// ilmoSignups serves /api/ilmo-signups, see server/ilmoSignups.ts;
+		// spotify serves /api/spotify-now-playing, see server/spotify.ts
+		plugins: [
+			react(),
+			ilmoSignups(),
+			spotify({
+				clientId: env.SPOTIFY_CLIENT_ID ?? '',
+				clientSecret: env.SPOTIFY_CLIENT_SECRET ?? '',
+				refreshToken: env.SPOTIFY_REFRESH_TOKEN ?? '',
+			}),
+		],
 		server: {
 			proxy: {
 				'/kanttiinitproxy': {

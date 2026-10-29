@@ -25,8 +25,9 @@ The main area rotates through these slides:
 The sidebar shows the date and time (with today's flag day, if any, from
 `src/flagDays.ts`), the weather in Otaniemi
 ([Open-Meteo](https://open-meteo.com)), the next HSL departures, the two
-coffee pots from [kahvikilke](https://kahvi.prodeko.org), and whether
-someone is watching Kiltiskamera.
+coffee pots from [kahvikilke](https://kahvi.prodeko.org), what the guild
+room's Spotify is playing (only while something plays, see below), and
+whether someone is watching Kiltiskamera.
 
 Slides that lead somewhere (sign-ups, elections, bulletin, calendar, PTER,
 and prodeko.org slides with a link) show a QR code to that page in the bottom
@@ -72,6 +73,25 @@ npm run build
 The keys and passwords in `.env` are read by the proxy in `vite.config.ts`
 when the server starts, not at build time, so `npm run build` needs none of
 them and none of them are in the built page.
+
+## Spotify ("Nyt soi")
+
+The sidebar card shows what the guild room's Spotify account is playing. It
+needs a Spotify app and one sign-in by that account; until then the card
+stays hidden.
+
+1. At https://developer.spotify.com/dashboard, signed in with the guild
+   room account, create an app. Choose *Web API*, and add the redirect URI
+   `http://127.0.0.1:8888/callback` exactly.
+2. Put the app's client ID and secret in `.env` as `SPOTIFY_CLIENT_ID` and
+   `SPOTIFY_CLIENT_SECRET`, on any computer with a browser.
+3. Run `npm run spotify-login`, open the link it prints, sign in with the
+   guild room account and allow access. It prints `SPOTIFY_REFRESH_TOKEN=…`.
+4. Put all three lines in the Pi's `.env` and restart the service.
+
+The tokens and the secret stay on the Pi (`server/spotify.ts`); the page only
+sees the song. If the card stops showing while music plays, the refresh
+token has probably been revoked: run step 3 again.
 
 ## Building and deploying
 
