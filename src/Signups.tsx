@@ -181,14 +181,18 @@ const Signups = ({
 								<span className="w-72 shrink-0 text-3xl font-bold tabular-nums">
 									{when(signup.signupStart)}
 								</span>
+								{/* The organizer as a dot in its Ilmo colour, like the bars
+								    above; the text would repeat when one team has several */}
+								<span
+									className="w-3 h-3 shrink-0 self-center rounded-full"
+									style={{ backgroundColor: signup.color ?? FALLBACK_COLOR }}
+								/>
 								<span className="text-2xl font-semibold truncate">
 									{signup.name}
 								</span>
-								{signup.organization && (
-									<span className="text-xl text-[#5A6475] shrink-0">
-										{signup.organization}
-									</span>
-								)}
+								<span className="text-xl text-[#5A6475] shrink-0">
+									{day(signup.eventStart)}
+								</span>
 							</li>
 						))}
 					</ul>
