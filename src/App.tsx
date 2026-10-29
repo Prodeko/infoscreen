@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import Biliskilke, { type BilisStats } from './Biliskilke'
 import Coffee from './Coffee'
 import Countdown, { type CountdownEntry, getNextCountdown } from './Countdown'
 import { type CalendarEvent, fetchWeekEvents } from './calendarApi'
@@ -83,6 +84,9 @@ const loadElection = async () => {
 		? fetchJson<VaaliElection>(`/vaaliproxy/api/election/${open.id}`)
 		: null
 }
+
+// Biliskilke's leaderboards and latest games (public, like the app itself)
+const loadBilisStats = () => fetchJson<BilisStats>('/bilisproxy/api/infoscreen')
 
 const useClock = () => {
 	const [time, setTime] = useState<Date>(new Date())
@@ -214,6 +218,7 @@ const App = () => {
 	const pterPoll = usePolling(loadPterIdeas, 10 * 60 * 1000)
 	const signupsPoll = usePolling(loadSignups, 5 * 60 * 1000)
 	const electionPoll = usePolling(loadElection, 10 * 60 * 1000)
+	const bilisPoll = usePolling(loadBilisStats, 2 * 60 * 1000)
 	const { quotesById } = useAutoRefreshingStocks()
 	const hslPoll = useAutoRefreshingHsl(60 * 1000)
 
@@ -326,6 +331,13 @@ const App = () => {
 							ideas={pterIdeas}
 							rotationInterval={15000}
 							{...freshness(pterPoll)}
+						/>
+					)}
+					{bilisPoll.data && bilisPoll.data.overall.length > 0 && (
+						<Biliskilke
+							stats={bilisPoll.data}
+							rotationInterval={20000}
+							{...freshness(bilisPoll)}
 						/>
 					)}
 					<Hsl data={hsl} rotationInterval={15000} {...freshness(hslPoll)} />
