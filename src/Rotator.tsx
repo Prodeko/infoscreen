@@ -23,11 +23,18 @@ interface RotatorProps {
 	defaultRotationInterval?: number // in milliseconds
 }
 
+// ?slide=N pins the rotation to the Nth slide (from 0), for working on one
+// slide without waiting for it to come round
+const pinnedSlide = (() => {
+	const value = new URLSearchParams(window.location.search).get('slide')
+	return value === null ? null : Number(value)
+})()
+
 const Rotator = ({
 	children,
 	defaultRotationInterval = 10000,
 }: RotatorProps) => {
-	const [currentIndex, setCurrentIndex] = useState(0)
+	const [currentIndex, setCurrentIndex] = useState(pinnedSlide ?? 0)
 	const [round, setRound] = useState(0)
 	const [isFading, setIsFading] = useState(false)
 
@@ -68,7 +75,7 @@ const Rotator = ({
 	}, [childrenArray.length, currentIndex])
 
 	useEffect(() => {
-		if (childrenArray.length < 2) {
+		if (childrenArray.length < 2 || pinnedSlide !== null) {
 			return
 		}
 
