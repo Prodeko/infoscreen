@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'react'
 import { CALENDARS, type CalendarEvent, startOfWeek } from './calendarApi'
 
 type WeekCalendarProps = {
@@ -18,6 +19,45 @@ const isOnDay = (event: CalendarEvent, day: Date) => {
 	const dayEnd = new Date(day)
 	dayEnd.setDate(dayEnd.getDate() + 1)
 	return event.start < dayEnd && event.end > day
+}
+
+// Event titles start at this size and shrink a pixel at a time, down to the
+// minimum, until their longest word fits the column. Words are never broken.
+const TITLE_MAX_PX = 20
+const TITLE_MIN_PX = 12
+
+/** An event title whose words all stay on one line: it shrinks until none of them is wider than the column. */
+const FitTitle = ({ text }: { text: string }) => {
+	const ref = useRef<HTMLParagraphElement>(null)
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: refit when the title changes
+	useLayoutEffect(() => {
+		const element = ref.current
+		if (!element) {
+			return
+		}
+		const fit = () => {
+			let size = TITLE_MAX_PX
+			element.style.fontSize = `${size}px`
+			while (size > TITLE_MIN_PX && element.scrollWidth > element.clientWidth) {
+				size -= 1
+				element.style.fontSize = `${size}px`
+			}
+		}
+		fit()
+		// The first fit may measure the fallback font; fit again once IBM Plex is in.
+		document.fonts.ready.then(fit)
+	}, [text])
+
+	return (
+		<p
+			ref={ref}
+			className="font-semibold leading-tight overflow-hidden"
+			style={{ fontSize: TITLE_MAX_PX }}
+		>
+			{text}
+		</p>
+	)
 }
 
 const WeekCalendar = ({ events }: WeekCalendarProps) => {
@@ -50,11 +90,11 @@ const WeekCalendar = ({ events }: WeekCalendarProps) => {
 					return (
 						<div
 							key={day.toISOString()}
-							className={`rounded-lg shadow-md p-3 flex flex-col gap-2 min-h-0 overflow-hidden ${
+							className={`rounded-lg shadow-md p-3 flex flex-col gap-1.5 min-h-0 overflow-hidden ${
 								isToday ? 'bg-blue-50 ring-2 ring-blue-600' : 'bg-white'
 							}`}
 						>
-							<h2 className="text-2xl font-semibold capitalize">
+							<h2 className="text-xl font-semibold capitalize">
 								{day.toLocaleDateString('fi-FI', {
 									weekday: 'short',
 									day: 'numeric',
@@ -67,20 +107,18 @@ const WeekCalendar = ({ events }: WeekCalendarProps) => {
 							{dayEvents.map((event) => (
 								<div
 									key={event.id}
-									className="flex gap-2 border-b border-stone-100 pb-2 last:border-b-0"
+									className="flex gap-2 border-b border-stone-100 pb-1.5 last:border-b-0"
 								>
 									<span
 										className={`w-1.5 shrink-0 rounded-full ${event.calendar.color}`}
 									/>
-									<div className="min-w-0">
+									<div className="min-w-0 flex-1">
 										<p className="font-mono text-base text-stone-600">
 											{event.allDay || !sameDay(event.start, day)
 												? 'Koko päivän'
 												: formatTime(event.start)}
 										</p>
-										<p className="text-lg font-semibold leading-tight break-words hyphens-auto">
-											{event.title}
-										</p>
+										<FitTitle text={event.title} />
 										{event.location && (
 											<p className="text-base text-stone-500 truncate">
 												{event.location}
