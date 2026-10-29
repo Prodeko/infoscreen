@@ -18,6 +18,9 @@ const INK = '#000a14'
 const TINT = '#eef1f8' // --pd-blue-tint-04, PTER's sunken surface
 const TRACK = '#d6dcea' // --pd-blue-tint-16
 const RAINBOW = ['#e84028', '#f08028', '#e8d068', '#408850', '#386088']
+// The rank numbers in the same colours; the brand yellow is too pale to read
+// as text on a light surface, so rank 3 uses a deeper yellow
+const RANK_TEXT = ['#e84028', '#f08028', '#c9a227', '#408850', '#386088']
 
 const RainbowStripe = () => (
 	<div
@@ -54,15 +57,15 @@ const PterIdeas = ({ ideas }: PterIdeasProps) => {
 							style={{ backgroundColor: TINT, color: INK }}
 						>
 							<span
-								className="row-span-2 w-14 h-14 rounded-md flex items-center justify-center text-3xl font-bold"
-								style={{ backgroundColor: color }}
+								className="row-span-2 w-12 text-5xl font-bold tabular-nums text-center"
+								style={{ color: RANK_TEXT[index % RANK_TEXT.length] }}
 							>
 								{index + 1}
 							</span>
 							<span className="text-3xl font-semibold truncate">
 								{idea.title}
 							</span>
-							<span className="row-span-2 text-3xl font-bold tabular-nums">
+							<span className="row-span-2 w-28 text-right text-3xl font-bold tabular-nums">
 								▲ {idea.votes}
 							</span>
 							<div
