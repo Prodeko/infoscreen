@@ -175,27 +175,40 @@ const Signups = ({
 			{upcoming.length > 0 && (
 				<section className="mt-auto pt-6 pr-48 border-t-2 border-[#E3E7ED]">
 					<h2 className="text-3xl font-bold mb-3">Aukeaa pian</h2>
-					<ul className="flex flex-col gap-2">
-						{upcoming.map((signup) => (
-							<li key={signup.url} className="flex items-baseline gap-6">
-								<span className="w-72 shrink-0 text-3xl font-bold tabular-nums">
-									{when(signup.signupStart)}
-								</span>
-								{/* The organizer as a dot in its Ilmo colour, like the bars
-								    above; the text would repeat when one team has several */}
-								<span
-									className="w-3 h-3 shrink-0 self-center rounded-full"
-									style={{ backgroundColor: signup.color ?? FALLBACK_COLOR }}
-								/>
-								<span className="text-2xl font-semibold truncate">
-									{signup.name}
-								</span>
-								<span className="text-xl text-[#5A6475] shrink-0">
-									{day(signup.eventStart)}
-								</span>
-							</li>
-						))}
-					</ul>
+					{/* A table with headings, so each opening time clearly belongs to
+					    its event and the last column reads as the event's day */}
+					<table className="text-left">
+						<thead>
+							<tr className="text-lg text-[#5A6475]">
+								<th className="font-normal pr-10 pb-1">Ilmo aukeaa</th>
+								<th className="font-normal pr-10 pb-1">Tapahtuma</th>
+								<th className="font-normal pb-1">Päivä</th>
+							</tr>
+						</thead>
+						<tbody>
+							{upcoming.map((signup) => (
+								<tr key={signup.url} className="border-t border-[#E3E7ED]">
+									<td className="pr-10 py-1.5 text-3xl font-bold tabular-nums whitespace-nowrap">
+										{when(signup.signupStart)}
+									</td>
+									<td className="pr-10 py-1.5 text-2xl font-semibold">
+										{/* The organizer as a dot in its Ilmo colour, like the
+										    bars above */}
+										<span
+											className="inline-block w-3 h-3 mr-3 rounded-full align-middle"
+											style={{
+												backgroundColor: signup.color ?? FALLBACK_COLOR,
+											}}
+										/>
+										{signup.name}
+									</td>
+									<td className="py-1.5 text-2xl text-[#5A6475] whitespace-nowrap">
+										{day(signup.eventStart)}
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
 				</section>
 			)}
 
