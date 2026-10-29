@@ -8,6 +8,7 @@ import { getFlagDays } from './flagDays'
 import Hsl from './Hsl'
 import McKinseyLogo from './McKinseyLogo'
 import { Menu } from './Menu'
+import Namukilke, { type NamuStats } from './Namukilke'
 import NowPlaying from './NowPlaying'
 import PterIdeas, { type PterIdea } from './PterIdeas'
 import RainMap from './RainMap'
@@ -85,6 +86,9 @@ const loadElection = async () => {
 		: null
 }
 
+// Namukilke's stats; the proxy adds the key. Without one namu answers 401,
+// the load fails and the slide stays hidden.
+const loadNamuStats = () => fetchJson<NamuStats>('/namuproxy/api/infoscreen')
 // Biliskilke's leaderboards and latest games (public, like the app itself)
 const loadBilisStats = () => fetchJson<BilisStats>('/bilisproxy/api/infoscreen')
 
@@ -218,6 +222,7 @@ const App = () => {
 	const pterPoll = usePolling(loadPterIdeas, 10 * 60 * 1000)
 	const signupsPoll = usePolling(loadSignups, 5 * 60 * 1000)
 	const electionPoll = usePolling(loadElection, 10 * 60 * 1000)
+	const namuPoll = usePolling(loadNamuStats, 10 * 60 * 1000)
 	const bilisPoll = usePolling(loadBilisStats, 2 * 60 * 1000)
 	const { quotesById } = useAutoRefreshingStocks()
 	const hslPoll = useAutoRefreshingHsl(60 * 1000)
@@ -333,6 +338,15 @@ const App = () => {
 							{...freshness(pterPoll)}
 						/>
 					)}
+					{namuPoll.data &&
+						(namuPoll.data.topProducts.length > 0 ||
+							namuPoll.data.topWishes.length > 0) && (
+							<Namukilke
+								stats={namuPoll.data}
+								rotationInterval={15000}
+								{...freshness(namuPoll)}
+							/>
+						)}
 					{bilisPoll.data && bilisPoll.data.overall.length > 0 && (
 						<Biliskilke
 							stats={bilisPoll.data}

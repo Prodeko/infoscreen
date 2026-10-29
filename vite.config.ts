@@ -114,6 +114,15 @@ export default defineConfig(({ mode }) => {
 						kiltiskameraPassword,
 					),
 				},
+				// Namukilke (namu2) /api/infoscreen. The key is sent as a header from
+				// here, so it's not part of the page. NAMU_ORIGIN points it elsewhere,
+				// e.g. a local namu2.
+				'/namuproxy': {
+					target: env.NAMU_ORIGIN || 'https://namu.prodeko.org',
+					changeOrigin: true,
+					rewrite: (path) => path.replace(/^\/namuproxy/, ''),
+					headers: { 'x-infoscreen-key': env.NAMU_INFOSCREEN_KEY ?? '' },
+				},
 				// Biliskilke (Bilis-2) /api/infoscreen, public like the rest of the
 				// app. BILIS_ORIGIN points it elsewhere, e.g. a local Bilis-2.
 				'/bilisproxy': {
