@@ -7,6 +7,7 @@ import { getFlagDays } from './flagDays'
 import Hsl from './Hsl'
 import McKinseyLogo from './McKinseyLogo'
 import { Menu } from './Menu'
+import NowPlaying from './NowPlaying'
 import PterIdeas, { type PterIdea } from './PterIdeas'
 import RainMap from './RainMap'
 import Rotator from './Rotator'
@@ -340,6 +341,7 @@ const App = () => {
 				<Weather />
 				<SidebarDepartures data={hsl} />
 				<Coffee />
+				<NowPlaying />
 				<div className="mt-auto">
 					<Viewers />
 				</div>

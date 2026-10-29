@@ -6,7 +6,8 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc && tsc -p tsconfig.node.json --noEmit && vite build",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"spotify-login": "node scripts/spotify-login.mjs"
 	},
 	"dependencies": {
 		"ical.js": "^2.2.1",
