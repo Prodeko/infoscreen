@@ -20,7 +20,7 @@ The main area rotates through these slides:
 | Biliskilke: this season's and the all-time top 10, and the latest games | Bilis-2's `/api/infoscreen` (bilis2.prodeko.org) | Public like the app itself. Hidden until the endpoint exists |
 | The most-voted active PTER ideas | `pter.prodeko.org/api/top-ideas` | Hidden when there are none |
 | HSL departures and disruptions: Aalto metro, Innopolis, Tietotie (bus 52), Maari (tram 15) | Digitransit | Needs `HSL_SUBSCRIPTION_KEY`. Each group shows the walk from TUAS; departures one could not walk to in time are left out. Free city bikes at the four nearest stations ([citybik.es](https://citybik.es)) next to the disruption notices, hidden off-season |
-| Rain radar for southern Finland | [FMI open data](https://en.ilmatieteenlaitos.fi/open-data) | Radar and background map both from FMI's WMS, no key |
+| Rain radar for the capital region | [FMI open data](https://en.ilmatieteenlaitos.fi/open-data) over [OpenStreetMap](https://www.openstreetmap.org) tiles | No keys. The map is greyed so the rain stands out |
 | Stock prices: S&P 500 (through the SPY ETF) and the Magnificent 7 | [Twelve Data](https://twelvedata.com) | Needs `TWELVE_DATA_API_KEY` (free plan: 8 symbols/min, 800/day, no indices). Refreshes every 15 minutes. Hidden without data |
 | McKinsey logo | `public/` | Sponsor |
 

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 
-// Rain radar over southern Finland. Both images come from FMI's open WMS (no
-// key): a gray Natural Earth background and the radar layer, requested for
-// the same Web Mercator area so they line up. The area is a 6 x 4 block of
-// zoom-8 map tiles around Otaniemi.
-const ZOOM = 8
-const COLS = 6
+// Rain radar over the capital region: FMI's radar layer (open WMS, no key)
+// over OpenStreetMap tiles, muted to grey so the rain stands out. The area is
+// a 7 x 4 block of zoom-10 map tiles around Otaniemi, roughly Kirkkonummi to
+// Sipoo; the radar is requested for exactly that Web Mercator area, so the
+// two line up. One screen loading a couple of dozen tiles is within
+// OpenStreetMap's tile usage policy, which asks for the attribution below.
+const ZOOM = 10
+const COLS = 7
 const ROWS = 4
 const TILE = 256
 const CENTER = { lat: 60.1867, lon: 24.8277 } // Otaniemi
@@ -18,8 +20,8 @@ const latRad = (CENTER.lat * Math.PI) / 180
 const centerY =
 	((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) *
 	tiles
-const firstX = Math.floor(centerX) - COLS / 2
-const firstY = Math.floor(centerY) - ROWS / 2
+const firstX = Math.floor(centerX - COLS / 2)
+const firstY = Math.floor(centerY - ROWS / 2)
 
 const metersX = (tileX: number) =>
 	(tileX / tiles) * 2 * Math.PI * EARTH - Math.PI * EARTH
@@ -39,7 +41,13 @@ const wmsUrl = (layer: string, extra = '') =>
 	`&BBOX=${RADAR_BBOX}&WIDTH=${COLS * TILE}&HEIGHT=${ROWS * TILE}` +
 	`&FORMAT=image/png${extra}`
 
-const BACKGROUND_URL = wmsUrl('Basemaps:naturalearthgray')
+const TILES = Array.from({ length: ROWS * COLS }, (_, i) => ({
+	x: firstX + (i % COLS),
+	y: firstY + Math.floor(i / COLS),
+	left: (i % COLS) * TILE,
+	top: Math.floor(i / COLS) * TILE,
+}))
+
 const radarUrl = (cacheKey: number) =>
 	wmsUrl('Radar:suomi_dbz_eureffin', `&TRANSPARENT=true&_=${cacheKey}`)
 
@@ -72,15 +80,24 @@ const RainMap = (_props: { rotationInterval?: number }) => {
 					className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
 					style={{ width: COLS * TILE, height: ROWS * TILE }}
 				>
-					<img
-						src={BACKGROUND_URL}
-						alt=""
-						className="absolute inset-0 w-full h-full"
-					/>
+					{TILES.map((tile) => (
+						<img
+							key={`${tile.x}-${tile.y}`}
+							src={`https://tile.openstreetmap.org/${ZOOM}/${tile.x}/${tile.y}.png`}
+							alt=""
+							className="absolute grayscale opacity-80"
+							style={{
+								left: tile.left,
+								top: tile.top,
+								width: TILE,
+								height: TILE,
+							}}
+						/>
+					))}
 					<img
 						src={radarUrl(loadedAt)}
 						alt="Sadetutka"
-						className="absolute inset-0 w-full h-full "
+						className="absolute inset-0 w-full h-full"
 					/>
 					<div
 						className="absolute w-4 h-4 -ml-2 -mt-2 rounded-full bg-red-600 ring-4 ring-white"
@@ -88,7 +105,7 @@ const RainMap = (_props: { rotationInterval?: number }) => {
 					/>
 				</div>
 				<p className="absolute bottom-1 right-2 text-xs text-stone-500 bg-white/70 px-1 rounded">
-					Tutka ja kartta © Ilmatieteen laitos, Natural Earth
+					Tutka: Ilmatieteen laitos. Kartta: © OpenStreetMapin tekijät
 				</p>
 			</div>
 		</div>
