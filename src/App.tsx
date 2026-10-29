@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
-import CityBikes from './CityBikes'
-import Countdown, { type CountdownEntry } from './Countdown'
+import Coffee from './Coffee'
+import Countdown, { type CountdownEntry, getNextCountdown } from './Countdown'
 import { type CalendarEvent, fetchWeekEvents } from './calendarApi'
 import Elections, { type VaaliElection } from './Elections'
+import { getFlagDays } from './flagDays'
 import Hsl from './Hsl'
 import McKinseyLogo from './McKinseyLogo'
 import { Menu } from './Menu'
@@ -141,10 +142,17 @@ const Time = () => {
 		day: 'numeric',
 	})
 
+	const flagDays = getFlagDays(time)
+
 	return (
 		<div>
 			<p className="text-3xl">{date}</p>
 			<p className="text-4xl font-mono font-bold">{timeHoursMinutesSeconds}</p>
+			{flagDays.length > 0 && (
+				<p className="text-sm mt-1">
+					<span className="emoji">🇫🇮</span> {flagDays.join(' · ')}
+				</p>
+			)}
 		</div>
 	)
 }
@@ -299,6 +307,12 @@ const App = () => {
 							{...freshness(tiedotePoll)}
 						/>
 					)}
+					{getNextCountdown(countdownsPoll.data) && (
+						<Countdown
+							countdowns={countdownsPoll.data}
+							rotationInterval={10000}
+						/>
+					)}
 					{weekEvents && weekEvents.length > 0 && (
 						<WeekCalendar
 							events={weekEvents}
@@ -323,10 +337,9 @@ const App = () => {
 			</div>
 			<div className="bg-stone-100 h-full text-center flex flex-col gap-4 shadow-md p-4">
 				<Time />
-				<Countdown countdowns={countdownsPoll.data} />
 				<Weather />
 				<SidebarDepartures data={hsl} />
-				<CityBikes />
+				<Coffee />
 				<div className="mt-auto">
 					<Viewers />
 				</div>
