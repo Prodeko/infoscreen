@@ -63,4 +63,6 @@ export type Slide = {
 	highlight: boolean
 	// Absolute URL
 	image?: string
+	// YYYY-MM-DD; the slide shows through the end of this day
+	until?: string
 }

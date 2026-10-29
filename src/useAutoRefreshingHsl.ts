@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import {
 	HSL_ENDPOINT,
 	HSL_QUERY,
@@ -6,43 +5,28 @@ import {
 	type HSLData,
 	type HSLResponse,
 } from './hslApi'
+import { usePolling } from './usePolling'
 
-export const useAutoRefreshingHsl = (refreshIntervalMS: number = 60 * 1000) => {
-	const [hslData, setHslData] = useState<HSLData | null>(null)
+const loadHsl = async (): Promise<HSLData | null> => {
+	const response = await fetch(HSL_ENDPOINT, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			query: HSL_QUERY,
+			variables: HSL_VARIABLES,
+		}),
+	})
 
-	useEffect(() => {
-		const fetchHsl = async () => {
-			try {
-				const response = await fetch(HSL_ENDPOINT, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						query: HSL_QUERY,
-						variables: HSL_VARIABLES,
-					}),
-				})
+	if (!response.ok) {
+		throw new Error(`HSL request failed with status ${response.status}`)
+	}
 
-				if (!response.ok) {
-					throw new Error(`HSL request failed with status ${response.status}`)
-				}
-
-				const data = (await response.json()) as HSLResponse
-				if (data.errors && data.errors.length > 0) {
-					console.error('HSL GraphQL errors:', data.errors)
-				}
-				setHslData(data.data || null)
-			} catch (error) {
-				console.error(
-					'Failed to fetch HSL data. Maybe the server is down?',
-					error,
-				)
-			}
-		}
-
-		fetchHsl()
-		const interval = setInterval(fetchHsl, refreshIntervalMS)
-		return () => clearInterval(interval)
-	}, [refreshIntervalMS])
-
-	return hslData
+	const data = (await response.json()) as HSLResponse
+	if (data.errors && data.errors.length > 0) {
+		console.error('HSL GraphQL errors:', data.errors)
+	}
+	return data.data || null
 }
+
+export const useAutoRefreshingHsl = (refreshIntervalMS: number = 60 * 1000) =>
+	usePolling(loadHsl, refreshIntervalMS)

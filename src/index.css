@@ -11,3 +11,19 @@ html {
 	color-scheme: light;
 	background: white;
 }
+
+#root {
+	background: white;
+	min-height: 100vh;
+}
+
+/* Night mode, see src/useNightMode.ts. Images and emoji are inverted a second
+   time so photos, maps and weather icons look normal. */
+html.night #root {
+	filter: invert(1) hue-rotate(180deg);
+}
+
+html.night #root img,
+html.night #root .emoji {
+	filter: invert(1) hue-rotate(180deg);
+}

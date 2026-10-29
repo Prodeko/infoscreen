@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
+import CityBikes from './CityBikes'
 import { type CalendarEvent, fetchWeekEvents } from './calendarApi'
+import Elections, { type VaaliElection } from './Elections'
 import Hsl from './Hsl'
 import McKinseyLogo from './McKinseyLogo'
 import { Menu } from './Menu'
 import PterIdeas, { type PterIdea } from './PterIdeas'
+import RainMap from './RainMap'
 import Rotator from './Rotator'
 import SidebarDepartures from './SidebarDepartures'
+import Signups, { type Signups as SignupsData } from './Signups'
 import Slides from './Slides'
 import Stocks, { useAutoRefreshingStocks } from './Stocks'
 import Tiedote from './Tiedote'
@@ -18,164 +22,60 @@ import type {
 	TiedoteMessageWithCategory,
 } from './types'
 import { useAutoRefreshingHsl } from './useAutoRefreshingHsl'
+import { useNightMode } from './useNightMode'
+import { fetchJson, usePolling } from './usePolling'
+import Weather from './Weather'
 import WeekCalendar from './WeekCalendar'
 
 const RESTAURANT_IDS = ['7', '52', '2'] // TUAS, A Bloc, T-talo, Täffä
 
-const useAutoRefreshingMenus = (refreshIntervalMS: number = 60 * 60 * 1000) => {
-	const [menus, setMenus] = useState<Record<string, MenuType> | null>(null)
-	const [restaurants, setRestaurants] = useState<Record<
-		string,
-		Restaurant
-	> | null>(null)
-
-	// Fetch menus and restaurants on mount, then refresh the menus every
-	// `refreshIntervalMS` milliseconds
-	useEffect(() => {
-		const fetchMenus = async () => {
-			try {
-				const response = await fetch(
-					`/kanttiinitproxy/menus?restaurants=${RESTAURANT_IDS.join(',')}`,
-				)
-				const data = await response.json()
-				setMenus(data)
-			} catch (error) {
-				console.error('Failed to fetch menus. Maybe the server is down?', error)
-			}
-		}
-
-		const fetchRestaurants = async () => {
-			try {
-				const response = await fetch('/kanttiinitproxy/restaurants')
-				const data = (await response.json()) as Restaurant[]
-				const restaurantMap = data.reduce(
-					(acc, restaurant) => {
-						acc[restaurant.id] = restaurant
-						return acc
-					},
-					{} as Record<string, Restaurant>,
-				)
-				setRestaurants(restaurantMap)
-			} catch (error) {
-				console.error(
-					'Failed to fetch restaurants. Maybe the server is down?',
-					error,
-				)
-			}
-		}
-
-		fetchMenus()
-		fetchRestaurants()
-		const interval = setInterval(fetchMenus, refreshIntervalMS)
-		return () => clearInterval(interval)
-	}, [refreshIntervalMS])
-
+const loadMenus = async () => {
+	const [menus, restaurantList] = await Promise.all([
+		fetchJson<Record<string, MenuType>>(
+			`/kanttiinitproxy/menus?restaurants=${RESTAURANT_IDS.join(',')}`,
+		),
+		fetchJson<Restaurant[]>('/kanttiinitproxy/restaurants'),
+	])
+	const restaurants: Record<string, Restaurant> = {}
+	for (const restaurant of restaurantList) {
+		restaurants[restaurant.id] = restaurant
+	}
 	return { menus, restaurants }
 }
 
-const useAutoRefreshingTiedote = (
-	refreshIntervalMS: number = 60 * 60 * 1000,
-) => {
-	const [tiedote, setTiedote] = useState<TiedoteCategory[] | null>(null)
+const loadTiedote = () => fetchJson<TiedoteCategory[]>('/tiedoteproxy/content/')
 
-	useEffect(() => {
-		const fetchTiedote = async () => {
-			try {
-				const response = await fetch('/tiedoteproxy/content/')
-				const data = await response.json()
-				setTiedote(data)
-			} catch (error) {
-				console.error(
-					'Failed to fetch tiedote. Maybe the server is down?',
-					error,
-				)
-			}
-		}
-
-		fetchTiedote()
-		const interval = setInterval(fetchTiedote, refreshIntervalMS)
-		return () => clearInterval(interval)
-	}, [refreshIntervalMS])
-
-	return tiedote
-}
-
-const useAutoRefreshingSlides = (refreshIntervalMS: number = 5 * 60 * 1000) => {
-	const [slides, setSlides] = useState<Slide[] | null>(null)
-
-	useEffect(() => {
-		const fetchSlides = async () => {
-			try {
-				const response = await fetch('/slidesproxy/fi/infoscreen.json')
-				if (!response.ok) {
-					throw new Error(
-						`Slides request failed with status ${response.status}`,
-					)
-				}
-				setSlides(await response.json())
-			} catch (error) {
-				console.error(
-					'Failed to fetch slides. Maybe the server is down?',
-					error,
-				)
-			}
-		}
-
-		fetchSlides()
-		const interval = setInterval(fetchSlides, refreshIntervalMS)
-		return () => clearInterval(interval)
-	}, [refreshIntervalMS])
-
-	return slides
+// A slide with an `until` date shows through the end of that day
+const loadSlides = async () => {
+	const slides = await fetchJson<Slide[]>('/slidesproxy/fi/infoscreen.json')
+	const today = new Date().toLocaleDateString('sv-SE') // YYYY-MM-DD, local
+	return slides.filter((slide) => !slide.until || slide.until >= today)
 }
 
 // The week shown is the one the fetch falls in, so on Monday the slide moves on
 // to the new week at the first refresh after midnight.
-const useAutoRefreshingWeekEvents = (
-	refreshIntervalMS: number = 60 * 60 * 1000,
-) => {
-	const [events, setEvents] = useState<CalendarEvent[] | null>(null)
-
-	useEffect(() => {
-		const fetchEvents = async () => setEvents(await fetchWeekEvents())
-
-		fetchEvents()
-		const interval = setInterval(fetchEvents, refreshIntervalMS)
-		return () => clearInterval(interval)
-	}, [refreshIntervalMS])
-
-	return events
-}
+const loadWeekEvents = (): Promise<CalendarEvent[]> => fetchWeekEvents()
 
 const PTER_IDEA_COUNT = 5
 
-const useAutoRefreshingPterIdeas = (
-	refreshIntervalMS: number = 10 * 60 * 1000,
-) => {
-	const [ideas, setIdeas] = useState<PterIdea[] | null>(null)
+const loadPterIdeas = async () =>
+	(
+		await fetchJson<{ ideas: PterIdea[] }>(
+			`/pterproxy/api/top-ideas?limit=${PTER_IDEA_COUNT}`,
+		)
+	).ideas
 
-	useEffect(() => {
-		const fetchIdeas = async () => {
-			try {
-				const response = await fetch(
-					`/pterproxy/api/top-ideas?limit=${PTER_IDEA_COUNT}`,
-				)
-				if (!response.ok) {
-					throw new Error(`PTER request failed with status ${response.status}`)
-				}
-				const data = (await response.json()) as { ideas: PterIdea[] }
-				setIdeas(data.ideas)
-			} catch (error) {
-				console.error('Failed to fetch PTER ideas. Maybe PTER is down?', error)
-			}
-		}
+const loadSignups = () => fetchJson<SignupsData>('/api/ilmo-signups')
 
-		fetchIdeas()
-		const interval = setInterval(fetchIdeas, refreshIntervalMS)
-		return () => clearInterval(interval)
-	}, [refreshIntervalMS])
-
-	return ideas
+// The open election, or null outside election season
+const loadElection = async () => {
+	const elections = await fetchJson<Array<{ id: number; state: string }>>(
+		'/vaaliproxy/api/election',
+	)
+	const open = elections.find((election) => election.state === 'open')
+	return open
+		? fetchJson<VaaliElection>(`/vaaliproxy/api/election/${open.id}`)
+		: null
 }
 
 const useClock = () => {
@@ -270,13 +170,33 @@ const Viewers = () => {
 }
 
 const App = () => {
-	const { menus, restaurants } = useAutoRefreshingMenus()
-	const tiedote = useAutoRefreshingTiedote()
-	const slides = useAutoRefreshingSlides()
+	useNightMode()
+	const menusPoll = usePolling(loadMenus, 60 * 60 * 1000)
+	const tiedotePoll = usePolling(loadTiedote, 60 * 60 * 1000)
+	const slidesPoll = usePolling(loadSlides, 5 * 60 * 1000)
+	const weekEventsPoll = usePolling(loadWeekEvents, 60 * 60 * 1000)
+	const pterPoll = usePolling(loadPterIdeas, 10 * 60 * 1000)
+	const signupsPoll = usePolling(loadSignups, 5 * 60 * 1000)
+	const electionPoll = usePolling(loadElection, 10 * 60 * 1000)
 	const { quotesById } = useAutoRefreshingStocks()
-	const hsl = useAutoRefreshingHsl(60 * 1000)
-	const weekEvents = useAutoRefreshingWeekEvents()
-	const pterIdeas = useAutoRefreshingPterIdeas()
+	const hslPoll = useAutoRefreshingHsl(60 * 1000)
+
+	const { menus, restaurants } = menusPoll.data ?? {
+		menus: null,
+		restaurants: null,
+	}
+	const tiedote = tiedotePoll.data
+	const slides = slidesPoll.data
+	const weekEvents = weekEventsPoll.data
+	const pterIdeas = pterPoll.data
+	const hsl = hslPoll.data
+	const signups = signupsPoll.data
+	const election = electionPoll.data
+	// Freshness of a source, for the stale-data note the Rotator shows
+	const freshness = (poll: { updatedAt: Date | null; isStale: boolean }) => ({
+		updatedAt: poll.updatedAt,
+		isStale: poll.isStale,
+	})
 
 	const allTiedoteMessages: TiedoteMessageWithCategory[] | undefined =
 		tiedote?.flatMap((category) =>
@@ -316,20 +236,56 @@ const App = () => {
 		<main className="grid grid-rows-1 grid-cols-[8fr_1fr] h-screen">
 			<div className="h-full p-4">
 				<Rotator defaultRotationInterval={10000}>
-					<Menu rotationInterval={30000} todaysMenus={todaysMenus} />
+					<Menu
+						rotationInterval={30000}
+						todaysMenus={todaysMenus}
+						{...freshness(menusPoll)}
+					/>
 					{slides && slides.length > 0 && (
-						<Slides slides={slides} rotationInterval={15000} />
+						<Slides
+							slides={slides}
+							rotationInterval={15000}
+							{...freshness(slidesPoll)}
+						/>
+					)}
+					{signups &&
+						(signups.open.length > 0 || signups.upcoming.length > 0) && (
+							<Signups
+								signups={signups}
+								rotationInterval={20000}
+								{...freshness(signupsPoll)}
+							/>
+						)}
+					{election && (
+						<Elections
+							election={election}
+							rotationInterval={20000}
+							{...freshness(electionPoll)}
+						/>
 					)}
 					{allTiedoteMessages && allTiedoteMessages.length > 0 && (
-						<Tiedote messages={allTiedoteMessages} rotationInterval={15000} />
+						<Tiedote
+							messages={allTiedoteMessages}
+							rotationInterval={15000}
+							{...freshness(tiedotePoll)}
+						/>
 					)}
 					{weekEvents && weekEvents.length > 0 && (
-						<WeekCalendar events={weekEvents} rotationInterval={20000} />
+						<WeekCalendar
+							events={weekEvents}
+							rotationInterval={20000}
+							{...freshness(weekEventsPoll)}
+						/>
 					)}
 					{pterIdeas && pterIdeas.length > 0 && (
-						<PterIdeas ideas={pterIdeas} rotationInterval={15000} />
+						<PterIdeas
+							ideas={pterIdeas}
+							rotationInterval={15000}
+							{...freshness(pterPoll)}
+						/>
 					)}
-					<Hsl data={hsl} rotationInterval={15000} />
+					<Hsl data={hsl} rotationInterval={15000} {...freshness(hslPoll)} />
+					<RainMap rotationInterval={15000} />
 					{Object.keys(quotesById).length > 0 && (
 						<Stocks quotesById={quotesById} rotationInterval={20000} />
 					)}
@@ -338,7 +294,9 @@ const App = () => {
 			</div>
 			<div className="bg-stone-100 h-full text-center flex flex-col gap-4 shadow-md p-4">
 				<Time />
+				<Weather />
 				<SidebarDepartures data={hsl} />
+				<CityBikes />
 				<div className="mt-auto">
 					<Viewers />
 				</div>
