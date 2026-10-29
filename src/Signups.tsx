@@ -1,3 +1,4 @@
+import QrLink from './QrLink'
 // Same shape as SignupsResponse in server/ilmoSignups.ts
 export type Signup = {
 	name: string
@@ -65,7 +66,7 @@ const Signups = ({
 	const upcoming = data.upcoming.slice(0, MAX_PER_COLUMN)
 
 	return (
-		<div className="h-full flex flex-col gap-4 p-4">
+		<div className="relative h-full flex flex-col gap-4 p-4">
 			<div className="flex items-baseline justify-between">
 				<h1 className="text-4xl font-bold">Ilmoittautumiset</h1>
 				<p className="text-lg text-stone-500">ilmo.prodeko.org</p>
@@ -106,6 +107,7 @@ const Signups = ({
 					</ul>
 				</section>
 			</div>
+			<QrLink url="https://ilmo.prodeko.org" />
 		</div>
 	)
 }

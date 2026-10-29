@@ -9,22 +9,27 @@ The main area rotates through these slides:
 
 | Slide | Source | Notes |
 | --- | --- | --- |
-| Lunch menus (TUAS, A Bloc, T-talo) with opening hours | [Kanttiinit](https://kanttiinit.fi) | Flags a restaurant that closes within 30 minutes |
+| Lunch menus (TUAS, A Bloc, T-talo) with opening hours | [Kanttiinit](https://kanttiinit.fi) | Flags a restaurant that closes within 30 minutes. Shown from 07:00 to 18:00 |
 | Slides from prodeko.org | `prodeko.org/fi/infoscreen.json` | Edited at prodeko.org/admin → Infoscreen. A slide with a "show until" date disappears after that day. Hidden when there are none |
 | Event sign-ups: open now and opening soon | [Ilmo](https://ilmo.prodeko.org) | Read on the server by `server/ilmoSignups.ts`, see the comment there. Hidden when there are none |
 | The open election: application count and the newest applications | [vaalit.prodeko.org](https://vaalit.prodeko.org) | Shown only while an election is open |
 | Weekly bulletin (viikkotiedote) | viikkotiedote API on old.prodeko.org (the old Django site) | Hidden when there is nothing to show |
 | This week's events from the guild's Google calendars (Tapahtumat, Yleiset, Excut, Fuksit, PoRa) | Public iCalendar feeds | Calendars are listed in `src/calendarApi.ts`. Hidden when the week has no events |
 | The most-voted active PTER ideas | `pter.prodeko.org/api/top-ideas` | Hidden when there are none |
-| HSL departures and disruptions: Aalto metro, Innopolis, Tietotie (bus 52), Maari (tram 15) | Digitransit | Needs `HSL_SUBSCRIPTION_KEY` |
+| HSL departures and disruptions: Aalto metro, Innopolis, Tietotie (bus 52), Maari (tram 15) | Digitransit | Needs `HSL_SUBSCRIPTION_KEY`. Each group shows the walk from TUAS; departures one could not walk to in time are left out |
 | Rain radar for southern Finland | [FMI open data](https://en.ilmatieteenlaitos.fi/open-data) | Radar and background map both from FMI's WMS, no key |
 | Stock prices: S&P 500 (through the SPY ETF) and the Magnificent 7 | [Twelve Data](https://twelvedata.com) | Needs `TWELVE_DATA_API_KEY` (free plan: 8 symbols/min, 800/day, no indices). Refreshes every 15 minutes. Hidden without data |
 | McKinsey logo | `public/` | Sponsor |
 
-The sidebar shows the date and time, the weather in Otaniemi
+The sidebar shows the date and time, a countdown to the next big event
+(`src/Countdown.tsx`, hidden when none is ahead), the weather in Otaniemi
 ([Open-Meteo](https://open-meteo.com)), the next HSL departures, free city
 bikes at the four nearest stations ([citybik.es](https://citybik.es), hidden
 off-season), and whether someone is watching Kiltiskamera.
+
+Slides that lead somewhere (sign-ups, elections, bulletin, calendar, PTER,
+and prodeko.org slides with a link) show a QR code to that page in the bottom
+right corner (`src/QrLink.tsx`).
 
 When a source stops answering, its slide or box shows a grey note with the
 time of its last successful update (`src/StaleNote.tsx`). From 22:00 to 07:00
