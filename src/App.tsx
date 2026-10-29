@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import CityBikes from './CityBikes'
-import Countdown from './Countdown'
+import Countdown, { type CountdownEntry } from './Countdown'
 import { type CalendarEvent, fetchWeekEvents } from './calendarApi'
 import Elections, { type VaaliElection } from './Elections'
 import Hsl from './Hsl'
@@ -52,6 +52,9 @@ const loadSlides = async () => {
 	const today = new Date().toLocaleDateString('sv-SE') // YYYY-MM-DD, local
 	return slides.filter((slide) => !slide.until || slide.until >= today)
 }
+
+const loadCountdowns = () =>
+	fetchJson<CountdownEntry[]>('/slidesproxy/fi/infoscreen-countdowns.json')
 
 // The week shown is the one the fetch falls in, so on Monday the slide moves on
 // to the new week at the first refresh after midnight.
@@ -197,6 +200,7 @@ const App = () => {
 	const menusPoll = usePolling(loadMenus, 60 * 60 * 1000)
 	const tiedotePoll = usePolling(loadTiedote, 60 * 60 * 1000)
 	const slidesPoll = usePolling(loadSlides, 5 * 60 * 1000)
+	const countdownsPoll = usePolling(loadCountdowns, 5 * 60 * 1000)
 	const weekEventsPoll = usePolling(loadWeekEvents, 60 * 60 * 1000)
 	const pterPoll = usePolling(loadPterIdeas, 10 * 60 * 1000)
 	const signupsPoll = usePolling(loadSignups, 5 * 60 * 1000)
@@ -319,7 +323,7 @@ const App = () => {
 			</div>
 			<div className="bg-stone-100 h-full text-center flex flex-col gap-4 shadow-md p-4">
 				<Time />
-				<Countdown />
+				<Countdown countdowns={countdownsPoll.data} />
 				<Weather />
 				<SidebarDepartures data={hsl} />
 				<CityBikes />

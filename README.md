@@ -22,7 +22,8 @@ The main area rotates through these slides:
 | McKinsey logo | `public/` | Sponsor |
 
 The sidebar shows the date and time, a countdown to the next big event
-(`src/Countdown.tsx`, hidden when none is ahead), the weather in Otaniemi
+(edited at prodeko.org/admin → Infoscreen → Laskurit, read from
+`prodeko.org/fi/infoscreen-countdowns.json`; hidden when none is ahead), the weather in Otaniemi
 ([Open-Meteo](https://open-meteo.com)), the next HSL departures, free city
 bikes at the four nearest stations ([citybik.es](https://citybik.es), hidden
 off-season), and whether someone is watching Kiltiskamera.
