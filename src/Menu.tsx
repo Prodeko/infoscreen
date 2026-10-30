@@ -1,17 +1,70 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { Meal, RestaurantDailyMenu } from './types'
 
-const MenuRow = ({ meal }: { meal: Meal }) => {
-	return (
-		<div>
-			<p className="text-lg font-semibold leading-snug line-clamp-2">
-				{meal.title}
+// Restaurants prefix dishes with their line ("Kasvislounas : Tummaa riisiä",
+// "Pizzat: BBQ pekonipizza"). Consecutive dishes of one line are grouped under
+// it once, which saves a line per dish on long menus.
+type MealGroup = { category: string; meals: { name: string; meal: Meal }[] }
+
+const groupMeals = (meals: Meal[]): MealGroup[] => {
+	const groups: MealGroup[] = []
+	for (const meal of meals) {
+		// Titles sometimes carry line breaks ("Erikoisannos: Valkosipulia\n")
+		const title = meal.title.replace(/\s+/g, ' ').trim()
+		const match = title.match(/^([^:]{2,40}?)\s*:\s*(.+)$/)
+		const category = match ? match[1].trim() : ''
+		const name = match ? match[2].trim() : title
+		const last = groups[groups.length - 1]
+		if (last && last.category === category) {
+			last.meals.push({ name, meal })
+		} else {
+			groups.push({ category, meals: [{ name, meal }] })
+		}
+	}
+	return groups
+}
+
+const MealRow = ({ name, meal }: { name: string; meal: Meal }) => (
+	<div>
+		<p className="font-semibold leading-snug">{name}</p>
+		{meal.properties.length > 0 && (
+			<p className="text-[0.65em] text-stone-500">
+				{meal.properties.join(', ')}
 			</p>
-			{meal.properties.length > 0 && (
-				<p className="text-xs text-stone-500">{meal.properties.join(', ')}</p>
-			)}
-		</div>
-	)
+		)}
+	</div>
+)
+
+// Shrinks the menu's text until it fits its column, so a long menu (A Bloc
+// often has ten dishes) never runs off the screen, whatever the screen's size.
+// Font size is in em below this element, so one value scales everything.
+const MAX_SCALE = 1.125 // text-lg
+const MIN_SCALE = 0.7
+
+const useFitText = (content: unknown) => {
+	const ref = useRef<HTMLDivElement>(null)
+	const [scale, setScale] = useState(MAX_SCALE)
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: refit when the menu changes
+	useLayoutEffect(() => {
+		const el = ref.current
+		if (!el) return
+		const fit = () => {
+			let next = MAX_SCALE
+			el.style.fontSize = `${next}rem`
+			while (el.scrollHeight > el.clientHeight + 1 && next > MIN_SCALE) {
+				next = Math.max(MIN_SCALE, next - 0.05)
+				el.style.fontSize = `${next}rem`
+			}
+			setScale(next)
+		}
+		fit()
+		const observer = new ResizeObserver(fit)
+		observer.observe(el)
+		return () => observer.disconnect()
+	}, [content])
+
+	return { ref, scale }
 }
 
 const useClosingSoon = (openingHours: string | null) => {
@@ -60,6 +113,7 @@ const RestaurantMenu = ({
 	restaurant: RestaurantDailyMenu
 }) => {
 	const isClosingSoon = useClosingSoon(restaurant.openingHours)
+	const fit = useFitText(menu)
 
 	return (
 		<div className="bg-white rounded-lg shadow-md p-4 flex flex-col gap-3 min-h-0 overflow-hidden">
@@ -79,9 +133,27 @@ const RestaurantMenu = ({
 					)}
 				</div>
 			</div>
-			<div className="flex-grow min-h-0 space-y-2.5">
+			<div
+				ref={fit.ref}
+				className="flex-grow min-h-0 overflow-hidden flex flex-col gap-[0.6em]"
+				style={{ fontSize: `${fit.scale}rem` }}
+			>
 				{menu ? (
-					menu.map((meal) => <MenuRow key={meal.title} meal={meal} />)
+					groupMeals(menu).map((group) => (
+						<div
+							key={`${group.category}|${group.meals[0].meal.title}`}
+							className="flex flex-col gap-[0.35em]"
+						>
+							{group.category && (
+								<p className="text-[0.75em] font-semibold text-stone-500">
+									{group.category}
+								</p>
+							)}
+							{group.meals.map(({ name, meal }) => (
+								<MealRow key={meal.title} name={name} meal={meal} />
+							))}
+						</div>
+					))
 				) : (
 					<p>No menu for today</p>
 				)}
