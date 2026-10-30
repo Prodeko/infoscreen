@@ -3,11 +3,13 @@ import type { Meal, RestaurantDailyMenu } from './types'
 
 const MenuRow = ({ meal }: { meal: Meal }) => {
 	return (
-		<div className="grid grid-cols-[6fr_1fr] gap-2">
-			<div className="flex flex-col">
-				<p className="text-xl font-bold">{meal.title}</p>
-				<p className="text-sm italic">{meal.properties.join(', ')}</p>
-			</div>
+		<div>
+			<p className="text-lg font-semibold leading-snug line-clamp-2">
+				{meal.title}
+			</p>
+			{meal.properties.length > 0 && (
+				<p className="text-xs text-stone-500">{meal.properties.join(', ')}</p>
+			)}
 		</div>
 	)
 }
@@ -60,13 +62,16 @@ const RestaurantMenu = ({
 	const isClosingSoon = useClosingSoon(restaurant.openingHours)
 
 	return (
-		<div className="bg-white rounded-lg shadow-md p-4 flex flex-col gap-4">
-			<div className="flex justify-between items-center">
-				<h1 className="text-3xl font-bold">{restaurant.name}</h1>
-				<div className="flex flex-col items-end gap-1">
+		<div className="bg-white rounded-lg shadow-md p-4 flex flex-col gap-3 min-h-0 overflow-hidden">
+			{/* Hours under the name: "Tietotekniikantalo" leaves no room beside it */}
+			<div className="flex justify-between items-end gap-2">
+				<div className="min-w-0">
+					<h1 className="text-3xl font-bold truncate">{restaurant.name}</h1>
 					{restaurant.openingHours && (
-						<p className="text-xl">{restaurant.openingHours}</p>
+						<p className="text-lg text-stone-600">{restaurant.openingHours}</p>
 					)}
+				</div>
+				<div className="flex flex-col items-end gap-1 shrink-0">
 					{isClosingSoon && (
 						<span className="bg-yellow-200 text-yellow-800 text-sm font-medium px-2.5 py-0.5 rounded animate-pulse">
 							Closing soon
@@ -74,7 +79,7 @@ const RestaurantMenu = ({
 					)}
 				</div>
 			</div>
-			<div className="flex-grow space-y-4">
+			<div className="flex-grow min-h-0 space-y-2.5">
 				{menu ? (
 					menu.map((meal) => <MenuRow key={meal.title} meal={meal} />)
 				) : (
@@ -104,7 +109,7 @@ export const Menu = ({
 			: `grid-cols-${restaurantsWithMenu.length + (restaurantsWithoutMenu.length > 0 ? 1 : 0)}`
 
 	return (
-		<div className={`grid ${gridCols} gap-4`}>
+		<div className={`grid ${gridCols} gap-4 h-full min-h-0`}>
 			{restaurantsWithMenu.map((restaurant) => (
 				<RestaurantMenu
 					key={restaurant.id}
