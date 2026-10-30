@@ -7,6 +7,9 @@ export type Polled<T> = {
 	// True when the last success is older than `staleAfterMS`, or nothing has
 	// loaded yet and the first attempt failed
 	isStale: boolean
+	// Why the last load failed, or null after a success. Shown on the screen so
+	// a broken source says what's wrong (a missing key, a network error…)
+	error: string | null
 }
 
 // Calls `load` on mount and every `intervalMS`. A failed load keeps the last
@@ -21,6 +24,7 @@ export const usePolling = <T>(
 	const [data, setData] = useState<T | null>(null)
 	const [updatedAt, setUpdatedAt] = useState<Date | null>(null)
 	const [failed, setFailed] = useState(false)
+	const [error, setError] = useState<string | null>(null)
 	const [now, setNow] = useState(() => Date.now())
 	const loadRef = useRef(load)
 	loadRef.current = load
@@ -34,10 +38,14 @@ export const usePolling = <T>(
 					setData(next)
 					setUpdatedAt(new Date())
 					setFailed(false)
+					setError(null)
 				}
 			} catch (error) {
 				console.error(error)
-				if (!cancelled) setFailed(true)
+				if (!cancelled) {
+					setFailed(true)
+					setError(error instanceof Error ? error.message : String(error))
+				}
 			}
 			if (!cancelled) setNow(Date.now())
 		}
@@ -52,7 +60,7 @@ export const usePolling = <T>(
 
 	const isStale = updatedAt ? now - updatedAt.getTime() > staleAfterMS : failed
 
-	return { data, updatedAt, isStale }
+	return { data, updatedAt, isStale, error }
 }
 
 export const fetchJson = async <T>(url: string): Promise<T> => {

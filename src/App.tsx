@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Biliskilke, { type BilisStats } from './Biliskilke'
 import Coffee from './Coffee'
 import Countdown, { type CountdownEntry, getNextCountdown } from './Countdown'
-import { type CalendarEvent, fetchWeekEvents } from './calendarApi'
+import { fetchWeekEvents, type WeekEvents } from './calendarApi'
 import Elections, { type VaaliElection } from './Elections'
 import { getFlagDays } from './flagDays'
 import Hsl from './Hsl'
@@ -63,7 +63,7 @@ const loadCountdowns = () =>
 
 // The week shown is the one the fetch falls in, so on Monday the slide moves on
 // to the new week at the first refresh after midnight.
-const loadWeekEvents = (): Promise<CalendarEvent[]> => fetchWeekEvents()
+const loadWeekEvents = (): Promise<WeekEvents> => fetchWeekEvents()
 
 const PTER_IDEA_COUNT = 5
 
@@ -253,9 +253,14 @@ const App = () => {
 	const signups = signupsPoll.data
 	const election = electionPoll.data
 	// Freshness of a source, for the stale-data note the Rotator shows
-	const freshness = (poll: { updatedAt: Date | null; isStale: boolean }) => ({
+	const freshness = (poll: {
+		updatedAt: Date | null
+		isStale: boolean
+		error: string | null
+	}) => ({
 		updatedAt: poll.updatedAt,
 		isStale: poll.isStale,
+		error: poll.error,
 	})
 
 	const allTiedoteMessages: TiedoteMessageWithCategory[] | undefined =
@@ -338,9 +343,10 @@ const App = () => {
 							rotationInterval={10000}
 						/>
 					)}
-					{weekEvents && weekEvents.length > 0 && (
+					{weekEvents && weekEvents.events.length > 0 && (
 						<WeekCalendar
-							events={weekEvents}
+							events={weekEvents.events}
+							failedCalendars={weekEvents.failed}
 							rotationInterval={20000}
 							{...freshness(weekEventsPoll)}
 						/>
@@ -379,7 +385,7 @@ const App = () => {
 			<div className="bg-stone-100 h-full text-center flex flex-col gap-4 shadow-md p-4">
 				<Time />
 				<Weather />
-				<SidebarDepartures data={hsl} />
+				<SidebarDepartures data={hsl} error={hslPoll.error} />
 				<Coffee />
 				<NowPlaying />
 				<div className="mt-auto">

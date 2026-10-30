@@ -15,6 +15,7 @@ interface RotatorChildProps {
 	// Freshness of the slide's data, for the stale-data note
 	updatedAt?: Date | null
 	isStale?: boolean
+	error?: string | null
 }
 
 interface RotatorProps {
@@ -122,6 +123,7 @@ const Rotator = ({
 				<StaleNote
 					updatedAt={currentChild.props.updatedAt ?? null}
 					isStale={currentChild.props.isStale ?? false}
+					error={currentChild.props.error ?? null}
 					className="absolute bottom-0 left-0"
 				/>
 			</div>

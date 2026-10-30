@@ -13,6 +13,8 @@ import {
 
 type HSLSlideProps = {
 	data: HSLData | null
+	// Why loading failed, if it did; shown instead of "loading"
+	error?: string | null
 	rotationInterval?: number
 }
 
@@ -25,11 +27,13 @@ const getGroupDepartures = (
 		reachableOnly: true,
 	})
 
-const Hsl = ({ data }: HSLSlideProps) => {
+const Hsl = ({ data, error }: HSLSlideProps) => {
 	if (!data) {
 		return (
 			<div className="flex items-center justify-center h-full">
-				<p className="text-2xl">Loading HSL departures...</p>
+				<p className="text-2xl">
+					{error ? `HSL-tietoja ei saatu: ${error}` : 'Ladataan HSL-lähtöjä…'}
+				</p>
 			</div>
 		)
 	}
