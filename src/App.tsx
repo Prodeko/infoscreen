@@ -30,6 +30,7 @@ import { useAutoRefreshingHsl } from './useAutoRefreshingHsl'
 import { useNightMode } from './useNightMode'
 import { fetchJson, usePolling } from './usePolling'
 import { useReloadOnNewBuild } from './useReloadOnNewBuild'
+import { VERSION, VERSION_NAME } from './version'
 import Weather from './Weather'
 import WeekCalendar from './WeekCalendar'
 
@@ -391,6 +392,9 @@ const App = () => {
 				<div className="mt-auto">
 					<Viewers />
 				</div>
+				<p className="text-xs text-stone-400 -mt-2">
+					Infoscreen {VERSION} "{VERSION_NAME}"
+				</p>
 			</div>
 		</main>
 	)
