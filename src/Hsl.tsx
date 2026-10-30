@@ -10,6 +10,7 @@ import {
 	type HSLData,
 	type HSLDeparture,
 } from './hslApi'
+import LineBadge from './LineBadge'
 
 type HSLSlideProps = {
 	data: HSLData | null
@@ -68,9 +69,11 @@ const Hsl = ({ data, error }: HSLSlideProps) => {
 											key={departure.id}
 											className="grid grid-cols-[auto_1fr_auto] items-center gap-3 border-b border-stone-100 pb-2 last:border-b-0"
 										>
-											<p className="font-mono font-bold text-lg bg-stone-100 rounded px-2">
-												{departure.line}
-											</p>
+											<LineBadge
+												line={departure.line}
+												mode={departure.mode}
+												className="text-lg px-2 min-w-[3.5rem]"
+											/>
 											<p className="text-lg truncate">{departure.headsign}</p>
 											<p className="text-lg font-mono font-semibold">
 												{formatHslDepartureDisplay(departure.departureUnix)}
