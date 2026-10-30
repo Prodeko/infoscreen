@@ -4,8 +4,8 @@ export default {
 	theme: {
 		extend: {
 			fontFamily: {
-				mono: ['IBM Plex Mono', 'monospace'],
-				sans: ['IBM Plex Sans', 'sans-serif'],
+				mono: ['IBM Plex Mono', 'Noto Color Emoji', 'monospace'],
+				sans: ['IBM Plex Sans', 'Noto Color Emoji', 'sans-serif'],
 			},
 		},
 	},
