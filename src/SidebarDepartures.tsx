@@ -3,6 +3,7 @@ import {
 	getMinutesUntilDeparture,
 	HSL_ALL_ALIASES,
 	type HSLData,
+	isStation,
 } from './hslApi'
 
 type SidebarDeparturesProps = {
@@ -29,23 +30,34 @@ const SidebarDepartures = ({ data, error }: SidebarDeparturesProps) => {
 		fromUnix: nowUnix,
 		reachableOnly: true,
 	})
+	// The next departure from each stop, and from the metro station the next
+	// train in each direction. The station is the longest walk, so its trains
+	// would never make the nearest few; they always get their rows.
 	const nextDepartureByStop = new Map<string, (typeof departures)[number]>()
 
 	for (const departure of departures) {
-		if (!nextDepartureByStop.has(departure.alias)) {
-			nextDepartureByStop.set(departure.alias, departure)
+		const key = isStation(departure.alias)
+			? `${departure.alias}-${departure.direction}`
+			: departure.alias
+		if (!nextDepartureByStop.has(key)) {
+			nextDepartureByStop.set(key, departure)
 		}
 	}
 
-	const nextStops = Array.from(nextDepartureByStop.values())
-		.sort((a, b) => a.departureUnix - b.departureUnix)
-		.slice(0, MAX_UPCOMING_STOPS)
+	const next = Array.from(nextDepartureByStop.values())
+	const metro = next.filter((departure) => isStation(departure.alias))
+	const nextStops = [
+		...metro,
+		...next
+			.filter((departure) => !isStation(departure.alias))
+			.slice(0, MAX_UPCOMING_STOPS - metro.length),
+	].sort((a, b) => a.departureUnix - b.departureUnix)
 
 	return (
 		<div className="bg-white rounded-lg shadow-md p-3 text-left">
 			<h2 className="text-2xl font-semibold mb-2">Lähdöt</h2>
 			{nextStops.length > 0 ? (
-				<div className="space-y-2">
+				<div className="space-y-1">
 					{nextStops.map((departure) => (
 						<div
 							key={departure.id}
