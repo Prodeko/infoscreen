@@ -25,6 +25,7 @@ export type HSLStoptime = {
 	trip?: {
 		directionId?: string | null
 		route?: {
+			mode?: string | null
 			shortName?: string | null
 		} | null
 	} | null
@@ -66,6 +67,7 @@ export type HSLDeparture = {
 	groupTitle: string
 	headsign: string
 	line: string
+	mode: string | null
 	// GTFS direction, "0" or "1"; tells a station's two directions apart
 	direction: string | null
 	departureUnix: number
@@ -176,6 +178,7 @@ const buildLocationQuery = (location: HSLQueryLocation) => `
       trip {
         directionId
         route {
+          mode
           shortName
         }
       }
@@ -207,6 +210,19 @@ export const getDepartureUnix = (stoptime: HSLStoptime) => {
 
 	return stoptime.serviceDay + secondsFromMidnight
 }
+
+// HSL's own colours for each mode, as on its stops and maps
+const HSL_MODE_COLORS: Record<string, string> = {
+	BUS: '#007ac9',
+	TRAM: '#00985f',
+	SUBWAY: '#ff6319',
+	RAIL: '#8c4799',
+	FERRY: '#00b9e4',
+}
+
+/** Background colour for a line number badge; null for an unknown mode. */
+export const getModeColor = (mode: string | null) =>
+	(mode && HSL_MODE_COLORS[mode]) || null
 
 export const formatHslTime = (departureUnix: number) =>
 	new Date(departureUnix * 1000).toLocaleTimeString('fi-FI', {
@@ -322,6 +338,7 @@ export const getHslDepartures = (
 				groupTitle: group?.title || alias,
 				headsign: stoptime.headsign || 'Tuntematon suunta',
 				line: stoptime.trip?.route?.shortName || '-',
+				mode: stoptime.trip?.route?.mode ?? null,
 				direction: stoptime.trip?.directionId ?? null,
 				departureUnix,
 			})

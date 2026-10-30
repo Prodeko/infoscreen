@@ -5,6 +5,7 @@ import {
 	type HSLData,
 	isStation,
 } from './hslApi'
+import LineBadge from './LineBadge'
 
 type SidebarDeparturesProps = {
 	data: HSLData | null
@@ -63,9 +64,11 @@ const SidebarDepartures = ({ data, error }: SidebarDeparturesProps) => {
 							key={departure.id}
 							className="grid grid-cols-[auto_1fr_auto] gap-2 items-center"
 						>
-							<p className="font-mono font-bold text-sm bg-stone-100 rounded px-2 py-1">
-								{departure.line}
-							</p>
+							<LineBadge
+								line={departure.line}
+								mode={departure.mode}
+								className="text-sm px-2 py-1 min-w-[2.75rem]"
+							/>
 							<div className="min-w-0">
 								<p className="text-sm truncate">{departure.stopName}</p>
 								<p className="text-xs text-stone-500 truncate">
