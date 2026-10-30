@@ -77,15 +77,20 @@ const loadPterIdeas = async () =>
 
 // Open sign-ups only while they have places left: Ilmo keeps a full event
 // open for its waiting list, but the screen shouldn't advertise it. An event
-// without a quota (places null) always has room.
+// without a quota (places null) always has room. Events tagged [Alumni] are
+// for graduates, not the students in the guild room, so they're left out.
+const isAlumni = (signup: { name: string }) => /\[alumni\]/i.test(signup.name)
+
 const loadSignups = async (): Promise<SignupsData> => {
 	const signups = await fetchJson<SignupsData>('/api/ilmo-signups')
 	return {
 		...signups,
 		open: signups.open.filter(
 			(signup) =>
-				signup.places === null || signup.registrations < signup.places,
+				!isAlumni(signup) &&
+				(signup.places === null || signup.registrations < signup.places),
 		),
+		upcoming: signups.upcoming.filter((signup) => !isAlumni(signup)),
 	}
 }
 
