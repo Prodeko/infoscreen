@@ -9,6 +9,8 @@ const placeName = (location: string) => location.split(',')[0].trim()
 
 type WeekCalendarProps = {
 	events: CalendarEvent[]
+	// Shown with a warning in the legend: their events are missing
+	failedCalendars?: string[]
 	rotationInterval?: number
 }
 
@@ -66,7 +68,7 @@ const FitTitle = ({ text }: { text: string }) => {
 	)
 }
 
-const WeekCalendar = ({ events }: WeekCalendarProps) => {
+const WeekCalendar = ({ events, failedCalendars = [] }: WeekCalendarProps) => {
 	const today = new Date()
 	const monday = startOfWeek(today)
 	const days = Array.from({ length: 7 }, (_, i) => {
@@ -84,6 +86,9 @@ const WeekCalendar = ({ events }: WeekCalendarProps) => {
 						<span key={calendar.id} className="flex items-center gap-2 text-lg">
 							<span className={`w-3 h-3 rounded-full ${calendar.color}`} />
 							{calendar.name}
+							{failedCalendars.includes(calendar.name) && (
+								<span className="text-red-600">ei latautunut</span>
+							)}
 						</span>
 					))}
 				</div>

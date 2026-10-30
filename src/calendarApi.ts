@@ -120,7 +120,15 @@ const parseEvents = (
 }
 
 /** This week's events from every calendar, Monday to Sunday, in start order. A calendar that fails to load is left out. */
-export const fetchWeekEvents = async (now: Date = new Date()) => {
+export type WeekEvents = {
+	events: CalendarEvent[]
+	// Calendars whose feed didn't load; their events are missing from the week
+	failed: string[]
+}
+
+export const fetchWeekEvents = async (
+	now: Date = new Date(),
+): Promise<WeekEvents> => {
 	const from = startOfWeek(now)
 	const to = new Date(from)
 	to.setDate(to.getDate() + 7)
@@ -135,16 +143,23 @@ export const fetchWeekEvents = async (now: Date = new Date()) => {
 				return parseEvents(await response.text(), calendar, from, to)
 			} catch (error) {
 				console.error(`Failed to fetch calendar ${calendar.name}:`, error)
-				return []
+				return null
 			}
 		}),
 	)
 
 	// One event is often in two calendars, e.g. an excursion for fuksis in both
 	// Excut and Fuksit; the first calendar in CALENDARS keeps it.
+	const failed = CALENDARS.filter((_, i) => perCalendar[i] === null).map(
+		(calendar) => calendar.name,
+	)
+	if (failed.length === CALENDARS.length) {
+		throw new Error('no calendar loaded')
+	}
+
 	const seen = new Set<string>()
-	return perCalendar
-		.flat()
+	const events = perCalendar
+		.flatMap((calendarEvents) => calendarEvents ?? [])
 		.filter((event) => {
 			const key = `${event.title.trim().toLowerCase()}|${event.start.getTime()}`
 			if (seen.has(key)) {
@@ -158,4 +173,5 @@ export const fetchWeekEvents = async (now: Date = new Date()) => {
 				a.start.getTime() - b.start.getTime() ||
 				a.title.localeCompare(b.title, 'fi'),
 		)
+	return { events, failed }
 }

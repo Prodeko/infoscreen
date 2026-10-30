@@ -3,10 +3,12 @@
 const StaleNote = ({
 	updatedAt,
 	isStale,
+	error = null,
 	className = '',
 }: {
 	updatedAt: Date | null
 	isStale: boolean
+	error?: string | null
 	className?: string
 }) => {
 	if (!isStale) {
@@ -21,6 +23,7 @@ const StaleNote = ({
 	return (
 		<p className={`text-sm text-stone-400 ${className}`}>
 			⚠ {time ? `Tiedot päivitetty viimeksi klo ${time}` : 'Tietoja ei saatu'}
+			{error && `: ${error}`}
 		</p>
 	)
 }

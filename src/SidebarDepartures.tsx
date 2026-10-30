@@ -7,16 +7,19 @@ import {
 
 type SidebarDeparturesProps = {
 	data: HSLData | null
+	error?: string | null
 }
 
 const MAX_UPCOMING_STOPS = 5
 
-const SidebarDepartures = ({ data }: SidebarDeparturesProps) => {
+const SidebarDepartures = ({ data, error }: SidebarDeparturesProps) => {
 	if (!data) {
 		return (
 			<div className="bg-white rounded-lg shadow-md p-3 text-left">
 				<h2 className="text-2xl font-semibold mb-2">Lähdöt</h2>
-				<p className="text-sm text-stone-500">Ladataan...</p>
+				<p className="text-sm text-stone-500">
+					{error ? 'Lähtöjä ei saatu' : 'Ladataan...'}
+				</p>
 			</div>
 		)
 	}
