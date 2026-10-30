@@ -74,7 +74,19 @@ const loadPterIdeas = async () =>
 		)
 	).ideas
 
-const loadSignups = () => fetchJson<SignupsData>('/api/ilmo-signups')
+// Open sign-ups only while they have places left: Ilmo keeps a full event
+// open for its waiting list, but the screen shouldn't advertise it. An event
+// without a quota (places null) always has room.
+const loadSignups = async (): Promise<SignupsData> => {
+	const signups = await fetchJson<SignupsData>('/api/ilmo-signups')
+	return {
+		...signups,
+		open: signups.open.filter(
+			(signup) =>
+				signup.places === null || signup.registrations < signup.places,
+		),
+	}
+}
 
 // The open election, or null outside election season
 const loadElection = async () => {
