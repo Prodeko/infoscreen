@@ -23,6 +23,7 @@ export type HSLStoptime = {
 	scheduledDeparture?: number | null
 	serviceDay?: number | null
 	trip?: {
+		directionId?: string | null
 		route?: {
 			shortName?: string | null
 		} | null
@@ -65,6 +66,8 @@ export type HSLDeparture = {
 	groupTitle: string
 	headsign: string
 	line: string
+	// GTFS direction, "0" or "1"; tells a station's two directions apart
+	direction: string | null
 	departureUnix: number
 }
 
@@ -171,6 +174,7 @@ const buildLocationQuery = (location: HSLQueryLocation) => `
       scheduledDeparture
       serviceDay
       trip {
+        directionId
         route {
           shortName
         }
@@ -234,6 +238,9 @@ const STATION_EXTRA_MINUTES = 2
 const NODE_TYPE_BY_ALIAS: Record<string, HSLNodeType> = Object.fromEntries(
 	HSL_QUERY_LOCATIONS.map((location) => [location.alias, location.nodeType]),
 )
+
+export const isStation = (alias: string) =>
+	NODE_TYPE_BY_ALIAS[alias] === 'station'
 
 const distanceMetres = (
 	a: { lat: number; lon: number },
@@ -315,6 +322,7 @@ export const getHslDepartures = (
 				groupTitle: group?.title || alias,
 				headsign: stoptime.headsign || 'Tuntematon suunta',
 				line: stoptime.trip?.route?.shortName || '-',
+				direction: stoptime.trip?.directionId ?? null,
 				departureUnix,
 			})
 		}

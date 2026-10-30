@@ -383,7 +383,7 @@ const App = () => {
 					<McKinseyLogo rotationInterval={5000} />
 				</Rotator>
 			</div>
-			<div className="bg-stone-100 h-full text-center flex flex-col gap-4 shadow-md p-4">
+			<div className="bg-stone-100 h-full text-center flex flex-col gap-3 shadow-md p-3">
 				<Time />
 				<Weather />
 				<SidebarDepartures data={hsl} error={hslPoll.error} />
