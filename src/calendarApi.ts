@@ -41,13 +41,15 @@ export type CalendarEvent = {
 // occurrence; this bounds the walk for a rule that never ends.
 const MAX_OCCURRENCES = 5000
 
-/** Monday 00:00 of the week `date` is in, local time. */
-export const startOfWeek = (date: Date) => {
-	const monday = new Date(date)
-	monday.setHours(0, 0, 0, 0)
-	monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7))
-	return monday
+/** 00:00 of the day `date` is on, local time. */
+export const startOfDay = (date: Date) => {
+	const day = new Date(date)
+	day.setHours(0, 0, 0, 0)
+	return day
 }
+
+// Days the calendar shows, today first
+export const CALENDAR_DAYS = 7
 
 const feedUrl = (id: string) =>
 	`/calendarproxy/calendar/ical/${encodeURIComponent(id)}/public/basic.ics`
@@ -119,7 +121,7 @@ const parseEvents = (
 	return events
 }
 
-/** This week's events from every calendar, Monday to Sunday, in start order. A calendar that fails to load is left out. */
+/** Events from every calendar for today and the days after it, in start order. A calendar that fails to load is left out. */
 export type WeekEvents = {
 	events: CalendarEvent[]
 	// Calendars whose feed didn't load; their events are missing from the week
@@ -129,9 +131,11 @@ export type WeekEvents = {
 export const fetchWeekEvents = async (
 	now: Date = new Date(),
 ): Promise<WeekEvents> => {
-	const from = startOfWeek(now)
+	// A day more than is shown, so that after midnight the last day is already
+	// there until the next refresh
+	const from = startOfDay(now)
 	const to = new Date(from)
-	to.setDate(to.getDate() + 7)
+	to.setDate(to.getDate() + CALENDAR_DAYS + 1)
 
 	const perCalendar = await Promise.all(
 		CALENDARS.map(async (calendar) => {
