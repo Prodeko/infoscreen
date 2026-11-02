@@ -62,8 +62,8 @@ const loadSlides = async () => {
 const loadCountdowns = () =>
 	fetchJson<CountdownEntry[]>('/slidesproxy/fi/infoscreen-countdowns.json')
 
-// The week shown is the one the fetch falls in, so on Monday the slide moves on
-// to the new week at the first refresh after midnight.
+// The calendar starts from today, so it moves on a day at the first refresh
+// after midnight.
 const loadWeekEvents = (): Promise<WeekEvents> => fetchWeekEvents()
 
 const PTER_IDEA_COUNT = 5

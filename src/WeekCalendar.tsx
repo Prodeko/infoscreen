@@ -1,5 +1,10 @@
 import { useLayoutEffect, useRef } from 'react'
-import { CALENDARS, type CalendarEvent, startOfWeek } from './calendarApi'
+import {
+	CALENDAR_DAYS,
+	CALENDARS,
+	type CalendarEvent,
+	startOfDay,
+} from './calendarApi'
 import QrLink from './QrLink'
 
 // Google Calendar locations are often full addresses ("Niittykummun koulu,
@@ -70,9 +75,9 @@ const FitTitle = ({ text }: { text: string }) => {
 
 const WeekCalendar = ({ events, failedCalendars = [] }: WeekCalendarProps) => {
 	const today = new Date()
-	const monday = startOfWeek(today)
-	const days = Array.from({ length: 7 }, (_, i) => {
-		const day = new Date(monday)
+	const first = startOfDay(today)
+	const days = Array.from({ length: CALENDAR_DAYS }, (_, i) => {
+		const day = new Date(first)
 		day.setDate(day.getDate() + i)
 		return day
 	})
@@ -80,7 +85,7 @@ const WeekCalendar = ({ events, failedCalendars = [] }: WeekCalendarProps) => {
 	return (
 		<div className="relative flex flex-col gap-4 h-full">
 			<div className="flex items-baseline justify-between">
-				<h1 className="text-4xl font-bold">Tämän viikon tapahtumat</h1>
+				<h1 className="text-4xl font-bold">Tulevat 7 päivää</h1>
 				<div className="flex gap-4">
 					{CALENDARS.map((calendar) => (
 						<span key={calendar.id} className="flex items-center gap-2 text-lg">
@@ -97,12 +102,17 @@ const WeekCalendar = ({ events, failedCalendars = [] }: WeekCalendarProps) => {
 				{days.map((day) => {
 					const dayEvents = events.filter((event) => isOnDay(event, day))
 					const isToday = sameDay(day, today)
+					const isWeekend = day.getDay() === 0 || day.getDay() === 6
 
 					return (
 						<div
 							key={day.toISOString()}
 							className={`rounded-lg shadow-md p-3 flex flex-col gap-1.5 min-h-0 overflow-hidden ${
-								isToday ? 'bg-blue-50 ring-2 ring-blue-600' : 'bg-white'
+								isToday
+									? 'bg-blue-50 ring-2 ring-blue-600'
+									: isWeekend
+										? 'bg-stone-200'
+										: 'bg-white'
 							}`}
 						>
 							<h2 className="text-xl font-semibold capitalize">
