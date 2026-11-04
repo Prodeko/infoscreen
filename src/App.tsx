@@ -27,6 +27,7 @@ import type {
 	TiedoteMessageWithCategory,
 } from './types'
 import { useAutoRefreshingHsl } from './useAutoRefreshingHsl'
+import { useNightlyReload } from './useNightlyReload'
 import { useNightMode } from './useNightMode'
 import { fetchJson, usePolling } from './usePolling'
 import { useReloadOnNewBuild } from './useReloadOnNewBuild'
@@ -234,6 +235,7 @@ const App = () => {
 	const isLunchTime = useIsLunchTime()
 	useNightMode()
 	useReloadOnNewBuild()
+	useNightlyReload()
 	const menusPoll = usePolling(loadMenus, 60 * 60 * 1000)
 	const tiedotePoll = usePolling(loadTiedote, 60 * 60 * 1000)
 	const slidesPoll = usePolling(loadSlides, 5 * 60 * 1000)
