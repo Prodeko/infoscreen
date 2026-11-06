@@ -14,8 +14,8 @@ type SidebarDeparturesProps = {
 }
 
 // Rail only: the metro from Aalto-yliopisto and tram 15 from Maari, the next
-// two departures one can still walk to in each direction. Buses are on the
-// HSL slide.
+// two departures in each direction, whether or not one can walk there in
+// time. Buses are on the HSL slide.
 const RAIL_MODES = ['SUBWAY', 'TRAM']
 const PER_DIRECTION = 2
 
@@ -33,7 +33,6 @@ const SidebarDepartures = ({ data, error }: SidebarDeparturesProps) => {
 
 	const departures = getHslDepartures(data, HSL_ALL_ALIASES, {
 		fromUnix: Math.floor(Date.now() / 1000),
-		reachableOnly: true,
 	}).filter((departure) => RAIL_MODES.includes(departure.mode ?? ''))
 
 	// One row per line and direction, in the order of its next departure
