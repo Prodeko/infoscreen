@@ -1,5 +1,5 @@
-# Lints and builds every push and pull request. Deploying is manual, on the
-# Raspberry Pi; see README.md.
+# Lints and builds every push and pull request. The Pi pulls and builds master
+# itself; see README.md.
 
 on:
   push:
