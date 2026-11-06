@@ -130,6 +130,17 @@ build id there changes. `vite preview` serves the new files without a
 restart. Restart the service only after changing `.env` or `vite.config.ts`,
 which are read when it starts.
 
+The Pi updates itself every 8 hours: `scripts/update-pi.sh` pulls master and,
+if there is anything new, installs dependencies, builds, and restarts the
+service when `vite.config.ts`, `server/` or the dependencies changed. It runs
+from the `pi` user's crontab (`crontab -e`):
+
+```
+0 */8 * * * /home/pi/infoscreen/scripts/update-pi.sh >> /home/pi/infoscreen-update.log 2>&1
+```
+
+Run the script by hand to update right away.
+
 The API proxies in `vite.config.ts` are what make the data sources reachable,
 so the screen has to be served by `vite preview` (or `vite`), not as plain
 static files.

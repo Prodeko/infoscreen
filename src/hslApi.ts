@@ -224,6 +224,10 @@ const HSL_MODE_COLORS: Record<string, string> = {
 export const getModeColor = (mode: string | null) =>
 	(mode && HSL_MODE_COLORS[mode]) || null
 
+/** The headsign without its "via …" part: "Vuosaari via Rautatientori" is "Vuosaari". */
+export const shortHeadsign = (headsign: string) =>
+	headsign.replace(/\s+via\s.*$/i, '')
+
 export const formatHslTime = (departureUnix: number) =>
 	new Date(departureUnix * 1000).toLocaleTimeString('fi-FI', {
 		hour: '2-digit',
@@ -254,9 +258,6 @@ const STATION_EXTRA_MINUTES = 2
 const NODE_TYPE_BY_ALIAS: Record<string, HSLNodeType> = Object.fromEntries(
 	HSL_QUERY_LOCATIONS.map((location) => [location.alias, location.nodeType]),
 )
-
-export const isStation = (alias: string) =>
-	NODE_TYPE_BY_ALIAS[alias] === 'station'
 
 const distanceMetres = (
 	a: { lat: number; lon: number },

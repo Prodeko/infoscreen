@@ -3,18 +3,29 @@ import {
 	getMinutesUntilDeparture,
 	HSL_ALL_ALIASES,
 	type HSLData,
-	isStation,
+	type HSLDeparture,
+	shortHeadsign,
 } from './hslApi'
 import LineBadge from './LineBadge'
 
 type SidebarDeparturesProps = {
 	data: HSLData | null
 	error?: string | null
+	// At most this many rows, the soonest first
+	maxRows?: number
 }
 
-const MAX_UPCOMING_STOPS = 5
+// Rail only: the metro from Aalto-yliopisto and tram 15 from Maari, the next
+// two departures in each direction, whether or not one can walk there in
+// time. Buses are on the HSL slide.
+const RAIL_MODES = ['SUBWAY', 'TRAM']
+const PER_DIRECTION = 2
 
-const SidebarDepartures = ({ data, error }: SidebarDeparturesProps) => {
+const SidebarDepartures = ({
+	data,
+	error,
+	maxRows = Number.POSITIVE_INFINITY,
+}: SidebarDeparturesProps) => {
 	if (!data) {
 		return (
 			<div className="bg-white rounded-lg shadow-md p-3 text-left">
@@ -26,57 +37,50 @@ const SidebarDepartures = ({ data, error }: SidebarDeparturesProps) => {
 		)
 	}
 
-	const nowUnix = Math.floor(Date.now() / 1000)
 	const departures = getHslDepartures(data, HSL_ALL_ALIASES, {
-		fromUnix: nowUnix,
-		reachableOnly: true,
-	})
-	// The next departure from each stop, and from the metro station the next
-	// train in each direction. The station is the longest walk, so its trains
-	// would never make the nearest few; they always get their rows.
-	const nextDepartureByStop = new Map<string, (typeof departures)[number]>()
+		fromUnix: Math.floor(Date.now() / 1000),
+	}).filter((departure) => RAIL_MODES.includes(departure.mode ?? ''))
 
+	// One row per line and direction, in the order of its next departure
+	const rows = new Map<string, HSLDeparture[]>()
 	for (const departure of departures) {
-		const key = isStation(departure.alias)
-			? `${departure.alias}-${departure.direction}`
-			: departure.alias
-		if (!nextDepartureByStop.has(key)) {
-			nextDepartureByStop.set(key, departure)
+		const key = `${departure.alias}-${departure.line}-${departure.direction}`
+		const row = rows.get(key)
+		if (!row) {
+			if (rows.size < maxRows) {
+				rows.set(key, [departure])
+			}
+		} else if (row.length < PER_DIRECTION) {
+			row.push(departure)
 		}
 	}
-
-	const next = Array.from(nextDepartureByStop.values())
-	const metro = next.filter((departure) => isStation(departure.alias))
-	const nextStops = [
-		...metro,
-		...next
-			.filter((departure) => !isStation(departure.alias))
-			.slice(0, MAX_UPCOMING_STOPS - metro.length),
-	].sort((a, b) => a.departureUnix - b.departureUnix)
 
 	return (
 		<div className="bg-white rounded-lg shadow-md p-3 text-left">
 			<h2 className="text-2xl font-semibold mb-2">Lähdöt</h2>
-			{nextStops.length > 0 ? (
+			{rows.size > 0 ? (
 				<div className="space-y-1">
-					{nextStops.map((departure) => (
+					{Array.from(rows.values()).map(([next, ...later]) => (
 						<div
-							key={departure.id}
+							key={next.id}
 							className="grid grid-cols-[auto_1fr_auto] gap-2 items-center"
 						>
 							<LineBadge
-								line={departure.line}
-								mode={departure.mode}
-								className="text-sm px-2 py-1 min-w-[2.75rem]"
+								line={next.line}
+								mode={next.mode}
+								className="text-sm px-1.5 py-0.5 min-w-[2.5rem]"
 							/>
-							<div className="min-w-0">
-								<p className="text-sm truncate">{departure.stopName}</p>
-								<p className="text-xs text-stone-500 truncate">
-									{departure.headsign}
-								</p>
-							</div>
+							<p className="text-sm leading-tight min-w-0 break-words">
+								{shortHeadsign(next.headsign)}
+							</p>
 							<p className="text-sm font-mono text-right whitespace-nowrap">
-								{getMinutesUntilDeparture(departure.departureUnix)} min
+								{getMinutesUntilDeparture(next.departureUnix)}
+								{later.map((departure) => (
+									<span key={departure.id} className="text-stone-400">
+										, {getMinutesUntilDeparture(departure.departureUnix)}
+									</span>
+								))}{' '}
+								min
 							</p>
 						</div>
 					))}

@@ -4,11 +4,13 @@ import {
 	getGroupWalkMinutes,
 	getHslAlerts,
 	getHslDepartures,
+	getWalkMinutes,
 	HSL_ALL_ALIASES,
 	HSL_GROUPS,
 	HSL_MAX_GROUP_DEPARTURES,
 	type HSLData,
 	type HSLDeparture,
+	shortHeadsign,
 } from './hslApi'
 import LineBadge from './LineBadge'
 
@@ -24,8 +26,8 @@ const getGroupDepartures = (
 	aliases: readonly string[],
 ): HSLDeparture[] =>
 	getHslDepartures(data, aliases, {
+		fromUnix: Math.floor(Date.now() / 1000),
 		limit: HSL_MAX_GROUP_DEPARTURES,
-		reachableOnly: true,
 	})
 
 const Hsl = ({ data, error }: HSLSlideProps) => {
@@ -48,6 +50,12 @@ const Hsl = ({ data, error }: HSLSlideProps) => {
 				{HSL_GROUPS.map((group) => {
 					const departures = getGroupDepartures(data, group.aliases)
 					const walkMinutes = getGroupWalkMinutes(data, group.aliases)
+					// Every departure is listed; the ones that leave before one could
+					// walk to the stop are greyed out
+					const nowUnix = Date.now() / 1000
+					const missed = (departure: HSLDeparture) =>
+						departure.departureUnix <
+						nowUnix + (getWalkMinutes(data, departure.alias) ?? 0) * 60
 
 					return (
 						<div
@@ -67,14 +75,18 @@ const Hsl = ({ data, error }: HSLSlideProps) => {
 									departures.map((departure) => (
 										<div
 											key={departure.id}
-											className="grid grid-cols-[auto_1fr_auto] items-center gap-3 border-b border-stone-100 pb-2 last:border-b-0"
+											className={`grid grid-cols-[auto_1fr_auto] items-center gap-3 border-b border-stone-100 pb-2 last:border-b-0 ${
+												missed(departure) ? 'opacity-40' : ''
+											}`}
 										>
 											<LineBadge
 												line={departure.line}
 												mode={departure.mode}
 												className="text-lg px-2 min-w-[3.5rem]"
 											/>
-											<p className="text-lg truncate">{departure.headsign}</p>
+											<p className="text-lg truncate">
+												{shortHeadsign(departure.headsign)}
+											</p>
 											<p className="text-lg font-mono font-semibold">
 												{formatHslDepartureDisplay(departure.departureUnix)}
 											</p>
