@@ -11,6 +11,8 @@ import LineBadge from './LineBadge'
 type SidebarDeparturesProps = {
 	data: HSLData | null
 	error?: string | null
+	// At most this many rows, the soonest first
+	maxRows?: number
 }
 
 // Rail only: the metro from Aalto-yliopisto and tram 15 from Maari, the next
@@ -19,7 +21,11 @@ type SidebarDeparturesProps = {
 const RAIL_MODES = ['SUBWAY', 'TRAM']
 const PER_DIRECTION = 2
 
-const SidebarDepartures = ({ data, error }: SidebarDeparturesProps) => {
+const SidebarDepartures = ({
+	data,
+	error,
+	maxRows = Number.POSITIVE_INFINITY,
+}: SidebarDeparturesProps) => {
 	if (!data) {
 		return (
 			<div className="bg-white rounded-lg shadow-md p-3 text-left">
@@ -39,10 +45,13 @@ const SidebarDepartures = ({ data, error }: SidebarDeparturesProps) => {
 	const rows = new Map<string, HSLDeparture[]>()
 	for (const departure of departures) {
 		const key = `${departure.alias}-${departure.line}-${departure.direction}`
-		const row = rows.get(key) ?? []
-		if (row.length < PER_DIRECTION) {
+		const row = rows.get(key)
+		if (!row) {
+			if (rows.size < maxRows) {
+				rows.set(key, [departure])
+			}
+		} else if (row.length < PER_DIRECTION) {
 			row.push(departure)
-			rows.set(key, row)
 		}
 	}
 

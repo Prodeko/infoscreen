@@ -9,7 +9,7 @@ import Hsl from './Hsl'
 import McKinseyLogo from './McKinseyLogo'
 import { Menu } from './Menu'
 import Namukilke, { type NamuStats } from './Namukilke'
-import NowPlaying from './NowPlaying'
+import NowPlaying, { loadNowPlaying } from './NowPlaying'
 import PterIdeas, { type PterIdea } from './PterIdeas'
 import RainMap from './RainMap'
 import Rotator from './Rotator'
@@ -237,6 +237,7 @@ const App = () => {
 	useReloadOnNewBuild()
 	useNightlyReload()
 	const menusPoll = usePolling(loadMenus, 60 * 60 * 1000)
+	const nowPlayingPoll = usePolling(loadNowPlaying, 10 * 1000)
 	const tiedotePoll = usePolling(loadTiedote, 60 * 60 * 1000)
 	const slidesPoll = usePolling(loadSlides, 5 * 60 * 1000)
 	const countdownsPoll = usePolling(loadCountdowns, 5 * 60 * 1000)
@@ -393,9 +394,15 @@ const App = () => {
 			<div className="bg-stone-100 h-full text-center flex flex-col gap-3 shadow-md p-3">
 				<Time />
 				<Weather />
-				<SidebarDepartures data={hsl} error={hslPoll.error} />
+				{/* The sidebar fits the screen exactly, so the song card takes the
+				    room of two departure rows */}
+				<SidebarDepartures
+					data={hsl}
+					error={hslPoll.error}
+					maxRows={nowPlayingPoll.data ? 4 : undefined}
+				/>
 				<Coffee />
-				<NowPlaying />
+				<NowPlaying data={nowPlayingPoll.data} />
 				<div className="mt-auto">
 					<Viewers />
 				</div>
