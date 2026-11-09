@@ -1,7 +1,7 @@
 #!/bin/sh
 # Brings the Pi up to date with master: pulls, and if anything changed,
 # installs dependencies and builds. The screen reloads itself on a new build.
-# Cron runs this every 8 hours; see README.md.
+# Cron runs this every hour; see README.md.
 set -e
 
 # In braces so sh reads it all before git pull can change this file
