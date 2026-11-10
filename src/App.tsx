@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import Bamskit from './Bamskit'
+import Bamskit, { isOnlyBamskit } from './Bamskit'
 import Biliskilke, { type BilisStats } from './Biliskilke'
 import Coffee from './Coffee'
 import Countdown, { type CountdownEntry, getNextCountdown } from './Countdown'
@@ -311,88 +311,94 @@ const App = () => {
 	return (
 		<main className="grid grid-rows-1 grid-cols-[8fr_1fr] h-screen">
 			<div className="h-full p-4">
-				<Rotator defaultRotationInterval={10000}>
-					{isLunchTime && (
-						<Menu
-							rotationInterval={30000}
-							todaysMenus={todaysMenus}
-							{...freshness(menusPoll)}
-						/>
-					)}
-					{slides && slides.length > 0 && (
-						<Slides
-							slides={slides}
-							rotationInterval={15000}
-							{...freshness(slidesPoll)}
-						/>
-					)}
-					{signups &&
-						(signups.open.length > 0 || signups.upcoming.length > 0) && (
-							<Signups
-								signups={signups}
-								rotationInterval={20000}
-								{...freshness(signupsPoll)}
+				{isOnlyBamskit() ? (
+					<Rotator>
+						<Bamskit />
+					</Rotator>
+				) : (
+					<Rotator defaultRotationInterval={10000}>
+						{isLunchTime && (
+							<Menu
+								rotationInterval={30000}
+								todaysMenus={todaysMenus}
+								{...freshness(menusPoll)}
 							/>
 						)}
-					{election && (
-						<Elections
-							election={election}
-							rotationInterval={20000}
-							{...freshness(electionPoll)}
-						/>
-					)}
-					{allTiedoteMessages && allTiedoteMessages.length > 0 && (
-						<Tiedote
-							messages={allTiedoteMessages}
-							rotationInterval={15000}
-							{...freshness(tiedotePoll)}
-						/>
-					)}
-					{getNextCountdown(countdownsPoll.data) && (
-						<Countdown
-							countdowns={countdownsPoll.data}
-							rotationInterval={10000}
-						/>
-					)}
-					{weekEvents && weekEvents.events.length > 0 && (
-						<WeekCalendar
-							events={weekEvents.events}
-							failedCalendars={weekEvents.failed}
-							rotationInterval={20000}
-							{...freshness(weekEventsPoll)}
-						/>
-					)}
-					{pterIdeas && pterIdeas.length > 0 && (
-						<PterIdeas
-							ideas={pterIdeas}
-							rotationInterval={15000}
-							{...freshness(pterPoll)}
-						/>
-					)}
-					{namuPoll.data &&
-						(namuPoll.data.topProducts.length > 0 ||
-							namuPoll.data.topWishes.length > 0) && (
-							<Namukilke
-								stats={namuPoll.data}
+						{slides && slides.length > 0 && (
+							<Slides
+								slides={slides}
 								rotationInterval={15000}
-								{...freshness(namuPoll)}
+								{...freshness(slidesPoll)}
 							/>
 						)}
-					{bilisPoll.data && bilisPoll.data.overall.length > 0 && (
-						<Biliskilke
-							stats={bilisPoll.data}
-							rotationInterval={20000}
-							{...freshness(bilisPoll)}
-						/>
-					)}
-					<Hsl data={hsl} rotationInterval={15000} {...freshness(hslPoll)} />
-					{/* <RainMap rotationInterval={15000} /> */}
-					{Object.keys(quotesById).length > 0 && (
-						<Stocks quotesById={quotesById} rotationInterval={20000} />
-					)}
-					<Bamskit rotationInterval={10000} />
-					<McKinseyLogo rotationInterval={5000} />
-				</Rotator>
+						{signups &&
+							(signups.open.length > 0 || signups.upcoming.length > 0) && (
+								<Signups
+									signups={signups}
+									rotationInterval={20000}
+									{...freshness(signupsPoll)}
+								/>
+							)}
+						{election && (
+							<Elections
+								election={election}
+								rotationInterval={20000}
+								{...freshness(electionPoll)}
+							/>
+						)}
+						{allTiedoteMessages && allTiedoteMessages.length > 0 && (
+							<Tiedote
+								messages={allTiedoteMessages}
+								rotationInterval={15000}
+								{...freshness(tiedotePoll)}
+							/>
+						)}
+						{getNextCountdown(countdownsPoll.data) && (
+							<Countdown
+								countdowns={countdownsPoll.data}
+								rotationInterval={10000}
+							/>
+						)}
+						{weekEvents && weekEvents.events.length > 0 && (
+							<WeekCalendar
+								events={weekEvents.events}
+								failedCalendars={weekEvents.failed}
+								rotationInterval={20000}
+								{...freshness(weekEventsPoll)}
+							/>
+						)}
+						{pterIdeas && pterIdeas.length > 0 && (
+							<PterIdeas
+								ideas={pterIdeas}
+								rotationInterval={15000}
+								{...freshness(pterPoll)}
+							/>
+						)}
+						{namuPoll.data &&
+							(namuPoll.data.topProducts.length > 0 ||
+								namuPoll.data.topWishes.length > 0) && (
+								<Namukilke
+									stats={namuPoll.data}
+									rotationInterval={15000}
+									{...freshness(namuPoll)}
+								/>
+							)}
+						{bilisPoll.data && bilisPoll.data.overall.length > 0 && (
+							<Biliskilke
+								stats={bilisPoll.data}
+								rotationInterval={20000}
+								{...freshness(bilisPoll)}
+							/>
+						)}
+						<Hsl data={hsl} rotationInterval={15000} {...freshness(hslPoll)} />
+						{/* <RainMap rotationInterval={15000} /> */}
+						{Object.keys(quotesById).length > 0 && (
+							<Stocks quotesById={quotesById} rotationInterval={20000} />
+						)}
+						<Bamskit rotationInterval={10000} />
+						<McKinseyLogo rotationInterval={5000} />
+					</Rotator>
+				)}
 			</div>
 			<div className="bg-stone-100 h-full text-center flex flex-col gap-3 shadow-md p-3">
 				<Time />
