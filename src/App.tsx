@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import Bamskit from './Bamskit'
 import Biliskilke, { type BilisStats } from './Biliskilke'
 import Coffee from './Coffee'
 import Countdown, { type CountdownEntry, getNextCountdown } from './Countdown'
@@ -389,6 +390,7 @@ const App = () => {
 					{Object.keys(quotesById).length > 0 && (
 						<Stocks quotesById={quotesById} rotationInterval={20000} />
 					)}
+					<Bamskit rotationInterval={10000} />
 					<McKinseyLogo rotationInterval={5000} />
 				</Rotator>
 			</div>
