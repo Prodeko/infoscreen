@@ -11,7 +11,8 @@ import { Menu } from './Menu'
 import Namukilke, { type NamuStats } from './Namukilke'
 import NowPlaying, { loadNowPlaying } from './NowPlaying'
 import PterIdeas, { type PterIdea } from './PterIdeas'
-import RainMap from './RainMap'
+// Rain radar hidden for now; uncomment this and the slide below to bring it back
+// import RainMap from './RainMap'
 import Rotator from './Rotator'
 import SidebarDepartures from './SidebarDepartures'
 import Signups, { type Signups as SignupsData } from './Signups'
@@ -384,7 +385,7 @@ const App = () => {
 						/>
 					)}
 					<Hsl data={hsl} rotationInterval={15000} {...freshness(hslPoll)} />
-					<RainMap rotationInterval={15000} />
+					{/* <RainMap rotationInterval={15000} /> */}
 					{Object.keys(quotesById).length > 0 && (
 						<Stocks quotesById={quotesById} rotationInterval={20000} />
 					)}
