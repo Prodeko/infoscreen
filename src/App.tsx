@@ -19,6 +19,10 @@ import SidebarDepartures from './SidebarDepartures'
 import Signups, { type Signups as SignupsData } from './Signups'
 import Slides from './Slides'
 import Stocks, { useAutoRefreshingStocks } from './Stocks'
+import TelegramPost, {
+	isRecentTelegramPost,
+	loadTelegramPost,
+} from './TelegramPost'
 import Tiedote from './Tiedote'
 import type {
 	Menu as MenuType,
@@ -246,6 +250,7 @@ const App = () => {
 	const weekEventsPoll = usePolling(loadWeekEvents, 60 * 60 * 1000)
 	const pterPoll = usePolling(loadPterIdeas, 10 * 60 * 1000)
 	const signupsPoll = usePolling(loadSignups, 5 * 60 * 1000)
+	const telegramPoll = usePolling(loadTelegramPost, 5 * 60 * 1000)
 	const electionPoll = usePolling(loadElection, 10 * 60 * 1000)
 	const namuPoll = usePolling(loadNamuStats, 10 * 60 * 1000)
 	const bilisPoll = usePolling(loadBilisStats, 2 * 60 * 1000)
@@ -344,6 +349,14 @@ const App = () => {
 								election={election}
 								rotationInterval={20000}
 								{...freshness(electionPoll)}
+							/>
+						)}
+						{telegramPoll.data && isRecentTelegramPost(telegramPoll.data) && (
+							<TelegramPost
+								key={telegramPoll.data.url}
+								post={telegramPoll.data}
+								rotationInterval={15000}
+								{...freshness(telegramPoll)}
 							/>
 						)}
 						{allTiedoteMessages && allTiedoteMessages.length > 0 && (
