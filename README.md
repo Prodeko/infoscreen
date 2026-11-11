@@ -14,6 +14,7 @@ The main area rotates through these slides:
 | Event sign-ups: open now and opening soon | [Ilmo](https://ilmo.prodeko.org) | Read on the server by `server/ilmoSignups.ts`, see the comment there. Hidden when there are none |
 | The open election: application count and the newest applications | [vaalit.prodeko.org](https://vaalit.prodeko.org) | Shown only while an election is open |
 | Countdown to the next big event | `prodeko.org/fi/infoscreen-countdowns.json` | Edited at prodeko.org/admin → Infoscreen → Laskurit. Hidden when none is ahead |
+| The newest post on Prodeko's Telegram announcement channel | The channel's public web page, [t.me/s/prodekotiedotus](https://t.me/s/prodekotiedotus) | Read on the server by `server/telegram.ts`; no bot or key. Shows the Finnish part of a bilingual post. Hidden when the newest post is over two weeks old |
 | Weekly bulletin (viikkotiedote) | viikkotiedote API on old.prodeko.org (the old Django site) | Hidden when there is nothing to show |
 | This week's events from the guild's Google calendars (Tapahtumat, Yleiset, Excut, Fuksit, PoRa) | Public iCalendar feeds | Calendars are listed in `src/calendarApi.ts`. Hidden when the week has no events |
 | Namukilke: this week's most bought products and the most liked open wishes | namu2's `/api/infoscreen` | Needs `NAMU_INFOSCREEN_KEY`, the same value as namu2's `INFOSCREEN_API_KEY`. Hidden without it |
