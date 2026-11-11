@@ -101,6 +101,9 @@ const loadSignups = async (): Promise<SignupsData> => {
 	}
 }
 
+// The elections slide is hidden for now; set to true to bring it back
+const SHOW_ELECTIONS = false
+
 // The open election, or null outside election season
 const loadElection = async () => {
 	const elections = await fetchJson<Array<{ id: number; state: string }>>(
@@ -344,7 +347,7 @@ const App = () => {
 									{...freshness(signupsPoll)}
 								/>
 							)}
-						{election && (
+						{SHOW_ELECTIONS && election && (
 							<Elections
 								election={election}
 								rotationInterval={20000}
