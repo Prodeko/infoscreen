@@ -17,8 +17,11 @@ set -e
 	fi
 
 	echo "$(date): updating $old -> $new"
+	# npm install on the Pi rewrites the lockfile, which would stop the merge.
+	# npm ci below installs from it without touching it.
+	git checkout -- package-lock.json
 	git merge -q --ff-only origin/master
-	npm install --no-audit --no-fund
+	npm ci --no-audit --no-fund
 	npm run build
 
 	# The service reads these only when it starts

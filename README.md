@@ -104,9 +104,13 @@ token has probably been revoked: run step 3 again.
 SSH into the Raspberry Pi (who has access, and how, is kept in the board's own documents, not in this public repo), pull the new contents of the repo and run:
 
 ```
-npm install
+npm ci
 npm run build
 ```
+
+Use `npm ci`, not `npm install`: on the Pi, `npm install` rewrites
+`package-lock.json`, and the next `git pull` then refuses to run. If that has
+happened, `git checkout -- package-lock.json` undoes it.
 
 Create a `.env` file in the project root first:
 
