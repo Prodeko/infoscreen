@@ -12,7 +12,9 @@ set -e
 	git fetch -q origin master
 	old=$(git rev-parse HEAD)
 	new=$(git rev-parse origin/master)
-	if [ "$old" = "$new" ]; then
+	# Nothing new, or on a branch such as sikajuhlat-only that already has
+	# everything in master
+	if git merge-base --is-ancestor "$new" "$old"; then
 		exit 0
 	fi
 
