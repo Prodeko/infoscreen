@@ -7,6 +7,7 @@ import { fetchWeekEvents, type WeekEvents } from './calendarApi'
 import Elections, { type VaaliElection } from './Elections'
 import { getFlagDays } from './flagDays'
 import Hsl from './Hsl'
+import Joulukalenteri, { JOULUKALENTERI_CHANNEL } from './Joulukalenteri'
 import McKinseyLogo from './McKinseyLogo'
 import { Menu } from './Menu'
 import Namukilke, { type NamuStats } from './Namukilke'
@@ -56,6 +57,8 @@ const loadMenus = async () => {
 	}
 	return { menus, restaurants }
 }
+
+const loadJoulukalenteri = () => loadTelegramPost(JOULUKALENTERI_CHANNEL)
 
 const loadTiedote = () => fetchJson<TiedoteCategory[]>('/tiedoteproxy/content/')
 
@@ -254,6 +257,7 @@ const App = () => {
 	const pterPoll = usePolling(loadPterIdeas, 10 * 60 * 1000)
 	const signupsPoll = usePolling(loadSignups, 5 * 60 * 1000)
 	const telegramPoll = usePolling(loadTelegramPost, 5 * 60 * 1000)
+	const joulukalenteriPoll = usePolling(loadJoulukalenteri, 5 * 60 * 1000)
 	const electionPoll = usePolling(loadElection, 10 * 60 * 1000)
 	const namuPoll = usePolling(loadNamuStats, 10 * 60 * 1000)
 	const bilisPoll = usePolling(loadBilisStats, 2 * 60 * 1000)
@@ -359,6 +363,15 @@ const App = () => {
 									{...freshness(telegramPoll)}
 								/>
 							)}
+							{joulukalenteriPoll.data &&
+								isRecentTelegramPost(joulukalenteriPoll.data) && (
+									<Joulukalenteri
+										key={joulukalenteriPoll.data.url}
+										post={joulukalenteriPoll.data}
+										rotationInterval={20000}
+										{...freshness(joulukalenteriPoll)}
+									/>
+								)}
 							{allTiedoteMessages && allTiedoteMessages.length > 0 && (
 								<Tiedote
 									messages={allTiedoteMessages}
