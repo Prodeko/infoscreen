@@ -2,7 +2,8 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import QrLink from './QrLink'
 
 // The newest post on Prodeko's Telegram announcement channel, from
-// /api/telegram-latest (server/telegram.ts).
+// /api/telegram-latest (server/telegram.ts). loadTelegramPost and the type
+// are shared with the advent calendar slide (Joulukalenteri.tsx).
 
 // Same shape as TelegramPost in server/telegram.ts
 export type TelegramPostData = {
@@ -10,13 +11,17 @@ export type TelegramPostData = {
 	date: string
 	url: string
 	image: string | null
+	video: string | null
+	poster: string | null
 }
 
 // Older posts are hidden: the slide is for what's current
 export const TELEGRAM_MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000
 
-export const loadTelegramPost = async (): Promise<TelegramPostData | null> => {
-	const response = await fetch('/api/telegram-latest')
+export const loadTelegramPost = async (
+	channel = 'prodekotiedotus',
+): Promise<TelegramPostData | null> => {
+	const response = await fetch(`/api/telegram-latest?channel=${channel}`)
 	// 204: no text post found on the channel page
 	if (response.status === 204) {
 		return null
